@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:lumilivre_app/utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,13 +13,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _userController = TextEditingController();
   final _passwordController = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
-
   bool _isLoading = false;
 
   void _handleLogin() {
-    // logica login aqui
     print('Usuário: ${_userController.text}');
     print('Senha: ${_passwordController.text}');
   }
@@ -34,40 +34,77 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  // TODO: logo aqui
-                  const SizedBox(height: 48.0),
+                  SvgPicture.asset(
+                    'assets/icons/logo.svg',
+                    height: 200,
+                    semanticsLabel: 'Logo LumiLivre',
+                  ),
+                  const Text(
+                    'LumiLivre',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: LumiLivreTheme.text,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
 
-                  // campo de usuario
                   TextFormField(
                     controller: _userController,
                     decoration: const InputDecoration(
                       labelText: 'Matrícula ou Email',
-                      border: OutlineInputBorder(),
+                      hintText: 'Digite seu usuário',
+                      prefixIcon: Icon(Icons.person_outline),
                     ),
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  const SizedBox(height: 16.0),
+                  const SizedBox(height: 16),
 
-                  // campo de senha
                   TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
                       labelText: 'Senha',
-                      border: OutlineInputBorder(),
+                      hintText: 'Digite sua senha',
+                      prefixIcon: Icon(Icons.lock_outline),
                     ),
                     obscureText: true,
                   ),
-                  const SizedBox(height: 24.0),
+                  const SizedBox(height: 24),
 
-                  // botão entrar
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    ),
                     child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('ENTRAR'),
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : const Text(
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            'ENTRAR',
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: () {
+                        // TODO: tela de esqueci a senha
+                        print('Clicou em esqueci a senha');
+                      },
+                      child: const Text(
+                        'Esqueceu sua senha?',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
                   ),
                 ],
               ),
