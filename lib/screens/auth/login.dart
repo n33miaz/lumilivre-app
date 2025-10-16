@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 import 'package:lumilivre_app/screens/auth/forgot_password.dart';
+import 'package:lumilivre_app/providers/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -56,14 +58,10 @@ class _LoginScreenState extends State<LoginScreen>
       });
 
       try {
-        final response = await _apiService.login(
-          _userController.text,
-          _passwordController.text,
-        );
-
-        print('Login com sucesso! Token: ${response.token}');
-
-        // TODO: salvar o token e navegar para a tela Home
+        await Provider.of<AuthProvider>(
+          context,
+          listen: false,
+        ).login(_userController.text, _passwordController.text);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -72,9 +70,9 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
     }
   }
@@ -110,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
                             color: LumiLivreTheme.text,
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 25),
                         TextFormField(
                           controller: _userController,
                           decoration: const InputDecoration(
@@ -133,21 +131,29 @@ class _LoginScreenState extends State<LoginScreen>
                               v!.isEmpty ? 'Digite sua senha' : null,
                         ),
 
-                        SwitchListTile(
-                          title: const Text(
-                            'Continuar Conectado',
-                            style: TextStyle(color: Colors.grey),
+                        Theme(
+                          data: ThemeData(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
                           ),
-                          value: _keepConnected,
-                          onChanged: (bool value) {
-                            setState(() {
-                              _keepConnected = value;
-                            });
-                          },
-                          activeColor: LumiLivreTheme.primary,
-                          contentPadding: EdgeInsets.zero,
+                          child: SwitchListTile(
+                            title: const Text(
+                              'Continuar Conectado',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                              ),
+                            ),
+                            value: _keepConnected,
+                            onChanged: (bool value) {
+                              setState(() {
+                                _keepConnected = value;
+                              });
+                            },
+                            activeColor: LumiLivreTheme.primary,
+                            contentPadding: EdgeInsets.zero,
+                          ),
                         ),
-                        const SizedBox(height: 12),
 
                         ElevatedButton(
                           onPressed: _isLoading ? null : _handleLogin,
@@ -168,12 +174,14 @@ class _LoginScreenState extends State<LoginScreen>
                                   'ENTRAR',
                                 ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         OutlinedButton(
                           onPressed: () {
-                            // TODO: lógica de convidado
-                            print('Entrar como convidado');
+                            Provider.of<AuthProvider>(
+                              context,
+                              listen: false,
+                            ).loginAsGuest();
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.grey[600],
@@ -185,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           child: const Text('ENTRAR COMO CONVIDADO'),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 4),
                         Align(
                           alignment: Alignment.center,
                           child: TextButton(
@@ -214,15 +222,9 @@ class _LoginScreenState extends State<LoginScreen>
           Positioned(
             left: 16,
             bottom: 16,
+            // backgroundColor: Colors.grey, // ajustar (bg cinza e ao clickar no botão fica cinza mais escuro)
             child: IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/moon.svg',
-                height: 28,
-                colorFilter: const ColorFilter.mode(
-                  LumiLivreTheme.text,
-                  BlendMode.srcIn,
-                ),
-              ),
+              icon: SvgPicture.asset('assets/icons/moon.svg', height: 28),
               onPressed: () {
                 // TODO: lógica troca de tema
                 print('Trocar tema');
