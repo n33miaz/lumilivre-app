@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre_app/services/api.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -11,14 +11,35 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _apiService = ApiService();
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  void _handleRequestReset() {
-    // TODO: implementar chamada a API
+  // considerar valição e alteração de senha pela web
+  void _handleRequestReset() async {
     if (_formKey.currentState?.validate() ?? false) {
-      print('Solicitando reset para: ${_emailController.text}');
+      setState(() => _isLoading = true);
+      try {
+        final message = await _apiService.requestPasswordReset(
+          _emailController.text,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
+        );
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) Navigator.of(context).pop();
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -29,7 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: LumiLivreTheme.text),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -51,7 +72,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: LumiLivreTheme.text,
                     ),
                   ),
                   const SizedBox(height: 8),

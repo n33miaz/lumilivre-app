@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 import 'package:lumilivre_app/screens/auth/forgot_password.dart';
 import 'package:lumilivre_app/providers/auth.dart';
+import 'package:lumilivre_app/providers/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +17,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _apiService = ApiService();
   final _userController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -105,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen>
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
-                            color: LumiLivreTheme.text,
                           ),
                         ),
                         const SizedBox(height: 25),
@@ -186,9 +184,9 @@ class _LoginScreenState extends State<LoginScreen>
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.grey[600],
                             side: BorderSide(color: Colors.grey.shade400),
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           child: const Text('ENTRAR COMO CONVIDADO'),
@@ -219,17 +217,50 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
 
-          Positioned(
-            left: 16,
-            bottom: 16,
-            // backgroundColor: Colors.grey, // ajustar (bg cinza e ao clickar no botão fica cinza mais escuro)
-            child: IconButton(
-              icon: SvgPicture.asset('assets/icons/moon.svg', height: 28),
-              onPressed: () {
-                // TODO: lógica troca de tema
-                print('Trocar tema');
-              },
-            ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              final buttonBackgroundColor = themeProvider.isDarkMode
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300;
+
+              return Positioned(
+                left: 16,
+                bottom: 16,
+                child: Material(
+                  color: buttonBackgroundColor,
+                  borderRadius: BorderRadius.circular(50),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(50),
+                    onTap: () {
+                      themeProvider.toggleTheme();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                        child: SvgPicture.asset(
+                          themeProvider.isDarkMode
+                              ? 'assets/icons/sun.svg'
+                              : 'assets/icons/moon.svg',
+                          key: ValueKey(themeProvider.isDarkMode),
+                          height: 28,
+                          colorFilter: ColorFilter.mode(
+                            Theme.of(context).iconTheme.color!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
