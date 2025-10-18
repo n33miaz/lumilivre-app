@@ -41,3 +41,4 @@ app.*.map.json
 
 .dart_tool
 .idea
+.vscode
