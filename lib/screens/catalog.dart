@@ -3,17 +3,16 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre_app/providers/auth.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class CatalogScreen extends StatelessWidget {
+  const CatalogScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Acessa o AuthProvider para pegar os dados
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LumiLivre Catálogo'),
+        title: const Text('Catálogo de Livros'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -23,12 +22,10 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Text(
-          authProvider.isGuest
-              ? 'Bem-vindo, Convidado!'
-              : 'Bem-vindo, ${authProvider.user?.email ?? 'Usuário'}!',
-          style: const TextStyle(fontSize: 22),
+          'Conteúdo do Catálogo (Carrosséis de Livros)',
+          style: TextStyle(fontSize: 20),
         ),
       ),
     );

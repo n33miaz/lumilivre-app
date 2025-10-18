@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // http://api.lumilivre.com.br:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile)
-const String apiBaseUrl = 'http://10.0.2.2:8080';
+const String apiBaseUrl = 'http://localhost:8080';
 
 class LumiLivreTheme {
   // cores do tema claro
@@ -29,15 +29,15 @@ class LumiLivreTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 16),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.0),
-        borderSide: const BorderSide(color: primary, width: 2.0),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: primary, width: 2),
       ),
       labelStyle: const TextStyle(color: label),
     ),
@@ -56,20 +56,20 @@ class LumiLivreTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 16),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: darkCard,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.0),
-        borderSide: const BorderSide(color: primary, width: 2.0),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: primary, width: 2),
       ),
       labelStyle: const TextStyle(color: label),
     ),

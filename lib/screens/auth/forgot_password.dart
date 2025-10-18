@@ -16,7 +16,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  // considerar valição e alteração de senha pela web
   void _handleRequestReset() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
@@ -57,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
               key: _formKey,
               child: Column(

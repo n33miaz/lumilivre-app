@@ -5,13 +5,13 @@ import 'package:lumilivre_app/services/api.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final String? token;
-
   const ChangePasswordScreen({super.key, this.token});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
+// considerar valição e alteração de senha pela web
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();

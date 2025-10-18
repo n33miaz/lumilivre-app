@@ -3,9 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/screens/auth/login.dart';
-import 'package:lumilivre_app/screens/home.dart';
 import 'package:lumilivre_app/utils/constants.dart';
+
+import 'package:lumilivre_app/screens/auth/login.dart';
+import 'package:lumilivre_app/screens/navigator_bar.dart';
 
 void main() {
   runApp(
@@ -34,7 +35,7 @@ class LumiLivreApp extends StatelessWidget {
         themeMode: themeProvider.currentTheme,
 
         home: auth.isAuthenticated || auth.isGuest
-            ? const HomeScreen()
+            ? const MainNavigator()
             : const LoginScreen(),
       ),
     );

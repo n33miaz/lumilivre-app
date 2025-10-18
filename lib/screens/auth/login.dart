@@ -38,7 +38,6 @@ class _LoginScreenState extends State<LoginScreen>
       parent: _animationController,
       curve: Curves.easeIn,
     );
-    // Inicia a animação
     _animationController.forward();
   }
 
@@ -235,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen>
                       themeProvider.toggleTheme();
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(12),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, animation) {
