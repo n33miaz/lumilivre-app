@@ -12,7 +12,6 @@ class BookCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // lógica de animação
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
@@ -22,12 +21,10 @@ class BookCard extends StatelessWidget {
                   const begin = Offset(0.0, 1.0);
                   const end = Offset.zero;
                   const curve = Curves.ease;
-
                   final tween = Tween(
                     begin: begin,
                     end: end,
                   ).chain(CurveTween(curve: curve));
-
                   return SlideTransition(
                     position: animation.drive(tween),
                     child: child,
@@ -63,20 +60,42 @@ class BookCard extends StatelessWidget {
                     ),
                   );
                 },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 210,
+                    width: 140,
+                    color: Colors.grey[200],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              book.title,
-              maxLines: 2, 
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            Text(
-              book.author,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    book.title,
+                    maxLines: 2, 
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      height: 1.2, 
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    book.author,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

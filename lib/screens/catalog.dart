@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:lumilivre_app/models/book.dart';
 import 'package:lumilivre_app/providers/theme.dart';
+import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/utils/constants.dart';
-import 'package:lumilivre_app/utils/mock-data.dart';
 import 'package:lumilivre_app/widgets/book_carousel.dart';
 import 'package:lumilivre_app/widgets/category_selector.dart';
 
@@ -16,62 +17,30 @@ class CatalogScreen extends StatefulWidget {
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
-  String _selectedCategory = 'Principal';
+  final ApiService _apiService = ApiService();
+  Future<Map<String, List<Book>>>? _catalogFuture;
 
+  String _selectedCategory = 'Principal';
   final List<String> _categories = [
     'Principal',
     'Gêneros',
     "PDF's, TCC's e Comunicados",
   ];
 
-  Widget _buildCarousels() {
-    switch (_selectedCategory) {
-      case 'Gêneros':
-        return Column(
-          children: [
-            BookCarousel(title: 'Aventura', books: mockBooks.reversed.toList()),
-            BookCarousel(title: 'Romance', books: mockBooks),
-            BookCarousel(
-              title: 'Educativos',
-              books: mockBooks.reversed.toList(),
-            ),
-            BookCarousel(title: 'Suspense', books: mockBooks),
-            BookCarousel(
-              title: 'Biografia',
-              books: mockBooks.reversed.toList(),
-            ),
-            BookCarousel(title: 'Ficção Científica', books: mockBooks),
-          ],
-        );
-      case "PDF's, TCC's e Comunicados":
-        return Column(
-          children: [
-            BookCarousel(title: 'TCCs em Destaque', books: mockBooks),
-            BookCarousel(
-              title: 'Manuais e Apostilas',
-              books: mockBooks.reversed.toList(),
-            ),
-            BookCarousel(title: 'Comunicados da Biblioteca', books: mockBooks),
-          ],
-        );
-      case 'Principal':
-      default:
-        return Column(
-          children: [
-            BookCarousel(title: 'Recomendações', books: mockBooks),
-            BookCarousel(
-              title: 'Os mais vistos',
-              books: mockBooks.reversed.toList(),
-            ),
-            BookCarousel(title: 'Novidades', books: mockBooks),
-            BookCarousel(
-              title: 'Adicionados Recentemente',
-              books: mockBooks.reversed.toList(),
-            ),
-            BookCarousel(title: 'Clássicos da Literatura', books: mockBooks),
-          ],
-        );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _catalogFuture = _apiService.getCatalog();
+  }
+
+  Widget _buildCarousels(Map<String, List<Book>> catalogData) {
+    // os mesmos carrosséis em todas as categorias, por enquanto
+
+    final carousels = catalogData.entries.map((entry) {
+      return BookCarousel(title: entry.key, books: entry.value);
+    }).toList();
+
+    return Column(children: carousels);
   }
 
   @override
@@ -79,35 +48,54 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 170), // espaço começo dos carrosséis
-                // seletor de categorias
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: CategorySelector(
-                    categories: _categories,
-                    selectedCategory: _selectedCategory,
-                    onCategorySelected: (category) {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
-                    },
-                  ),
-                ),
+          FutureBuilder<Map<String, List<Book>>>(
+            future: _catalogFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Erro ao carregar catálogo: ${snapshot.error}'),
+                );
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text('Nenhum livro encontrado no catálogo.'),
+                );
+              }
 
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  child: _buildCarousels(),
-                ),
+              final catalogData = snapshot.data!;
 
-                // TODO: adicionar um botão que redireciona o usuário para a página de pesquisa
-                const SizedBox(height: 100), // espaço final dos carrosséis
-              ],
-            ),
+              // seletor de categorias
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 220),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 24.0),
+                      child: CategorySelector(
+                        categories: _categories,
+                        selectedCategory: _selectedCategory,
+                        onCategorySelected: (category) {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        },
+                      ),
+                    ),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: _buildCarousels(catalogData),
+                    ),
+
+                    // TODO: adicionar um botão que redireciona o usuário para a página de pesquisa
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              );
+            },
           ),
-
           _buildHeader(context),
         ],
       ),

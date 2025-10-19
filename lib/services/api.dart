@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/constants.dart';
 import '../models/user.dart';
+import '../models/book.dart';
 import '../models/book_details.dart';
 
 class ApiService {
@@ -88,6 +90,40 @@ class ApiService {
       }
     } catch (e) {
       print('Erro em changePasswordWithToken: $e');
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
+  Future<Map<String, List<Book>>> getCatalog() async {
+    final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+
+        Map<String, List<Book>> catalog = {};
+
+        for (var genreData in data) {
+          String genreName = genreData['nome'];
+          List<Book> books = (genreData['livros'] as List).map((bookData) {
+            return Book(
+              id: bookData['isbn'] ?? UniqueKey().toString(),
+              title: bookData['titulo'],
+              author: bookData['autor'],
+              imageUrl:
+                  bookData['imagem'] ??
+                  'https://via.placeholder.com/140x210.png?text=No+Image',
+            );
+          }).toList();
+          catalog[genreName] = books;
+        }
+        return catalog;
+      } else {
+        throw Exception('Falha ao carregar o catálogo.');
+      }
+    } catch (e) {
+      print('Erro em getCatalog: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
