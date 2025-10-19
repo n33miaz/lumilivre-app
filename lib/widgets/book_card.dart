@@ -1,62 +1,85 @@
 import 'package:flutter/material.dart';
 
-class BookCard extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String author;
+import 'package:lumilivre_app/models/book.dart';
+import 'package:lumilivre_app/screens/book_details.dart';
 
-  const BookCard({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.author,
-  });
+class BookCard extends StatelessWidget {
+  final Book book;
+
+  const BookCard({super.key, required this.book});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 140,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 4,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        // lógica de animação
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                BookDetailsScreen(book: book),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0);
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  final tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 140,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              elevation: 4,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Image.network(
+                book.imageUrl,
+                height: 210,
+                width: 140,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 210,
+                    width: 140,
+                    color: Colors.grey[300],
+                    child: const Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Colors.grey,
+                    ),
+                  );
+                },
+              ),
             ),
-            child: Image.asset(
-              imageUrl,
-              height: 210,
-              width: 140,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 210,
-                  width: 140,
-                  color: Colors.grey[300],
-                  child: const Icon(
-                    Icons.image_not_supported_outlined,
-                    color: Colors.grey,
-                  ),
-                );
-              },
+            const SizedBox(height: 8),
+            Text(
+              book.title,
+              maxLines: 2, 
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          Text(
-            author,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-          ),
-        ],
+            Text(
+              book.author,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+          ],
+        ),
       ),
     );
   }

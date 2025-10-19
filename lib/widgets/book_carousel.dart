@@ -46,11 +46,7 @@ class BookCarousel extends StatelessWidget {
               final book = books[index];
               return Padding(
                 padding: const EdgeInsets.only(right: 16.0),
-                child: BookCard(
-                  imageUrl: book.imageUrl,
-                  title: book.title,
-                  author: book.author,
-                ),
+                child: BookCard(book: book),
               );
             },
           ),

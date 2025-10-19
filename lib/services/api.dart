@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import '../utils/constants.dart';
 import '../models/user.dart';
+import '../models/book_details.dart';
 
 class ApiService {
   Future<LoginResponse> login(String user, String password) async {
@@ -87,6 +88,22 @@ class ApiService {
       }
     } catch (e) {
       print('Erro em changePasswordWithToken: $e');
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
+  Future<BookDetails> getBookDetails(String isbn) async {
+    final url = Uri.parse('$apiBaseUrl/livros/$isbn');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return bookDetailsFromJson(utf8.decode(response.bodyBytes));
+      } else {
+        throw Exception('Falha ao carregar detalhes do livro.');
+      }
+    } catch (e) {
+      print('Erro em getBookDetails: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }

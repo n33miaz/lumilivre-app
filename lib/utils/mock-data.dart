@@ -7,7 +7,7 @@ final List<Book> mockBooks = [
     id: '1',
     title: 'A Hipótese do Amor',
     author: 'Ali Hazelwood',
-    imageUrl: mock,
+    imageUrl: 'images/mock.png',
   ),
   Book(
     id: '2',
