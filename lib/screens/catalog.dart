@@ -4,23 +4,108 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:lumilivre_app/providers/theme.dart';
 import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre_app/utils/mock-data.dart';
+import 'package:lumilivre_app/widgets/book_carousel.dart';
+import 'package:lumilivre_app/widgets/category_selector.dart';
 
-class CatalogScreen extends StatelessWidget {
+class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
+
+  @override
+  State<CatalogScreen> createState() => _CatalogScreenState();
+}
+
+class _CatalogScreenState extends State<CatalogScreen> {
+  String _selectedCategory = 'Principal';
+
+  final List<String> _categories = [
+    'Principal',
+    'Gêneros',
+    "PDF's, TCC's e Comunicados",
+  ];
+
+  Widget _buildCarousels() {
+    switch (_selectedCategory) {
+      case 'Gêneros':
+        return Column(
+          children: [
+            BookCarousel(title: 'Aventura', books: mockBooks.reversed.toList()),
+            BookCarousel(title: 'Romance', books: mockBooks),
+            BookCarousel(
+              title: 'Educativos',
+              books: mockBooks.reversed.toList(),
+            ),
+            BookCarousel(title: 'Suspense', books: mockBooks),
+            BookCarousel(
+              title: 'Biografia',
+              books: mockBooks.reversed.toList(),
+            ),
+            BookCarousel(title: 'Ficção Científica', books: mockBooks),
+          ],
+        );
+      case "PDF's, TCC's e Comunicados":
+        return Column(
+          children: [
+            BookCarousel(title: 'TCCs em Destaque', books: mockBooks),
+            BookCarousel(
+              title: 'Manuais e Apostilas',
+              books: mockBooks.reversed.toList(),
+            ),
+            BookCarousel(title: 'Comunicados da Biblioteca', books: mockBooks),
+          ],
+        );
+      case 'Principal':
+      default:
+        return Column(
+          children: [
+            BookCarousel(title: 'Recomendações', books: mockBooks),
+            BookCarousel(
+              title: 'Os mais vistos',
+              books: mockBooks.reversed.toList(),
+            ),
+            BookCarousel(title: 'Novidades', books: mockBooks),
+            BookCarousel(
+              title: 'Adicionados Recentemente',
+              books: mockBooks.reversed.toList(),
+            ),
+            BookCarousel(title: 'Clássicos da Literatura', books: mockBooks),
+          ],
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          ListView(
-            padding: const EdgeInsets.only(top: 220),
-            children: const [
-              // TODO: carrosséis de livros
-              SizedBox(height: 20),
-              Center(child: Text("Carrosséis de Livros Virão Aqui")),
-              SizedBox(height: 100), // Espaço extra no final
-            ],
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 170), // espaço começo dos carrosséis
+                // seletor de categorias
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: CategorySelector(
+                    categories: _categories,
+                    selectedCategory: _selectedCategory,
+                    onCategorySelected: (category) {
+                      setState(() {
+                        _selectedCategory = category;
+                      });
+                    },
+                  ),
+                ),
+
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: _buildCarousels(),
+                ),
+
+                // TODO: adicionar um botão que redireciona o usuário para a página de pesquisa
+                const SizedBox(height: 100), // espaço final dos carrosséis
+              ],
+            ),
           ),
 
           _buildHeader(context),
@@ -33,72 +118,69 @@ class CatalogScreen extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Container(
-      height: 200,
+      height: 160,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Container(
-            height: 160,
-            decoration: const BoxDecoration(
-              color: LumiLivreTheme.label,
-              borderRadius: BorderRadius.only(
+            height: 120,
+            decoration: BoxDecoration(
+              color: LumiLivreTheme.label.withOpacity(0.8),
+              borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
               ),
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Material(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(50),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(50),
-                          onTap: () => themeProvider.toggleTheme(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SvgPicture.asset(
-                              themeProvider.isDarkMode
-                                  ? 'assets/icons/sun.svg'
-                                  : 'assets/icons/moon.svg',
-                              height: 24,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.white,
-                                BlendMode.srcIn,
-                              ),
-                            ),
+                  Material(
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(50),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () => themeProvider.toggleTheme(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SvgPicture.asset(
+                          themeProvider.isDarkMode
+                              ? 'assets/icons/sun.svg'
+                              : 'assets/icons/moon.svg',
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
                           ),
                         ),
                       ),
-                      // Título
-                      const Text(
-                        'LumiLivre',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 40),
-                    ],
+                    ),
                   ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'LumiLivre',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
           ),
-
           Positioned(
-            top: 120,
+            top: 90,
             left: 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
@@ -110,11 +192,12 @@ class CatalogScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              // TODO: usar svg, deixar icone do lado direito com bg mais escuro, ajustar altura da label e bordar no modo escuro
               child: const TextField(
                 decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search),
                   hintText: 'Digite algum livro ou autor',
                   border: InputBorder.none,
-                  icon: Icon(Icons.search),
                 ),
               ),
             ),

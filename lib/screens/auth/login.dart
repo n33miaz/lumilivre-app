@@ -217,6 +217,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
 
           Consumer<ThemeProvider>(
+            // TODO: deixar icone fixo
             builder: (context, themeProvider, child) {
               final buttonBackgroundColor = themeProvider.isDarkMode
                   ? Colors.grey.shade800

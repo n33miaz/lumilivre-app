@@ -25,17 +25,20 @@ class BookCard extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Image.network(
+            child: Image.asset(
               imageUrl,
               height: 210,
               width: 140,
               fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
+              errorBuilder: (context, error, stackTrace) {
                 return Container(
                   height: 210,
                   width: 140,
                   color: Colors.grey[300],
+                  child: const Icon(
+                    Icons.image_not_supported_outlined,
+                    color: Colors.grey,
+                  ),
                 );
               },
             ),
