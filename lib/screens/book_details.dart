@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 import 'package:lumilivre_app/models/book.dart';
 import 'package:lumilivre_app/models/book_details.dart';
@@ -6,7 +7,7 @@ import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  final Book book; 
+  final Book book;
 
   const BookDetailsScreen({super.key, required this.book});
 
@@ -14,14 +15,28 @@ class BookDetailsScreen extends StatefulWidget {
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
 }
 
-class _BookDetailsScreenState extends State<BookDetailsScreen> {
+class _BookDetailsScreenState extends State<BookDetailsScreen>
+    with TickerProviderStateMixin {
   final ApiService _apiService = ApiService();
   Future<BookDetails>? _bookDetailsFuture;
+
+  late AnimationController _shakeController;
 
   @override
   void initState() {
     super.initState();
     _bookDetailsFuture = _apiService.getBookDetails(widget.book.id);
+
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -67,7 +82,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   // header da página
   SliverAppBar _buildSliverAppBar(BuildContext context, BookDetails details) {
     return SliverAppBar(
-      pinned: true, 
+      pinned: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       leading: IconButton(
@@ -165,7 +180,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _InfoCard(top: '★ $mockRating', bottom: 'Avaliações'),
+        _InfoCard(top: '★ $mockRating', bottom: 'Avaliações'), // retirar mock
         _InfoCard(top: details.tipoCapa, bottom: 'Tipo'),
         _InfoCard(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
         _InfoCard(top: details.classificacaoEtaria, bottom: 'Classificação'),
@@ -180,19 +195,45 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _ActionButton(icon: Icons.favorite_border, onTap: () {}),
-          _ActionButton(icon: Icons.star_border, onTap: () {}),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(24),
-              backgroundColor: LumiLivreTheme.primary,
-            ),
-            child: const Icon(
-              Icons.add_shopping_cart,
-              color: Colors.white,
-              size: 32,
+          _ActionButton(
+            icon: Icons.favorite_border,
+            onTap: () {},
+            type: 'like',
+          ),
+          _ActionButton(
+            icon: Icons.star_border,
+            onTap: () {},
+            type: 'favorite',
+          ),
+
+          GestureDetector(
+            onTap: () {
+              // animação de shake
+              _shakeController.forward(from: 0.0);
+              // TODO: lógica para solicitar empréstimo
+            },
+            child: AnimatedBuilder(
+              animation: _shakeController,
+              builder: (context, child) {
+                final sineValue = sin(2 * pi * 2 * _shakeController.value);
+                return Transform.translate(
+                  offset: Offset(sineValue * 8, 0),
+                  child: child,
+                );
+              },
+              child: Material(
+                elevation: 8,
+                shape: const CircleBorder(),
+                color: LumiLivreTheme.primary,
+                child: const Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Icon(
+                    Icons.add_shopping_cart,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -250,23 +291,98 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
+class _ActionButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _ActionButton({required this.icon, required this.onTap});
+  final String type; // 'like', 'favorite', ou 'borrow'
+
+  const _ActionButton({
+    required this.icon,
+    required this.onTap,
+    required this.type,
+  });
+
+  @override
+  State<_ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<_ActionButton> {
+  bool _isTapped = false;
+
+  void _handleTap() {
+    setState(() => _isTapped = true);
+    // A animação acontece, e depois de um tempo, volta ao estado original
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        setState(() => _isTapped = false);
+      }
+    });
+    widget.onTap();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // coração pulsando
+    if (widget.type == 'like') {
+      return GestureDetector(
+        onTap: _handleTap,
+        child: AnimatedScale(
+          scale: _isTapped ? 1.3 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: Material(
+            color: Theme.of(context).cardColor,
+            shape: const CircleBorder(),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Icon(
+                _isTapped ? Icons.favorite : Icons.favorite_border,
+                color: _isTapped ? Colors.redAccent : LumiLivreTheme.primary,
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // estrela girando
+    if (widget.type == 'favorite') {
+      return GestureDetector(
+        onTap: _handleTap,
+        child: AnimatedRotation(
+          turns: _isTapped ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutBack,
+          child: Material(
+            color: Theme.of(context).cardColor,
+            shape: const CircleBorder(),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Icon(
+                _isTapped ? Icons.star : Icons.star_border,
+                color: _isTapped ? Colors.amber : LumiLivreTheme.primary,
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // sem animação, por enquanto
     return Material(
       color: Theme.of(context).cardColor,
       shape: const CircleBorder(),
       elevation: 4,
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Icon(icon, color: LumiLivreTheme.primary, size: 28),
+          child: Icon(widget.icon, color: LumiLivreTheme.primary, size: 28),
         ),
       ),
     );

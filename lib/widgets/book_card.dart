@@ -94,6 +94,7 @@ class BookCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
+                  // TODO: adicionar avaliação do livro do lado do autor com space-between (deixar autor com truncate)
                 ],
               ),
             ),
