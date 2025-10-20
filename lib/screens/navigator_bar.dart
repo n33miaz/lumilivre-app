@@ -49,6 +49,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     return Scaffold(
       body: _screens[_selectedIndex],
 
+      // TODO: ajustar animação de click
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(

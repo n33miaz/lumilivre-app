@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:lumilivre_app/providers/theme.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 
+// TODO: remover primeiro icone de pesquisa
 class CustomHeader extends StatelessWidget {
   final String title;
 
