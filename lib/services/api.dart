@@ -6,6 +6,7 @@ import '../utils/constants.dart';
 import '../models/user.dart';
 import '../models/book.dart';
 import '../models/book_details.dart';
+import '../models/loan.dart';
 
 class ApiService {
   Future<LoginResponse> login(String user, String password) async {
@@ -140,6 +141,25 @@ class ApiService {
       }
     } catch (e) {
       print('Erro em getBookDetails: $e');
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
+  Future<List<Loan>> getMyLoans(String matricula, String token) async {
+    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula/ativos');
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return loanFromJson(utf8.decode(response.bodyBytes));
+      } else {
+        throw Exception('Falha ao carregar empréstimos.');
+      }
+    } catch (e) {
+      print('Erro em getMyLoans: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
