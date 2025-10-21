@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:lumilivre_app/providers/theme.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 
-// TODO: remover primeiro icone de pesquisa
 class CustomHeader extends StatelessWidget {
   final String title;
 
@@ -38,7 +37,7 @@ class CustomHeader extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Botão de Tema
+                  // botão tema
                   Material(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(50),
@@ -60,7 +59,8 @@ class CustomHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Título
+
+                  // título
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
@@ -78,44 +78,125 @@ class CustomHeader extends StatelessWidget {
             ),
           ),
 
-          Positioned(
-            top: 90,
-            left: 20,
-            right: 20,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              // TODO: usar svg, deixar icone do lado direito com bg mais escuro, ajustar altura da label e bordar no modo escuro
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Digite algum livro ou autor',
-                  border: InputBorder.none,
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
+          // campo de busca
+          Positioned(top: 90, left: 20, right: 20, child: _SearchField()),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchField extends StatefulWidget {
+  @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  final TextEditingController _controller = TextEditingController();
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onSearch() {
+    _focusNode.unfocus();
+
+    final texto = _controller.text.trim();
+    if (texto.isNotEmpty) {
+      debugPrint('Pesquisando por: $texto');
+      // TODO: chamar função real de busca
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      shadowColor: Colors.black.withOpacity(0.1),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            border: Border.all(
+              color: _isFocused ? LumiLivreTheme.primary : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // campo de texto
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    textAlignVertical: TextAlignVertical.center,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {},
+                    decoration: InputDecoration(
+                      hintText: 'Procure por um livro ou autor',
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
+                      ),
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                    ),
+                    onSubmitted: (_) => _onSearch(),
+                  ),
+                ),
+
+                // Botão de busca
+                Material(
+                  color: isDark
+                      ? const Color(0xFF333333)
+                      : Colors.grey.shade200,
+                  child: InkWell(
+                    onTap: _onSearch,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SvgPicture.asset(
+                        'assets/icons/search.svg',
+                        width: 22,
+                        height: 22,
+                        colorFilter: ColorFilter.mode(
+                          isDark ? Colors.white : Colors.grey.shade700,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
