@@ -14,7 +14,7 @@ class CustomHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return Container(
+    return SizedBox(
       height: 160,
       child: Stack(
         clipBehavior: Clip.none,
@@ -29,7 +29,6 @@ class CustomHeader extends StatelessWidget {
               ),
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -59,7 +58,6 @@ class CustomHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   // título
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -77,7 +75,6 @@ class CustomHeader extends StatelessWidget {
               ),
             ),
           ),
-
           // campo de busca
           Positioned(top: 90, left: 20, right: 20, child: _SearchField()),
         ],
@@ -95,15 +92,18 @@ class _SearchFieldState extends State<_SearchField> {
   final TextEditingController _controller = TextEditingController();
   late FocusNode _focusNode;
   bool _isFocused = false;
+  bool _isPressed = false;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusNode.addListener(() {
-      setState(() {
-        _isFocused = _focusNode.hasFocus;
-      });
+      if (mounted) {
+        setState(() {
+          _isFocused = _focusNode.hasFocus;
+        });
+      }
     });
   }
 
@@ -116,7 +116,6 @@ class _SearchFieldState extends State<_SearchField> {
 
   void _onSearch() {
     _focusNode.unfocus();
-
     final texto = _controller.text.trim();
     if (texto.isNotEmpty) {
       debugPrint('Pesquisando por: $texto');
@@ -127,67 +126,134 @@ class _SearchFieldState extends State<_SearchField> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    const double borderRadiusValue = 12.0;
+    const double buttonWidth = 56.0;
 
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(12),
-      shadowColor: Colors.black.withOpacity(0.1),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: Border.all(
-              color: _isFocused ? LumiLivreTheme.primary : Colors.transparent,
-              width: 2,
-            ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadiusValue),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        ],
+        border: Border.all(
+          color: _isFocused ? LumiLivreTheme.primary : Colors.transparent,
+          width: 2.0,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadiusValue - 1.5),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Fundo visual (cores fixas atrás do TextField e botão)
+            Row(
               children: [
-                // campo de texto
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    textAlignVertical: TextAlignVertical.center,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Procure por um livro ou autor',
-                      hintStyle: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey.shade600,
-                      ),
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                    ),
-                    onSubmitted: (_) => _onSearch(),
-                  ),
-                ),
-
-                // Botão de busca
-                Material(
+                Expanded(child: Container(color: Theme.of(context).cardColor)),
+                Container(
+                  width: buttonWidth,
                   color: isDark
                       ? const Color(0xFF333333)
                       : Colors.grey.shade200,
-                  child: InkWell(
-                    onTap: _onSearch,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/search.svg',
-                        width: 22,
-                        height: 22,
-                        colorFilter: ColorFilter.mode(
-                          isDark ? Colors.white : Colors.grey.shade700,
-                          BlendMode.srcIn,
+                ),
+              ],
+            ),
+
+            // Widgets interativos
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Campo de texto
+                Expanded(
+                  child: Center(
+                    child: TextField(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      textAlignVertical: TextAlignVertical.center,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 16,
+                      ),
+                      decoration: const InputDecoration(
+                        isCollapsed: true,
+                        hintText: 'Procure por um livro ou autor',
+                        hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onSubmitted: (_) => _onSearch(),
+                    ),
+                  ),
+                ),
+
+                // Botão de busca com animação
+                SizedBox(
+                  width: buttonWidth,
+                  child: GestureDetector(
+                    onTapDown: (_) => setState(() => _isPressed = true),
+                    onTapUp: (_) {
+                      setState(() => _isPressed = false);
+                      _onSearch();
+                    },
+                    onTapCancel: () => setState(() => _isPressed = false),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      decoration: BoxDecoration(
+                        color: _isPressed
+                            ? LumiLivreTheme.primary.withOpacity(0.85)
+                            : (isDark
+                                  ? const Color(0xFF333333)
+                                  : Colors.grey.shade200),
+                        boxShadow: _isPressed
+                            ? [
+                                BoxShadow(
+                                  color: LumiLivreTheme.primary.withOpacity(
+                                    0.4,
+                                  ),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: AnimatedScale(
+                        scale: _isPressed ? 0.92 : 1.0,
+                        duration: const Duration(milliseconds: 120),
+                        curve: Curves.easeOut,
+                        child: Center(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            child: SvgPicture.asset(
+                              'assets/icons/search.svg',
+                              key: ValueKey(_isPressed),
+                              width: 22,
+                              height: 22,
+                              colorFilter: ColorFilter.mode(
+                                _isPressed
+                                    ? Colors.white
+                                    : (isDark
+                                          ? Colors.white
+                                          : Colors.grey.shade700),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -195,7 +261,7 @@ class _SearchFieldState extends State<_SearchField> {
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
