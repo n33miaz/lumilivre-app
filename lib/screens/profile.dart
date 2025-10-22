@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre_app/models/loan.dart';
 import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/widgets/loan_card.dart';
 import 'package:lumilivre_app/providers/auth.dart';
+import 'package:lumilivre_app/utils/constants.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,10 +21,18 @@ class _ProfileScreenState extends State<ProfileScreen>
   final ApiService _apiService = ApiService();
   Future<List<Loan>>? _loansFuture;
 
+  int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+
+    _tabController.addListener(() {
+      setState(() {
+        _currentIndex = _tabController.index;
+      });
+    });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
@@ -54,21 +64,72 @@ class _ProfileScreenState extends State<ProfileScreen>
               floating: false,
               pinned: true,
               backgroundColor: theme.primaryColor,
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: true,
-                title: Text(
-                  'Empréstimos', // TODO: mudar dinamicamente com a aba
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    // TODO: tela de configurações
+                  },
                 ),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
                 background: _buildProfileHeader(authProvider, theme),
               ),
               bottom: TabBar(
                 controller: _tabController,
-                tabs: const [
-                  Tab(icon: Icon(Icons.grid_on)),
-                  Tab(icon: Icon(Icons.favorite_border)),
-                  Tab(icon: Icon(Icons.star_border)),
-                  Tab(icon: Icon(Icons.how_to_vote_outlined)),
+                indicatorColor: LumiLivreTheme.label,
+                indicatorWeight: 4.0, 
+                indicatorSize:
+                    TabBarIndicatorSize.label, 
+                splashFactory: NoSplash.splashFactory,
+                overlayColor: MaterialStateProperty.resolveWith<Color?>((
+                  Set<MaterialState> states,
+                ) {
+                  return Colors
+                      .transparent; 
+                }),
+
+                tabs: [
+                  Tab(
+                    icon: SvgPicture.asset(
+                      _currentIndex == 0
+                          ? 'assets/icons/loans-active.svg'
+                          : 'assets/icons/loans.svg',
+                      height: 24, 
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      _currentIndex == 1
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: Colors.white,
+                      size: 24, 
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      _currentIndex == 2 ? Icons.star : Icons.star_border,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      _currentIndex == 3
+                          ? Icons.how_to_vote
+                          : Icons.how_to_vote_outlined,
+                      color: Colors.white,
+                      size: 24, 
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -90,37 +151,31 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-        child: Column(
+        padding: const EdgeInsets.only(top: 24, left: 16, right: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            CircleAvatar(
+              radius: 35,
+              backgroundColor: Colors.white.withOpacity(0.3),
+              child: const Icon(Icons.person, size: 45, color: Colors.white),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Olá, ${authProvider.user?.email.split('@')[0] ?? 'Aluno'}',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Ranking: #12 de 345', // Mock
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white.withOpacity(0.3),
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
+                Text(
+                  authProvider.user?.email.split('@')[0] ?? 'Aluno',
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Ranking: #12 de 345', // MOCK
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
                   ),
                 ),
               ],
