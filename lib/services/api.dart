@@ -163,4 +163,33 @@ class ApiService {
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
+
+  Future<List<Book>> getBooksByGenre(String genre) async {
+    final url = Uri.parse('$apiBaseUrl/livros/genero/$genre');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+
+        return data.map((bookData) {
+          return Book(
+            id:
+                bookData['isbn'] ??
+                UniqueKey().toString(),
+            title: bookData['titulo'],
+            author: bookData['autor'],
+            imageUrl:
+                bookData['imagem'] ??
+                'https://via.placeholder.com/140x210.png?text=No+Image',
+          );
+        }).toList();
+      } else {
+        throw Exception('Falha ao carregar livros do gênero: $genre');
+      }
+    } catch (e) {
+      print('Erro em getBooksByGenre: $e');
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
 }

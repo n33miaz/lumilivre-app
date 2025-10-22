@@ -152,7 +152,6 @@ class _SearchFieldState extends State<_SearchField> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Fundo visual (cores fixas atrás do TextField e botão)
             Row(
               children: [
                 Expanded(child: Container(color: Theme.of(context).cardColor)),
@@ -165,11 +164,10 @@ class _SearchFieldState extends State<_SearchField> {
               ],
             ),
 
-            // Widgets interativos
             Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Campo de texto
+                // campo de texto
                 Expanded(
                   child: Center(
                     child: TextField(
@@ -201,7 +199,7 @@ class _SearchFieldState extends State<_SearchField> {
                   ),
                 ),
 
-                // Botão de busca com animação
+                // botão de busca
                 SizedBox(
                   width: buttonWidth,
                   child: GestureDetector(
