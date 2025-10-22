@@ -22,7 +22,7 @@ class CustomHeader extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: LumiLivreTheme.label.withOpacity(0.8),
+              color: LumiLivreTheme.label,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),

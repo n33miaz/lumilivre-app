@@ -7,6 +7,7 @@ import 'package:lumilivre_app/services/api.dart';
 import 'package:lumilivre_app/widgets/loan_card.dart';
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre_app/screens/settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -56,133 +57,145 @@ class _ProfileScreenState extends State<ProfileScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              expandedHeight: 200,
-              floating: false,
-              pinned: true,
-              backgroundColor: theme.primaryColor,
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.settings_outlined,
-                    color: Colors.white,
+      appBar: AppBar(
+        backgroundColor: theme.primaryColor,
+        toolbarHeight: 150,
+        elevation: 0,
+        title: _buildProfileHeader(authProvider, theme),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: LumiLivreTheme.label,
+          indicatorWeight: 4.0,
+          indicatorPadding: const EdgeInsets.symmetric(horizontal: 0),
+          indicatorSize: TabBarIndicatorSize.label,
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+            (_) => Colors.transparent,
+          ),
+          tabs: [
+            Tab(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SvgPicture.asset(
+                  _currentIndex == 0
+                      ? 'assets/icons/loans-active.svg'
+                      : 'assets/icons/loans.svg',
+                  height: 28,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
-                  onPressed: () {
-                    // TODO: tela de configurações
-                  },
                 ),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                background: _buildProfileHeader(authProvider, theme),
-              ),
-              bottom: TabBar(
-                controller: _tabController,
-                indicatorColor: LumiLivreTheme.label,
-                indicatorWeight: 4.0, 
-                indicatorSize:
-                    TabBarIndicatorSize.label, 
-                splashFactory: NoSplash.splashFactory,
-                overlayColor: MaterialStateProperty.resolveWith<Color?>((
-                  Set<MaterialState> states,
-                ) {
-                  return Colors
-                      .transparent; 
-                }),
-
-                tabs: [
-                  Tab(
-                    icon: SvgPicture.asset(
-                      _currentIndex == 0
-                          ? 'assets/icons/loans-active.svg'
-                          : 'assets/icons/loans.svg',
-                      height: 24, 
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      _currentIndex == 1
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: Colors.white,
-                      size: 24, 
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      _currentIndex == 2 ? Icons.star : Icons.star_border,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      _currentIndex == 3
-                          ? Icons.how_to_vote
-                          : Icons.how_to_vote_outlined,
-                      color: Colors.white,
-                      size: 24, 
-                    ),
-                  ),
-                ],
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildLoansList(),
-            const Center(child: Text('Livros Favoritos')),
-            const Center(child: Text('Livros Curtidos')),
-            const Center(child: Text('Livros Votados')),
+            Tab(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(
+                  _currentIndex == 1 ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+            Tab(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(
+                  _currentIndex == 2 ? Icons.star : Icons.star_border,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+            Tab(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(
+                  _currentIndex == 3
+                      ? Icons.how_to_vote
+                      : Icons.how_to_vote_outlined,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildLoansList(),
+          const Center(child: Text('Livros Favoritos')),
+          const Center(child: Text('Livros Curtidos')),
+          const Center(child: Text('Livros Votados')),
+        ],
       ),
     );
   }
 
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 24, left: 16, right: 16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 35,
-              backgroundColor: Colors.white.withOpacity(0.3),
-              child: const Icon(Icons.person, size: 45, color: Colors.white),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  authProvider.user?.email.split('@')[0] ?? 'Aluno',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Ranking: #12 de 345', // MOCK
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          radius: 30,
+          backgroundColor: Colors.white.withOpacity(0.3),
+          child: const Icon(Icons.person, size: 40, color: Colors.white),
         ),
-      ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                authProvider.user?.email.split('@')[0] ?? 'Aluno',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Ranking: #12 de 345', // MOCK
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.settings_outlined,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const SettingsScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 1.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      final tween = Tween(
+                        begin: begin,
+                        end: end,
+                      ).chain(CurveTween(curve: curve));
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
