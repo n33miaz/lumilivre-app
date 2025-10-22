@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lumilivre_app/utils/constants.dart';
-import 'package:lumilivre_app/screens/auth/forgot_password.dart';
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/providers/theme.dart';
 
@@ -72,6 +72,13 @@ class _LoginScreenState extends State<LoginScreen>
           setState(() => _isLoading = false);
         }
       }
+    }
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Não foi possível abrir $url';
     }
   }
 
@@ -195,11 +202,8 @@ class _LoginScreenState extends State<LoginScreen>
                           alignment: Alignment.center,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ForgotPasswordScreen(),
-                                ),
+                              _launchURL(
+                                'https://lumilivre-web.onrender.com/esqueci-a-senha', // URL vai mudar
                               );
                             },
                             child: const Text(
