@@ -9,6 +9,7 @@ class LoginResponse {
   final String role;
   final String? matriculaAluno;
   final String token;
+  final bool isInitialPassword;
 
   LoginResponse({
     required this.id,
@@ -16,6 +17,7 @@ class LoginResponse {
     required this.role,
     this.matriculaAluno,
     required this.token,
+    required this.isInitialPassword,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
@@ -24,5 +26,6 @@ class LoginResponse {
     role: json["role"],
     matriculaAluno: json["matriculaAluno"],
     token: json["token"],
+    isInitialPassword: json["isInitialPassword"] ?? false,
   );
 }

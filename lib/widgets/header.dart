@@ -217,7 +217,7 @@ class _SearchFieldState extends State<_SearchField> {
                             ? LumiLivreTheme.primary.withOpacity(0.85)
                             : (isDark
                                   ? const Color(0xFF333333)
-                                  : Colors.grey.shade200),
+                                  : LumiLivreTheme.primary),
                         boxShadow: _isPressed
                             ? [
                                 BoxShadow(

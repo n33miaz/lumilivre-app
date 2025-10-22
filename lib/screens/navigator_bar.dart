@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/utils/constants.dart';
 
 import 'catalog.dart';
@@ -22,6 +25,55 @@ class _MainNavigatorState extends State<MainNavigator> {
     const CatalogScreen(),
     const ProfileScreen(),
   ];
+
+  // popup de mudar senha, caso seja o primeiro login
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isAuthenticated && authProvider.isInitialPassword) {
+        _showChangePasswordDialog(context);
+      }
+    });
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Não foi possível abrir $url';
+    }
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Alterar Senha'),
+          content: const Text(
+            'Percebemos que você está usando uma senha inicial. Para sua segurança, recomendamos alterá-la agora.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('DEIXAR PARA DEPOIS'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('ALTERAR AGORA'),
+              onPressed: () {
+                _launchURL('https://lumilivre-web.onrender.com/mudar-senha'); // URL vai mudar
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _onItemTapped(int index) {
     setState(() {

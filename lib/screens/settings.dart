@@ -47,11 +47,10 @@ class SettingsScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.lock_outline),
               title: const Text('Mudar Senha'),
-              subtitle: const Text('Você será redirecionado para o site.'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 _launchURL(
-                  'https://lumilivre-web.onrender.com/esqueci-a-senha',
+                  'https://lumilivre-web.onrender.com/esqueci-a-senha', // URL vai mudar
                 );
               },
             ),

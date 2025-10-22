@@ -96,7 +96,7 @@ class SearchScreen extends StatelessWidget {
                   }, childCount: searchCategories.length),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 50)),
+              const SliverToBoxAdapter(child: SizedBox(height: 35)),
             ],
           ),
           // Header fixo no topo
