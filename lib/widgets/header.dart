@@ -44,12 +44,12 @@ class CustomHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(50),
                       onTap: () => themeProvider.toggleTheme(),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: SvgPicture.asset(
                           themeProvider.isDarkMode
                               ? 'assets/icons/sun.svg'
                               : 'assets/icons/moon.svg',
-                          height: 24,
+                          height: 20,
                           colorFilter: const ColorFilter.mode(
                             Colors.white,
                             BlendMode.srcIn,
@@ -60,9 +60,10 @@ class CustomHeader extends StatelessWidget {
                   ),
                   // título
                   Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
+                    padding: const EdgeInsets.only(top: 2.5, left: 10),
                     child: Text(
                       title,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -126,13 +127,13 @@ class _SearchFieldState extends State<_SearchField> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const double borderRadiusValue = 12.0;
-    const double buttonWidth = 56.0;
+    const double borderRadiusValue = 12;
+    const double buttonWidth = 56;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
-      height: 52,
+      height: 54,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadiusValue),
         boxShadow: [
@@ -152,17 +153,7 @@ class _SearchFieldState extends State<_SearchField> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Row(
-              children: [
-                Expanded(child: Container(color: Theme.of(context).cardColor)),
-                Container(
-                  width: buttonWidth,
-                  color: isDark
-                      ? const Color(0xFF333333)
-                      : Colors.grey.shade200,
-                ),
-              ],
-            ),
+            Container(color: Theme.of(context).cardColor),
 
             Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -210,14 +201,12 @@ class _SearchFieldState extends State<_SearchField> {
                     },
                     onTapCancel: () => setState(() => _isPressed = false),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
+                      duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOut,
                       decoration: BoxDecoration(
                         color: _isPressed
                             ? LumiLivreTheme.primary.withOpacity(0.85)
-                            : (isDark
-                                  ? const Color(0xFF333333)
-                                  : LumiLivreTheme.primary),
+                            : LumiLivreTheme.primary,
                         boxShadow: _isPressed
                             ? [
                                 BoxShadow(
@@ -232,11 +221,11 @@ class _SearchFieldState extends State<_SearchField> {
                       ),
                       child: AnimatedScale(
                         scale: _isPressed ? 0.92 : 1.0,
-                        duration: const Duration(milliseconds: 120),
+                        duration: const Duration(milliseconds: 200),
                         curve: Curves.easeOut,
                         child: Center(
                           child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 180),
+                            duration: const Duration(milliseconds: 200),
                             child: SvgPicture.asset(
                               'assets/icons/search.svg',
                               key: ValueKey(_isPressed),
@@ -244,10 +233,8 @@ class _SearchFieldState extends State<_SearchField> {
                               height: 22,
                               colorFilter: ColorFilter.mode(
                                 _isPressed
-                                    ? Colors.white
-                                    : (isDark
-                                          ? Colors.white
-                                          : Colors.grey.shade700),
+                                    ? Colors.white.withOpacity(0.5)
+                                    : Colors.white,
                                 BlendMode.srcIn,
                               ),
                             ),

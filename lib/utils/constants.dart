@@ -21,10 +21,16 @@ class LumiLivreTheme {
     brightness: Brightness.light,
     primaryColor: primary,
     scaffoldBackgroundColor: lightBackground,
+    cardColor: lightCard,
+
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
       brightness: Brightness.light,
+      primary: primary,
+      background: lightBackground,
+      surface: lightCard,
     ),
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
@@ -41,6 +47,7 @@ class LumiLivreTheme {
       ),
       labelStyle: const TextStyle(color: label),
     ),
+    cardTheme: const CardThemeData(color: lightCard),
   );
 
   // tema escuro
@@ -48,10 +55,16 @@ class LumiLivreTheme {
     brightness: Brightness.dark,
     primaryColor: primary,
     scaffoldBackgroundColor: darkBackground,
+    cardColor: darkCard,
+
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
       brightness: Brightness.dark,
+      primary: primary,
+      background: darkBackground,
+      surface: darkCard,
     ),
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
@@ -73,17 +86,18 @@ class LumiLivreTheme {
       ),
       labelStyle: const TextStyle(color: label),
     ),
+    cardTheme: const CardThemeData(color: darkCard),
   );
 
   // tela de busca
   static const List<Color> genreCardColors = [
-    Color(0xFFE13300), 
-    Color(0xFF006450), 
-    Color(0xFF8400E7), 
-    Color(0xFF1E3264), 
-    Color(0xFFE8115B), 
-    Color(0xFF148A08), 
-    Color(0xFFBC5900), 
-    Color(0xFF7D4B32), 
+    Color(0xFFE13300),
+    Color(0xFF006450),
+    Color(0xFF8400E7),
+    Color(0xFF1E3264),
+    Color(0xFFE8115B),
+    Color(0xFF148A08),
+    Color(0xFFBC5900),
+    Color(0xFF7D4B32),
   ];
 }

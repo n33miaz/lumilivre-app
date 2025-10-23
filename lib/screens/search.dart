@@ -52,15 +52,13 @@ class SearchScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      // Usaremos uma Stack para sobrepor o Header
       body: Stack(
         children: [
-          // Conteúdo principal que rola
           CustomScrollView(
             slivers: [
               const SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 130,
+                  height: 140,
                 ), 
               ),
               const SliverToBoxAdapter(
@@ -96,11 +94,10 @@ class SearchScreen extends StatelessWidget {
                   }, childCount: searchCategories.length),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 35)),
+              const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
           ),
-          // Header fixo no topo
-          const CustomHeader(title: 'Pesquisa'),
+          const CustomHeader(title: 'Categorias'),
         ],
       ),
     );

@@ -48,7 +48,7 @@ class _MainNavigatorState extends State<MainNavigator> {
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, 
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alterar Senha'),
@@ -65,7 +65,9 @@ class _MainNavigatorState extends State<MainNavigator> {
             ElevatedButton(
               child: const Text('ALTERAR AGORA'),
               onPressed: () {
-                _launchURL('https://lumilivre-web.onrender.com/mudar-senha'); // URL vai mudar
+                _launchURL(
+                  'https://lumilivre-web.onrender.com/mudar-senha',
+                ); // URL vai mudar
                 Navigator.of(context).pop();
               },
             ),
@@ -98,33 +100,37 @@ class _MainNavigatorState extends State<MainNavigator> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.white.withOpacity(0.1),
+        highlightColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        body: _screens[_selectedIndex],
 
-      // TODO: ajustar animação de click
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: _buildIcon('search', 0),
-            label: 'Pesquisa',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildIcon('home', 1),
-            label: 'Catálogo',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildIcon('profile', 2),
-            label: 'Perfil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey.shade400,
-        onTap: _onItemTapped,
-
-        backgroundColor: LumiLivreTheme.primary,
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: _buildIcon('search', 0),
+              label: 'Pesquisa',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildIcon('home', 1),
+              label: 'Catálogo',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildIcon('profile', 2),
+              label: 'Perfil',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey.shade400,
+          onTap: _onItemTapped,
+          backgroundColor: LumiLivreTheme.primary,
+          type: BottomNavigationBarType.fixed,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

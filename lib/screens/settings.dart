@@ -1,4 +1,7 @@
+// lib/screens/settings.dart
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:local_auth/local_auth.dart';
@@ -6,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/providers/theme.dart';
+import 'package:lumilivre_app/utils/constants.dart'; // Importei para usar as cores do tema
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -48,11 +52,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           });
           await _saveBiometricsPreference(true);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Biometria não disponível neste dispositivo.'),
-            ),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Biometria não disponível neste dispositivo.'),
+              ),
+            );
+          }
         }
       } catch (e) {
         print(e);
@@ -74,11 +80,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Definindo o shape para corrigir o highlight quadrado
+    final roundedShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('Configurações'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          // --- SEÇÃO APARÊNCIA ---
           Text(
             'Aparência',
             style: TextStyle(
@@ -91,6 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildThemeSelector(context),
           const SizedBox(height: 24),
 
+          // --- SEÇÃO SEGURANÇA ---
           Text(
             'Segurança',
             style: TextStyle(
@@ -101,16 +114,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Card(
+            shape: roundedShape, // Aplicando o shape no Card
+            clipBehavior:
+                Clip.antiAlias, // Garante que o conteúdo respeite o shape
             child: SwitchListTile(
               title: const Text('Acesso com Biometria'),
               subtitle: const Text('Entrar com digital ou rosto.'),
               value: _isBiometricsEnabled,
               onChanged: _toggleBiometrics,
-              secondary: const Icon(Icons.fingerprint),
+              // NOVO: Ícone SVG para biometria
+              secondary: SvgPicture.asset(
+                'assets/icons/biometric.svg',
+                height: 28,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).iconTheme.color!,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
 
+          // --- SEÇÃO CONTA ---
           Text(
             'Conta',
             style: TextStyle(
@@ -120,28 +145,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          // TODO: redirecionar direto para tela de mudança de senha com o token salvo na sessão
           Card(
+            shape: roundedShape,
+            clipBehavior: Clip.antiAlias,
             child: ListTile(
+              shape: roundedShape, // Aplicando o shape no ListTile
               leading: const Icon(Icons.lock_outline),
               title: const Text('Mudar Senha'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 _launchURL(
-                  'https://lumilivre-web.onrender.com/esqueci-a-senha', // URL vai mudar
+                  'https://lumilivre-web.onrender.com/esqueci-a-senha',
                 );
               },
             ),
           ),
-
           Card(
+            shape: roundedShape,
+            clipBehavior: Clip.antiAlias,
             child: ListTile(
+              shape: roundedShape, // Aplicando o shape no ListTile
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: Text(
                 'Sair da Conta',
                 style: TextStyle(color: Colors.red.shade400),
               ),
               onTap: () {
+                // NOVO: Fecha a tela de configurações antes de deslogar
+                Navigator.of(context).pop();
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
             ),
@@ -151,10 +182,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // --- WIDGET DO SELETOR DE TEMA (TOTALMENTE REFEITO) ---
   Widget _buildThemeSelector(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final bool isDarkMode = themeProvider.isDarkMode;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -162,63 +191,94 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              // TODO: adicionar o botão 'Automático'
               'Tema',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    if (isDarkMode) themeProvider.toggleTheme();
-                  },
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.wb_sunny,
-                        color: !isDarkMode
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Claro',
-                        style: TextStyle(
-                          color: !isDarkMode
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+                _ThemeOptionButton(
+                  label: 'Claro',
+                  iconPath: 'assets/icons/sun.svg',
+                  option: ThemeOption.light,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    if (!isDarkMode) themeProvider.toggleTheme();
-                  },
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.nightlight_round,
-                        color: isDarkMode
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Escuro',
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+                _ThemeOptionButton(
+                  label: 'Escuro',
+                  iconPath: 'assets/icons/moon.svg',
+                  option: ThemeOption.dark,
+                ),
+                _ThemeOptionButton(
+                  label: 'Sistema',
+                  // Usei um ícone material pois não temos um para "automático"
+                  // Se vocês criarem um, é só trocar aqui.
+                  materialIcon: Icons.brightness_auto_outlined,
+                  option: ThemeOption.system,
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- WIDGET AUXILIAR PARA OS BOTÕES DE TEMA ---
+class _ThemeOptionButton extends StatelessWidget {
+  final String label;
+  final String? iconPath; // Para SVGs
+  final IconData? materialIcon; // Para ícones do Flutter
+  final ThemeOption option;
+
+  const _ThemeOptionButton({
+    required this.label,
+    this.iconPath,
+    this.materialIcon,
+    required this.option,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isSelected = themeProvider.themeOption == option;
+
+    final color = isSelected
+        ? LumiLivreTheme.primary
+        : Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+
+    return GestureDetector(
+      onTap: () => themeProvider.setTheme(option),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? LumiLivreTheme.primary.withOpacity(0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? LumiLivreTheme.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            if (iconPath != null)
+              SvgPicture.asset(
+                iconPath!,
+                height: 28,
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              )
+            else if (materialIcon != null)
+              Icon(materialIcon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ],
         ),
