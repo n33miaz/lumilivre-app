@@ -1,5 +1,3 @@
-// lib/screens/settings.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/utils/constants.dart'; // Importei para usar as cores do tema
+import 'package:lumilivre_app/utils/constants.dart'; 
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -80,7 +78,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Definindo o shape para corrigir o highlight quadrado
     final roundedShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     );
@@ -90,7 +87,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // --- SEÇÃO APARÊNCIA ---
           Text(
             'Aparência',
             style: TextStyle(
@@ -103,7 +99,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildThemeSelector(context),
           const SizedBox(height: 24),
 
-          // --- SEÇÃO SEGURANÇA ---
           Text(
             'Segurança',
             style: TextStyle(
@@ -114,15 +109,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Card(
-            shape: roundedShape, // Aplicando o shape no Card
+            shape: roundedShape, 
             clipBehavior:
-                Clip.antiAlias, // Garante que o conteúdo respeite o shape
+                Clip.antiAlias, 
             child: SwitchListTile(
               title: const Text('Acesso com Biometria'),
               subtitle: const Text('Entrar com digital ou rosto.'),
               value: _isBiometricsEnabled,
               onChanged: _toggleBiometrics,
-              // NOVO: Ícone SVG para biometria
               secondary: SvgPicture.asset(
                 'assets/icons/biometric.svg',
                 height: 28,
@@ -135,7 +129,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 24),
 
-          // --- SEÇÃO CONTA ---
           Text(
             'Conta',
             style: TextStyle(
@@ -149,13 +142,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              shape: roundedShape, // Aplicando o shape no ListTile
+              shape: roundedShape,
               leading: const Icon(Icons.lock_outline),
               title: const Text('Mudar Senha'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 _launchURL(
-                  'https://lumilivre-web.onrender.com/esqueci-a-senha',
+                  'https://lumilivre-web.onrender.com/esqueci-a-senha', // TODO: direto para /mudar-senha
                 );
               },
             ),
@@ -164,14 +157,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              shape: roundedShape, // Aplicando o shape no ListTile
+              shape: roundedShape, 
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: Text(
                 'Sair da Conta',
                 style: TextStyle(color: Colors.red.shade400),
               ),
               onTap: () {
-                // NOVO: Fecha a tela de configurações antes de deslogar
                 Navigator.of(context).pop();
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
@@ -182,7 +174,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // --- WIDGET DO SELETOR DE TEMA (TOTALMENTE REFEITO) ---
   Widget _buildThemeSelector(BuildContext context) {
     return Card(
       child: Padding(
@@ -210,8 +201,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _ThemeOptionButton(
                   label: 'Sistema',
-                  // Usei um ícone material pois não temos um para "automático"
-                  // Se vocês criarem um, é só trocar aqui.
                   materialIcon: Icons.brightness_auto_outlined,
                   option: ThemeOption.system,
                 ),
@@ -224,11 +213,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// --- WIDGET AUXILIAR PARA OS BOTÕES DE TEMA ---
 class _ThemeOptionButton extends StatelessWidget {
   final String label;
-  final String? iconPath; // Para SVGs
-  final IconData? materialIcon; // Para ícones do Flutter
+  final String? iconPath;
+  final IconData? materialIcon; 
   final ThemeOption option;
 
   const _ThemeOptionButton({

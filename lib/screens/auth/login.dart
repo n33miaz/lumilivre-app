@@ -236,7 +236,10 @@ class _LoginScreenState extends State<LoginScreen>
                   child: InkWell(
                     borderRadius: BorderRadius.circular(50),
                     onTap: () {
-                      themeProvider.toggleTheme();
+                      final newTheme = themeProvider.isDarkMode
+                          ? ThemeOption.light
+                          : ThemeOption.dark;
+                      themeProvider.setTheme(newTheme);
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12),

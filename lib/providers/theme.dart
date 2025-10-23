@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ThemeOption { system, light, dark }
 
 class ThemeProvider with ChangeNotifier {
-  ThemeOption _themeOption = ThemeOption.system;
+  ThemeOption _themeOption = ThemeOption.light;
 
   ThemeProvider() {
     _loadThemePreference();
@@ -20,8 +20,7 @@ class ThemeProvider with ChangeNotifier {
       case ThemeOption.dark:
         return ThemeMode.dark;
       case ThemeOption.system:
-      default:
-        return ThemeMode.system;
+        return ThemeMode.light;
     }
   }
 

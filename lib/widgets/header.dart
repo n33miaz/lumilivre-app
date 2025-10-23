@@ -42,7 +42,12 @@ class CustomHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(50),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(50),
-                      onTap: () => themeProvider.toggleTheme(),
+                      onTap: () {
+                        final newTheme = themeProvider.isDarkMode
+                            ? ThemeOption.light
+                            : ThemeOption.dark;
+                        themeProvider.setTheme(newTheme);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: SvgPicture.asset(
