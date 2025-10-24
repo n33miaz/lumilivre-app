@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:lumilivre_app/models/loan.dart';
-import 'package:lumilivre_app/services/api.dart';
-import 'package:lumilivre_app/widgets/loan_card.dart';
-import 'package:lumilivre_app/providers/auth.dart';
-import 'package:lumilivre_app/utils/constants.dart';
-import 'package:lumilivre_app/screens/settings.dart';
+import 'package:lumilivre/models/loan.dart';
+import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/widgets/loan_card.dart';
+import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/screens/settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

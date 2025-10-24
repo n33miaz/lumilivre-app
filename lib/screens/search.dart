@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:lumilivre_app/utils/constants.dart';
-import 'package:lumilivre_app/widgets/header.dart';
-import 'package:lumilivre_app/widgets/genre_card.dart';
-import 'package:lumilivre_app/screens/category_books.dart';
+import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/header.dart';
+import 'package:lumilivre/widgets/genre_card.dart';
+import 'package:lumilivre/screens/category_books.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});

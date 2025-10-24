@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 class CategorySelector extends StatelessWidget {
   final List<String> categories;

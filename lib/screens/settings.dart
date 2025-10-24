@@ -5,9 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:lumilivre_app/providers/auth.dart';
-import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

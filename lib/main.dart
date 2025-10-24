@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:lumilivre_app/providers/auth.dart';
-import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/utils/constants.dart';
 
-import 'package:lumilivre_app/screens/auth/login.dart';
-import 'package:lumilivre_app/screens/navigator_bar.dart';
+import 'package:lumilivre/screens/auth/login.dart';
+import 'package:lumilivre/screens/navigator_bar.dart';
 
 void main() {
   runApp(

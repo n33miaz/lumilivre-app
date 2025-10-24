@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:lumilivre_app/models/book.dart';
-import 'package:lumilivre_app/services/api.dart';
-import 'package:lumilivre_app/widgets/book_carousel.dart';
-import 'package:lumilivre_app/widgets/category_selector.dart';
-import 'package:lumilivre_app/widgets/header.dart';
+import 'package:lumilivre/models/book.dart';
+import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/widgets/book_carousel.dart';
+import 'package:lumilivre/widgets/category_selector.dart';
+import 'package:lumilivre/widgets/header.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});

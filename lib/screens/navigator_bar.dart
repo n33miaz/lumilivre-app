@@ -3,8 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:lumilivre_app/providers/auth.dart';
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 import 'catalog.dart';
 import 'search.dart';

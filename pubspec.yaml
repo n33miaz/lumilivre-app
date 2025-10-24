@@ -1,5 +1,5 @@
-name: lumilivre_app
-description: "A new Flutter project."
+name: lumilivre
+description: "Vitrine de livros da sua biblioteca."
 publish_to: "none"
 version: 1.0.0+1
 
@@ -11,8 +11,8 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/images/logo-foreground.png"
 
 flutter_native_splash:
-  color: "#F3F4F6"
-  color_dark: "#111827"
+  color: "#762075"
+  color_dark: "#762075"
   image: assets/images/logo-foreground.png
   image_dark: assets/images/logo-foreground.png
 

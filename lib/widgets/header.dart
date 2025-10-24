@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/utils/constants.dart';
+import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 class CustomHeader extends StatelessWidget {
   final String title;

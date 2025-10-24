@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:lumilivre_app/models/book.dart';
-import 'package:lumilivre_app/screens/book_details.dart';
+import 'package:lumilivre/models/book.dart';
+import 'package:lumilivre/screens/book_details.dart';
 
 class BookCard extends StatelessWidget {
   final Book book;

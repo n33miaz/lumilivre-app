@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:lumilivre_app/models/book.dart';
-import 'package:lumilivre_app/services/api.dart';
-import 'package:lumilivre_app/widgets/book_card.dart';
+import 'package:lumilivre/models/book.dart';
+import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/widgets/book_card.dart';
 
 class CategoryBooksScreen extends StatefulWidget {
   final String categoryName;
