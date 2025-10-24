@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-// http://api.lumilivre.com.br:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile)
-const String apiBaseUrl = 'http://localhost:8080';
+// http://api.lumilivre.com.br:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile emulador)
+const String apiBaseUrl = 'http://192.168.56.1:8080';
 
 class LumiLivreTheme {
   // cores do tema claro
