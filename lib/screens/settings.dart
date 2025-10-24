@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lumilivre_app/providers/auth.dart';
 import 'package:lumilivre_app/providers/theme.dart';
-import 'package:lumilivre_app/utils/constants.dart'; 
+import 'package:lumilivre_app/utils/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -109,9 +109,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Card(
-            shape: roundedShape, 
-            clipBehavior:
-                Clip.antiAlias, 
+            shape: roundedShape,
+            clipBehavior: Clip.antiAlias,
             child: SwitchListTile(
               title: const Text('Acesso com Biometria'),
               subtitle: const Text('Entrar com digital ou rosto.'),
@@ -157,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              shape: roundedShape, 
+              shape: roundedShape,
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: Text(
                 'Sair da Conta',
@@ -216,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 class _ThemeOptionButton extends StatelessWidget {
   final String label;
   final String? iconPath;
-  final IconData? materialIcon; 
+  final IconData? materialIcon;
   final ThemeOption option;
 
   const _ThemeOptionButton({

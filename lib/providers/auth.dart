@@ -63,10 +63,10 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     _user = null;
     _isGuest = false;
-    _isInitialPassword = false; 
+    _isInitialPassword = false;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
-    await prefs.remove('userData'); 
+    await prefs.remove('userData');
 
     notifyListeners();
   }

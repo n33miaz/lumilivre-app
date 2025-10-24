@@ -112,9 +112,7 @@ class ApiService {
 
         return data.map((bookData) {
           return Book(
-            id:
-                bookData['isbn'] ??
-                UniqueKey().toString(),
+            id: bookData['isbn'] ?? UniqueKey().toString(),
             title: bookData['titulo'],
             author: bookData['autor'],
             imageUrl:

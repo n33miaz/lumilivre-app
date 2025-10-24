@@ -56,11 +56,7 @@ class SearchScreen extends StatelessWidget {
         children: [
           CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 140,
-                ), 
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 140)),
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(16, 24, 16, 16),

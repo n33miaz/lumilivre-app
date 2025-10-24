@@ -21,7 +21,7 @@ class GenreCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(color: color),
         child: Stack(
-          children: [ 
+          children: [
             // título TODO: aumentar tamanho do card e diminuir espaçamento entre eles
             Positioned(
               top: 12,
