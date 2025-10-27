@@ -28,4 +28,13 @@ class LoginResponse {
     token: json["token"],
     isInitialPassword: json["isInitialPassword"] ?? false,
   );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "email": email,
+    "role": role,
+    "matriculaAluno": matriculaAluno,
+    "token": token,
+    "isInitialPassword": isInitialPassword,
+  };
 }

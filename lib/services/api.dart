@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/constants.dart';
@@ -12,12 +13,20 @@ class ApiService {
   Future<LoginResponse> login(String user, String password) async {
     final url = Uri.parse('$apiBaseUrl/auth/login');
 
+    // final requestBody = jsonEncode({'user': user, 'senha': password});
+    // print('--- ENVIANDO PARA O BACKEND ---');
+    // print(requestBody);
+
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode({'user': user, 'senha': password}),
       );
+
+      // print('--- RESPOSTA DO BACKEND ---');
+      // print('Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         return loginResponseFromJson(response.body);
@@ -35,12 +44,23 @@ class ApiService {
 
   Future<Map<String, List<Book>>> getCatalog() async {
     final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    if (token == null) {
+      throw Exception(
+        'Token de autenticação não encontrado. Faça o login novamente.',
+      );
+    }
+
     try {
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-
         Map<String, List<Book>> catalog = {};
 
         for (var genreData in data) {
@@ -58,7 +78,10 @@ class ApiService {
           catalog[genreName] = books;
         }
         return catalog;
+      } else if (response.statusCode == 204) {
+        return {};
       } else {
+        print('Falha ao carregar catálogo. Status: ${response.statusCode}');
         throw Exception('Falha ao carregar o catálogo.');
       }
     } catch (e) {

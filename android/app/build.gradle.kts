@@ -20,7 +20,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.etec.tcc.lumilivre"
+    namespace = "br.com.lumilivre.lumilivre" // rmv duplicado
     compileSdk = 36
 
     compileOptions {
@@ -39,7 +39,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "br.com.etec.tcc.lumilivre"
+        applicationId = "br.com.lumilivre.lumilivre"
         minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = (localProperties.getProperty("flutter.versionCode")?.toIntOrNull()) ?: 1
