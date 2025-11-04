@@ -179,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     const SettingsScreen(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 1.0);
+                      const begin = Offset(1.0, 0.0);
                       const end = Offset.zero;
                       const curve = Curves.ease;
                       final tween = Tween(

@@ -33,12 +33,12 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> searchCategories = [
-      'Recomendações',
+      // 'Recomendações',
       'Mais Vistos',
       'Novidades',
       'Aventura',
       'Romance',
-      'Educativos',
+      'Educativo',
       'Suspense',
       'Biografia',
       'Ficção Científica',
@@ -48,7 +48,7 @@ class SearchScreen extends StatelessWidget {
       'Terror',
       'Poesia',
       'TCCs',
-      'Manuais',
+      // 'Manuais',
     ];
 
     return Scaffold(

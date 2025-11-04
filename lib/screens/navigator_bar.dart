@@ -19,6 +19,7 @@ class MainNavigator extends StatefulWidget {
 
 class _MainNavigatorState extends State<MainNavigator> {
   int _selectedIndex = 1;
+  late PageController _pageController;
 
   final List<Widget> _screens = [
     const SearchScreen(),
@@ -30,12 +31,20 @@ class _MainNavigatorState extends State<MainNavigator> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (authProvider.isAuthenticated && authProvider.isInitialPassword) {
         _showChangePasswordDialog(context);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _launchURL(String url) async {
@@ -81,6 +90,12 @@ class _MainNavigatorState extends State<MainNavigator> {
     setState(() {
       _selectedIndex = index;
     });
+
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   Widget _buildIcon(String name, int index) {
@@ -106,7 +121,15 @@ class _MainNavigatorState extends State<MainNavigator> {
         highlightColor: Colors.transparent,
       ),
       child: Scaffold(
-        body: _screens[_selectedIndex],
+        body: PageView(
+          controller: _pageController,
+          children: _screens,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
 
         bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[

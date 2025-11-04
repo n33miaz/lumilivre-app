@@ -85,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Configurações'), centerTitle: true),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         children: [
           Text(
             'Aparência',
@@ -112,16 +112,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: SwitchListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
               title: const Text('Acesso com Biometria'),
               subtitle: const Text('Entrar com digital ou rosto.'),
               value: _isBiometricsEnabled,
               onChanged: _toggleBiometrics,
-              secondary: SvgPicture.asset(
-                'assets/icons/biometric.svg',
-                height: 28,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).iconTheme.color!,
-                  BlendMode.srcIn,
+              secondary: SizedBox(
+                width: 40,
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/biometric.svg',
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onSurface,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -141,10 +150,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
               shape: roundedShape,
               leading: const Icon(Icons.lock_outline),
               title: const Text('Mudar Senha'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 20),
               onTap: () {
                 _launchURL(
                   'https://lumilivre-web.onrender.com/esqueci-a-senha', // TODO: direto para /mudar-senha
@@ -156,6 +169,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
               shape: roundedShape,
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: Text(
@@ -176,7 +193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildThemeSelector(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -186,22 +203,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _ThemeOptionButton(
-                  label: 'Claro',
-                  iconPath: 'assets/icons/sun.svg',
-                  option: ThemeOption.light,
+                Expanded(
+                  child: _ThemeOptionButton(
+                    label: 'Claro',
+                    iconPath: 'assets/icons/sun.svg',
+                    option: ThemeOption.light,
+                  ),
                 ),
-                _ThemeOptionButton(
-                  label: 'Escuro',
-                  iconPath: 'assets/icons/moon.svg',
-                  option: ThemeOption.dark,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _ThemeOptionButton(
+                    label: 'Escuro',
+                    iconPath: 'assets/icons/moon.svg',
+                    option: ThemeOption.dark,
+                  ),
                 ),
-                _ThemeOptionButton(
-                  label: 'Sistema',
-                  materialIcon: Icons.brightness_auto_outlined,
-                  option: ThemeOption.system,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _ThemeOptionButton(
+                    label: 'Sistema',
+                    materialIcon: Icons.brightness_auto_outlined,
+                    option: ThemeOption.system,
+                  ),
                 ),
               ],
             ),
