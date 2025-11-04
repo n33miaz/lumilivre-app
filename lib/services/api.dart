@@ -10,6 +10,8 @@ import '../models/book_details.dart';
 import '../models/loan.dart';
 
 class ApiService {
+  Map<String, List<Book>>? _cachedCatalog;
+
   Future<LoginResponse> login(String user, String password) async {
     final url = Uri.parse('$apiBaseUrl/auth/login');
 
@@ -43,6 +45,13 @@ class ApiService {
   }
 
   Future<Map<String, List<Book>>> getCatalog() async {
+    if (_cachedCatalog != null) {
+      print('--- RETORNANDO CATÁLOGO DO CACHE ---');
+      return _cachedCatalog!;
+    }
+
+    print('--- BUSCANDO CATÁLOGO DA API ---');
+
     final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
@@ -67,7 +76,7 @@ class ApiService {
           String genreName = genreData['nome'];
           List<Book> books = (genreData['livros'] as List).map((bookData) {
             return Book(
-              id: bookData['isbn'] ?? UniqueKey().toString(),
+              id: bookData['id'],
               title: bookData['titulo'],
               author: bookData['autor'],
               imageUrl:
@@ -77,8 +86,11 @@ class ApiService {
           }).toList();
           catalog[genreName] = books;
         }
+
+        _cachedCatalog = catalog;
         return catalog;
       } else if (response.statusCode == 204) {
+        _cachedCatalog = {};
         return {};
       } else {
         print('Falha ao carregar catálogo. Status: ${response.statusCode}');
@@ -90,10 +102,16 @@ class ApiService {
     }
   }
 
-  Future<BookDetails> getBookDetails(String isbn) async {
-    final url = Uri.parse('$apiBaseUrl/livros/$isbn');
+  Future<BookDetails> getBookDetails(int bookId) async {
+    final url = Uri.parse('$apiBaseUrl/livros/$bookId');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
     try {
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
 
       if (response.statusCode == 200) {
         return bookDetailsFromJson(utf8.decode(response.bodyBytes));
