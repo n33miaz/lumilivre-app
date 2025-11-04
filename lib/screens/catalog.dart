@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
-import 'package:lumilivre/widgets/category_selector.dart';
 import 'package:lumilivre/widgets/header.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -15,29 +13,65 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   final ApiService _apiService = ApiService();
-  Future<Map<String, List<Book>>>? _catalogFuture;
+  final ScrollController _scrollController = ScrollController();
 
-  String _selectedCategory = 'Principal';
-  final List<String> _categories = [
-    'Principal',
-    'Gêneros',
-    "PDF's, TCC's e Comunicados",
-  ];
+  List<MapEntry<String, List<Book>>> _allCategories = [];
+  List<MapEntry<String, List<Book>>> _displayedCategories = [];
+
+  bool _isLoading = false;
+  bool _initialLoad = true;
 
   @override
   void initState() {
     super.initState();
-    _catalogFuture = _apiService.getCatalog();
+    _fetchInitialData();
+    _scrollController.addListener(_onScroll);
   }
 
-  Widget _buildCarousels(Map<String, List<Book>> catalogData) {
-    // os mesmos carrosséis em todas as categorias, por enquanto
+  Future<void> _fetchInitialData() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
 
-    final carousels = catalogData.entries.map((entry) {
-      return BookCarousel(title: entry.key, books: entry.value);
-    }).toList();
+    try {
+      final catalogData = await _apiService.getCatalog();
+      _allCategories = catalogData.entries.toList();
+      _loadMoreCategories();
+    } catch (e) {
+      // Tratar erro
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _initialLoad = false;
+        });
+      }
+    }
+  }
 
-    return Column(children: carousels);
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      _loadMoreCategories();
+    }
+  }
+
+  void _loadMoreCategories() {
+    if (_isLoading || _displayedCategories.length >= _allCategories.length)
+      return;
+
+    setState(() {
+      final nextEnd = (_displayedCategories.length + 4).clamp(
+        0,
+        _allCategories.length,
+      );
+      _displayedCategories = _allCategories.sublist(0, nextEnd);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,54 +79,36 @@ class _CatalogScreenState extends State<CatalogScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          FutureBuilder<Map<String, List<Book>>>(
-            future: _catalogFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text('Erro ao carregar catálogo: ${snapshot.error}'),
-                );
-              }
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text('Nenhum livro encontrado no catálogo.'),
-                );
-              }
-
-              final catalogData = snapshot.data!;
-
-              // seletor de categorias
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 220),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 24.0),
-                      child: CategorySelector(
-                        categories: _categories,
-                        selectedCategory: _selectedCategory,
-                        onCategorySelected: (category) {
-                          setState(() {
-                            _selectedCategory = category;
-                          });
-                        },
-                      ),
-                    ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 500),
-                      child: _buildCarousels(catalogData),
-                    ),
-
-                    // TODO: adicionar um botão que redireciona o usuário para a página de pesquisa
-                    const SizedBox(height: 100),
-                  ],
-                ),
-              );
-            },
-          ),
+          if (_initialLoad)
+            const Center(child: CircularProgressIndicator())
+          else if (_allCategories.isEmpty)
+            const Center(child: Text('Nenhum livro encontrado no catálogo.'))
+          else
+            ListView.builder(
+              controller: _scrollController,
+              itemCount:
+                  _displayedCategories.length + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const SizedBox(height: 160);
+                }
+                if (index <= _displayedCategories.length) {
+                  final category = _displayedCategories[index - 1];
+                  return BookCarousel(
+                    key: ValueKey(category.key),
+                    title: category.key,
+                    books: category.value,
+                  );
+                }
+                if (_displayedCategories.length < _allCategories.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return const SizedBox(height: 100);
+              },
+            ),
           const CustomHeader(title: 'LumiLivre'),
         ],
       ),

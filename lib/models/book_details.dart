@@ -39,16 +39,16 @@ class BookDetails {
   });
 
   factory BookDetails.fromJson(Map<String, dynamic> json) => BookDetails(
-    isbn: json["isbn"],
+    isbn: json["isbn"] ?? 'N/A',
     nome: json["nome"],
     dataLancamento: DateTime.parse(json["data_lancamento"]),
     numeroPaginas: json["numero_paginas"],
-    cdd: json["cdd"],
+    cdd: json["cdd"] != null ? json["cdd"]["codigo"] : 'N/A',
     editora: json["editora"],
     classificacaoEtaria: json["classificacao_etaria"],
-    edicao: json["edicao"],
+    edicao: json["edicao"] ?? 'N/A',
     volume: json["volume"],
-    sinopse: json["sinopse"],
+    sinopse: json["sinopse"] ?? 'Sinopse não disponível.',
     autor: json["autor"],
     tipoCapa: json["tipo_capa"],
     imagem: json["imagem"],

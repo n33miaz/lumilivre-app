@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +11,14 @@ import '../models/book_details.dart';
 import '../models/loan.dart';
 
 class ApiService {
+  static final ApiService _instance = ApiService._internal();
+
+  factory ApiService() {
+    return _instance;
+  }
+
+  ApiService._internal();
+
   Map<String, List<Book>>? _cachedCatalog;
 
   Future<LoginResponse> login(String user, String password) async {
@@ -46,26 +55,22 @@ class ApiService {
 
   Future<Map<String, List<Book>>> getCatalog() async {
     if (_cachedCatalog != null) {
-      print('--- RETORNANDO CATÁLOGO DO CACHE ---');
+      if (kDebugMode) {
+        print('--- RETORNANDO CATÁLOGO DO CACHE ---');
+      }
       return _cachedCatalog!;
     }
-
-    print('--- BUSCANDO CATÁLOGO DA API ---');
-
+    if (kDebugMode) {
+      print('--- BUSCANDO CATÁLOGO DA API ---');
+    }
     final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
-    if (token == null) {
-      throw Exception(
-        'Token de autenticação não encontrado. Faça o login novamente.',
-      );
-    }
-
     try {
       final response = await http.get(
         url,
-        headers: {'Authorization': 'Bearer $token'},
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
       );
 
       if (response.statusCode == 200) {
@@ -81,23 +86,20 @@ class ApiService {
               author: bookData['autor'],
               imageUrl:
                   bookData['imagem'] ??
-                  'https://via.placeholder.com/140x210.png?text=No+Image',
+                  'https://via.placeholder.com/140x210.png?text=Lumi',
             );
           }).toList();
           catalog[genreName] = books;
         }
-
         _cachedCatalog = catalog;
         return catalog;
       } else if (response.statusCode == 204) {
         _cachedCatalog = {};
         return {};
       } else {
-        print('Falha ao carregar catálogo. Status: ${response.statusCode}');
         throw Exception('Falha ao carregar o catálogo.');
       }
     } catch (e) {
-      print('Erro em getCatalog: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
@@ -106,20 +108,60 @@ class ApiService {
     final url = Uri.parse('$apiBaseUrl/livros/$bookId');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
-
     try {
       final response = await http.get(
         url,
         headers: token != null ? {'Authorization': 'Bearer $token'} : {},
       );
-
       if (response.statusCode == 200) {
-        return bookDetailsFromJson(utf8.decode(response.bodyBytes));
+        final jsonData = json.decode(utf8.decode(response.bodyBytes));
+        return BookDetails.fromJson(jsonData);
       } else {
         throw Exception('Falha ao carregar detalhes do livro.');
       }
     } catch (e) {
-      print('Erro em getBookDetails: $e');
+      if (kDebugMode) {
+        print('Erro em getBookDetails: $e');
+      }
+      throw Exception('Falha ao carregar detalhes do livro.');
+    }
+  }
+
+  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/livros/genero/$genre?page=$page&size=10',
+    );
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+    try {
+      final response = await http.get(
+        url,
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> pageData = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
+        final List<dynamic> bookList = pageData['content'];
+        return bookList.map((bookData) {
+          return Book(
+            id: bookData['id'],
+            title: bookData['nome'],
+            author: bookData['autor'] ?? 'Autor desconhecido',
+            imageUrl:
+                bookData['imagem'] ??
+                'https://via.placeholder.com/140x210.png?text=Lumi',
+          );
+        }).toList();
+      } else if (response.statusCode == 204) {
+        return [];
+      } else {
+        throw Exception('Falha ao carregar livros do gênero: $genre');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro em getBooksByGenre: $e');
+      }
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
@@ -139,46 +181,6 @@ class ApiService {
       }
     } catch (e) {
       print('Erro em getMyLoans: $e');
-      throw Exception('Não foi possível conectar ao servidor.');
-    }
-  }
-
-  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
-    final url = Uri.parse(
-      '$apiBaseUrl/livros/genero/$genre?page=$page&size=20',
-    );
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-
-    try {
-      final response = await http.get(
-        url,
-        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> pageData = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> bookList = pageData['content'];
-
-        return bookList.map((bookData) {
-          return Book(
-            id: bookData['isbn'] ?? UniqueKey().toString(),
-            title: bookData['nome'],
-            author: bookData['autor'] ?? 'Autor desconhecido',
-            imageUrl:
-                bookData['imagem'] ??
-                'https://via.placeholder.com/140x210.png?text=Lumi',
-          );
-        }).toList();
-      } else if (response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception('Falha ao carregar livros do gênero: $genre');
-      }
-    } catch (e) {
-      print('Erro em getBooksByGenre: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
