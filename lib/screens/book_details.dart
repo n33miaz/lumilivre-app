@@ -177,14 +177,19 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     // API do Google Books fornece, mas a nossa não.
     const double mockRating = 4.6;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _InfoCard(top: '★ $mockRating', bottom: 'Avaliações'), // retirar mock
-        _InfoCard(top: details.tipoCapa, bottom: 'Tipo'),
-        _InfoCard(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
-        _InfoCard(top: details.classificacaoEtaria, bottom: 'Classificação'),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Wrap(
+        alignment: WrapAlignment.spaceAround,
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          _InfoCard(top: '★ $mockRating', bottom: 'Avaliações'), // retirar mock
+          _InfoCard(top: details.tipoCapa, bottom: 'Tipo'),
+          _InfoCard(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
+          _InfoCard(top: details.classificacaoEtaria, bottom: 'Classificação'),
+        ],
+      ),
     );
   }
 

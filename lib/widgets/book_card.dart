@@ -72,10 +72,11 @@ class BookCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            Expanded(
+            SizedBox(
+              height: 70,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     book.title,
@@ -87,7 +88,6 @@ class BookCard extends StatelessWidget {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 2),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
