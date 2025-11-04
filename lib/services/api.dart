@@ -125,24 +125,37 @@ class ApiService {
     }
   }
 
-  Future<List<Book>> getBooksByGenre(String genre) async {
-    final url = Uri.parse('$apiBaseUrl/livros/genero/$genre');
+  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/livros/genero/$genre?page=$page&size=20',
+    );
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
     try {
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        final Map<String, dynamic> pageData = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
+        final List<dynamic> bookList = pageData['content'];
 
-        return data.map((bookData) {
+        return bookList.map((bookData) {
           return Book(
             id: bookData['isbn'] ?? UniqueKey().toString(),
-            title: bookData['titulo'],
-            author: bookData['autor'],
+            title: bookData['nome'],
+            author: bookData['autor'] ?? 'Autor desconhecido',
             imageUrl:
                 bookData['imagem'] ??
-                'https://via.placeholder.com/140x210.png?text=No+Image',
+                'https://via.placeholder.com/140x210.png?text=Lumi',
           );
         }).toList();
+      } else if (response.statusCode == 204) {
+        return [];
       } else {
         throw Exception('Falha ao carregar livros do gênero: $genre');
       }
