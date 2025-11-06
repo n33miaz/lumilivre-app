@@ -4,12 +4,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum ThemeOption { system, light, dark }
 
-class ThemeProvider with ChangeNotifier {
+class ThemeProvider with ChangeNotifier, WidgetsBindingObserver {
   ThemeOption _themeOption = ThemeOption.light;
+
+  bool _isSystemDark =
+      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+      Brightness.dark;
 
   ThemeProvider() {
     _loadThemePreference();
+    WidgetsBinding.instance.addObserver(this);
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    final newBrightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    final isNowDark = newBrightness == Brightness.dark;
+
+    if (_isSystemDark != isNowDark) {
+      _isSystemDark = isNowDark;
+      if (_themeOption == ThemeOption.system) {
+        notifyListeners();
+      }
+    }
+  }        
 
   ThemeOption get themeOption => _themeOption;
 
@@ -20,14 +45,13 @@ class ThemeProvider with ChangeNotifier {
       case ThemeOption.dark:
         return ThemeMode.dark;
       case ThemeOption.system:
-        return ThemeMode.light;
+        return _isSystemDark ? ThemeMode.dark : ThemeMode.light;
     }
   }
 
   bool get isDarkMode {
     if (_themeOption == ThemeOption.system) {
-      return SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark;
+      return _isSystemDark;
     }
     return _themeOption == ThemeOption.dark;
   }

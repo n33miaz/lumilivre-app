@@ -21,6 +21,13 @@ class ApiService {
 
   Map<String, List<Book>>? _cachedCatalog;
 
+  void clearCatalogCache() {
+    _cachedCatalog = null;
+    if (kDebugMode) {
+      print('--- CACHE DO CATÁLOGO LIMPO ---');
+    }
+  }
+
   Future<LoginResponse> login(String user, String password) async {
     final url = Uri.parse('$apiBaseUrl/auth/login');
 
@@ -94,12 +101,14 @@ class ApiService {
         _cachedCatalog = catalog;
         return catalog;
       } else if (response.statusCode == 204) {
-        _cachedCatalog = {};
         return {};
       } else {
         throw Exception('Falha ao carregar o catálogo.');
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('*** ERRO AO BUSCAR CATÁLOGO: $e');
+      }
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
 import 'package:lumilivre/widgets/header.dart';
 
@@ -74,40 +76,58 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.dispose();
   }
 
+  Future<void> _handleRefresh() async {
+    _apiService.clearCatalogCache();
+
+    setState(() {
+      _allCategories = [];
+      _displayedCategories = [];
+      _initialLoad = true;
+    });
+
+    await _fetchInitialData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          if (_initialLoad)
+          if (_initialLoad && _displayedCategories.isEmpty)
             const Center(child: CircularProgressIndicator())
-          else if (_allCategories.isEmpty)
-            const Center(child: Text('Nenhum livro encontrado no catálogo.'))
           else
-            ListView.builder(
-              controller: _scrollController,
-              itemCount:
-                  _displayedCategories.length + 2,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const SizedBox(height: 160);
-                }
-                if (index <= _displayedCategories.length) {
-                  final category = _displayedCategories[index - 1];
-                  return BookCarousel(
-                    key: ValueKey(category.key),
-                    title: category.key,
-                    books: category.value,
-                  );
-                }
-                if (_displayedCategories.length < _allCategories.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                return const SizedBox(height: 100);
-              },
+            RefreshIndicator(
+              onRefresh: _handleRefresh,
+              color: LumiLivreTheme.primary,
+              child: _allCategories.isEmpty
+                  ? const Center(
+                      child: Text('Nenhum livro encontrado no catálogo.'),
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      itemCount: _displayedCategories.length + 2,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return const SizedBox(height: 160);
+                        }
+                        if (index <= _displayedCategories.length) {
+                          final category = _displayedCategories[index - 1];
+                          return BookCarousel(
+                            key: ValueKey(category.key),
+                            title: category.key,
+                            books: category.value,
+                          );
+                        }
+                        if (_displayedCategories.length <
+                            _allCategories.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        return const SizedBox(height: 100);
+                      },
+                    ),
             ),
           const CustomHeader(title: 'LumiLivre'),
         ],
