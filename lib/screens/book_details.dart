@@ -255,7 +255,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
         children: [
           _InfoRow(label: 'Editora', value: details.editora),
           const Divider(height: 32),
-          _InfoRow(label: 'Gêneros', value: details.generos.join(', ')),
+
+          Row(
+            children: [
+              Text('Gêneros', style: TextStyle(color: Colors.grey[600])),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  details.generos.join(', '),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ),
+            ],
+          ),
+
           const Divider(height: 32),
           Text(
             'Sinopse',

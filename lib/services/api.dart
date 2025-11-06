@@ -88,9 +88,9 @@ class ApiService {
           String genreName = genreData['nome'];
           List<Book> books = (genreData['livros'] as List).map((bookData) {
             return Book(
-              id: bookData['id'],
-              title: bookData['titulo'],
-              author: bookData['autor'],
+              id: (bookData['id'] as num?)?.toInt() ?? 0,
+              title: bookData['titulo'] ?? 'Título Desconhecido',
+              author: bookData['autor'] ?? 'Autor Desconhecido',
               imageUrl:
                   bookData['imagem'] ??
                   'https://via.placeholder.com/140x210.png?text=Lumi',
