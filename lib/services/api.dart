@@ -75,13 +75,20 @@ class ApiService {
     final token = prefs.getString('authToken');
 
     try {
+      print('--- INICIANDO REQUEST HTTP ---');
       final response = await http.get(
         url,
         headers: token != null ? {'Authorization': 'Bearer $token'} : {},
       );
 
+      print('--- STATUS CODE: ${response.statusCode} ---');
+      // print('--- BODY: ${response.body} ---'); //
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+
+        print('--- ITENS RECEBIDOS: ${data.length} ---');
+
         Map<String, List<Book>> catalog = {};
 
         for (var genreData in data) {
@@ -101,13 +108,15 @@ class ApiService {
         _cachedCatalog = catalog;
         return catalog;
       } else if (response.statusCode == 204) {
+        print('--- STATUS 204: CONTEÚDO VAZIO ---');
         return {};
       } else {
-        throw Exception('Falha ao carregar o catálogo.');
+        throw Exception('Falha ao carregar o catálogo: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (kDebugMode) {
         print('*** ERRO AO BUSCAR CATÁLOGO: $e');
+        print('*** STACKTRACE: $stackTrace');
       }
       throw Exception('Não foi possível conectar ao servidor.');
     }

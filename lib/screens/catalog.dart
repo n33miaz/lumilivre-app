@@ -37,9 +37,21 @@ class _CatalogScreenState extends State<CatalogScreen> {
     try {
       final catalogData = await _apiService.getCatalog();
       _allCategories = catalogData.entries.toList();
-      _loadMoreCategories();
+      
+      final nextEnd = 4.clamp(0, _allCategories.length);
+      _displayedCategories = _allCategories.sublist(0, nextEnd);
+
     } catch (e) {
-      // Tratar erro
+      print('Erro na UI ao buscar catálogo: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro de conexão: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
