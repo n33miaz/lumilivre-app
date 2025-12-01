@@ -31,20 +31,12 @@ class ApiService {
   Future<LoginResponse> login(String user, String password) async {
     final url = Uri.parse('$apiBaseUrl/auth/login');
 
-    // final requestBody = jsonEncode({'user': user, 'senha': password});
-    // print('--- ENVIANDO PARA O BACKEND ---');
-    // print(requestBody);
-
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode({'user': user, 'senha': password}),
       );
-
-      // print('--- RESPOSTA DO BACKEND ---');
-      // print('Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         return loginResponseFromJson(response.body);
@@ -82,7 +74,6 @@ class ApiService {
       );
 
       print('--- STATUS CODE: ${response.statusCode} ---');
-      // print('--- BODY: ${response.body} ---'); //
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
@@ -200,6 +191,66 @@ class ApiService {
     } catch (e) {
       print('Erro em getMyLoans: $e');
       throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
+  // --- MÉTODOS ADICIONADOS DENTRO DA CLASSE ---
+
+  Future<List<dynamic>> getMyRequests(String matricula, String token) async {
+    final url = Uri.parse('$apiBaseUrl/solicitacoes/aluno/$matricula');
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar solicitações: $e');
+      return [];
+    }
+  }
+
+  Future<bool> requestLoan(String matricula, String tombo, String token) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/solicitacoes/solicitar?matriculaAluno=$matricula&tomboExemplar=$tombo',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Erro ao solicitar: $e');
+      return false;
+    }
+  }
+
+  Future<bool> requestLoanByBookId(
+    String matricula,
+    int livroId,
+    String token,
+  ) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/solicitacoes/solicitar-mobile?matriculaAluno=$matricula&livroId=$livroId',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print('Erro ao solicitar: $e');
+      return false;
     }
   }
 }

@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:lumilivre/services/api.dart';
+import 'package:provider/provider.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
-import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/models/loan.dart';
+import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
+
+enum LoanStatus {
+  loading,
+  available,
+  unavailable,
+  pending,
+  active,
+  overdue,
+  guest,
+}
 
 class BookDetailsScreen extends StatefulWidget {
   final Book book;
@@ -17,51 +30,233 @@ class BookDetailsScreen extends StatefulWidget {
 
 class _BookDetailsScreenState extends State<BookDetailsScreen> {
   final ApiService _apiService = ApiService();
-  Future<BookDetails>? _bookDetailsFuture;
+
+  BookDetails? _details;
+  LoanStatus _status = LoanStatus.loading;
+  DateTime? _dueDate;
+  bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
-    _bookDetailsFuture = _apiService.getBookDetails(widget.book.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAllData();
+    });
+  }
+
+  Future<void> _loadAllData() async {
+    if (!mounted) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      // 1. Carrega Detalhes do Livro
+      print("DEBUG: Carregando detalhes do livro...");
+      final details = await _apiService.getBookDetails(widget.book.id);
+      print("DEBUG: Detalhes carregados com sucesso.");
+
+      // Verificação de Segurança: Usuário Logado?
+      if (!authProvider.isAuthenticated || authProvider.user == null) {
+        print("DEBUG: Usuário não autenticado ou nulo.");
+        if (mounted) {
+          setState(() {
+            _details = details;
+            _status = LoanStatus.guest;
+            _hasError = false;
+          });
+        }
+        return;
+      }
+
+      // Verificação de Segurança: Matrícula existe?
+      final user = authProvider.user!;
+      if (user.matriculaAluno == null || user.matriculaAluno!.isEmpty) {
+        print(
+          "DEBUG: Usuário logado, mas sem matrícula (provavelmente Admin).",
+        );
+        if (mounted) {
+          setState(() {
+            _details = details;
+            // Se não tem matrícula, não pode pedir emprestado, tratamos como guest ou unavailable
+            _status = LoanStatus.guest;
+            _hasError = false;
+          });
+        }
+        return;
+      }
+
+      final matricula = user.matriculaAluno!;
+      final token = user.token;
+
+      // 2. Carrega Empréstimos
+      print("DEBUG: Carregando empréstimos para matrícula: $matricula...");
+      List<Loan> loans = [];
+      try {
+        loans = await _apiService.getMyLoans(matricula, token);
+        print("DEBUG: Empréstimos carregados: ${loans.length}");
+      } catch (e) {
+        print("ERRO NÃO FATAL (Empréstimos): $e");
+        loans = [];
+      }
+
+      // 3. Carrega Solicitações
+      print("DEBUG: Carregando solicitações...");
+      List<dynamic> requests = [];
+      try {
+        requests = await _apiService.getMyRequests(matricula, token);
+        print("DEBUG: Solicitações carregadas: ${requests.length}");
+      } catch (e) {
+        print("ERRO NÃO FATAL (Solicitações): $e");
+        requests = [];
+      }
+
+      if (mounted) {
+        _calculateStatus(details, loans, requests);
+        setState(() => _hasError = false);
+      }
+    } catch (e, stackTrace) {
+      // Esse print vai nos mostrar exatamente onde quebrou se acontecer de novo
+      print('ERRO CRÍTICO GERAL: $e');
+      print(stackTrace);
+
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _status = LoanStatus.available;
+        });
+      }
+    }
+  }
+
+  void _calculateStatus(
+    BookDetails details,
+    List<Loan> loans,
+    List<dynamic> requests,
+  ) {
+    LoanStatus newStatus = LoanStatus.available;
+    DateTime? date;
+
+    final activeLoan = loans.firstWhere(
+      (l) => l.livroId == widget.book.id,
+      orElse: () => Loan(
+        id: -1,
+        dataEmprestimo: DateTime.now(),
+        dataDevolucao: DateTime(1900),
+        status: '',
+        livroId: -1,
+        livroTitulo: '',
+      ),
+    );
+
+    if (activeLoan.id != -1) {
+      date = activeLoan.dataDevolucao;
+      newStatus = DateTime.now().isAfter(activeLoan.dataDevolucao)
+          ? LoanStatus.overdue
+          : LoanStatus.active;
+    } else {
+      final hasPendingRequest = requests.any((r) {
+        if (r == null || r is! Map) return false;
+
+        final reqLivroId = (r['livroId'] as num?)?.toInt() ?? -1;
+        final reqStatus = r['status']?.toString() ?? '';
+
+        return (reqLivroId == widget.book.id) && (reqStatus == 'PENDENTE');
+      });
+
+      if (hasPendingRequest) {
+        newStatus = LoanStatus.pending;
+      } else {
+        if (details.exemplaresDisponiveis <= 0) {
+          newStatus = LoanStatus.unavailable;
+        } else {
+          newStatus = LoanStatus.available;
+        }
+      }
+    }
+
+    setState(() {
+      _details = details;
+      _status = newStatus;
+      _dueDate = date;
+    });
+  }
+
+  Future<void> _handleLoanRequest() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    setState(() => _status = LoanStatus.loading);
+
+    bool success = await _apiService.requestLoanByBookId(
+      auth.user!.matriculaAluno!,
+      widget.book.id,
+      auth.user!.token,
+    );
+
+    if (success) {
+      await _loadAllData();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Solicitação enviada com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        setState(() => _status = LoanStatus.available);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao solicitar. Verifique se há exemplares.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<BookDetails>(
-        future: _bookDetailsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro ao carregar: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Nenhum detalhe encontrado.'));
-          }
-
-          final details = snapshot.data!;
-
-          return CustomScrollView(
-            slivers: [
-              _buildSliverAppBar(context),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  _buildHeaderSection(context, details),
-                  const SizedBox(height: 24),
-                  _buildInfoRow(context, details),
-                  const SizedBox(height: 24),
-                  _buildActionButtons(context),
-                  const SizedBox(height: 24),
-                  _buildAdditionalInfo(context, details),
-                  const SizedBox(height: 40),
-                ]),
+    // TRATAMENTO DE ERRO
+    if (_hasError && _details == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Detalhes')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text('Não foi possível carregar os dados.'),
+              ElevatedButton(
+                onPressed: _loadAllData,
+                child: const Text('Tentar Novamente'),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: _details == null
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                _buildSliverAppBar(context),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildHeaderSection(context, _details!),
+                    const SizedBox(height: 24),
+                    _buildInfoRow(context, _details!),
+                    const SizedBox(height: 24),
+                    _buildActionButtons(context),
+                    const SizedBox(height: 24),
+                    _buildAdditionalInfo(context, _details!),
+                    const SizedBox(height: 40),
+                  ]),
+                ),
+              ],
+            ),
     );
   }
 
@@ -77,7 +272,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       actions: [
         PopupMenuButton<String>(
           onSelected: (value) {
-            // TODO: "Livros do mesmo autor"
             print('Selecionado: $value');
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -195,8 +389,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
           _InfoItem(top: tipoCapaFormatado, bottom: 'Tipo da Capa'),
 
-          _InfoItem(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
-
           Column(
             children: [
               SizedBox(
@@ -232,7 +424,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         children: [
           const _LikeButton(),
           const SizedBox(width: 16),
-          const Expanded(child: _BorrowButton()),
+          Expanded(
+            child: _BorrowButton(
+              status: _status,
+              dueDate: _dueDate,
+              onPressed: _handleLoanRequest,
+            ),
+          ),
         ],
       ),
     );
@@ -345,66 +543,105 @@ class _LikeButtonState extends State<_LikeButton> {
   }
 }
 
-class _BorrowButton extends StatefulWidget {
-  const _BorrowButton();
+class _BorrowButton extends StatelessWidget {
+  final LoanStatus status;
+  final DateTime? dueDate;
+  final VoidCallback? onPressed;
 
-  @override
-  State<_BorrowButton> createState() => _BorrowButtonState();
-}
-
-class _BorrowButtonState extends State<_BorrowButton> {
-  bool _isPressed = false;
+  const _BorrowButton({required this.status, this.dueDate, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
+    Color backgroundColor;
+    Color textColor = Colors.white;
+    String text;
+    String iconPath = 'assets/icons/loans.svg';
+    bool isClickable = false;
+
+    switch (status) {
+      case LoanStatus.loading:
+        return const SizedBox(
+          height: 56,
+          child: Center(child: CircularProgressIndicator()),
+        );
+
+      case LoanStatus.guest:
+        backgroundColor = Colors.grey;
+        text = 'FAÇA LOGIN PARA SOLICITAR';
+        break;
+
+      case LoanStatus.available:
+        backgroundColor = LumiLivreTheme.primary;
+        text = 'SOLICITAR EMPRÉSTIMO';
+        isClickable = true;
+        break;
+
+      case LoanStatus.pending:
+        backgroundColor = Colors.amber;
+        text = 'AGUARDANDO APROVAÇÃO';
+        iconPath = 'assets/icons/loans-active.svg';
+        break;
+
+      case LoanStatus.active:
+        backgroundColor = Colors.green;
+        String dateStr = dueDate != null
+            ? '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}'
+            : '?';
+        text = 'EM USO ATÉ: $dateStr';
+        break;
+
+      case LoanStatus.overdue:
+        backgroundColor = Colors.redAccent;
+        text = 'DEVOLUÇÃO EXCEDIDA';
+        break;
+
+      case LoanStatus.unavailable:
+        backgroundColor = Colors.grey;
+        if (dueDate != null && dueDate!.isAfter(DateTime.now())) {
+          String dateStr = '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}';
+          text = 'DISPONÍVEL A PARTIR DE: $dateStr';
+        } else {
+          text = 'EMPRESTADO (SEM PREVISÃO)';
+        }
+        break;
+    }
+
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        // TODO: Lógica de solicitar empréstimo
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Solicitação enviada!')));
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: isClickable ? onPressed : null,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 300),
         height: 56,
         decoration: BoxDecoration(
-          color: _isPressed
-              ? LumiLivreTheme.primary.withOpacity(0.9)
-              : LumiLivreTheme.primary,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: _isPressed
-              ? []
-              : [
+          boxShadow: isClickable
+              ? [
                   BoxShadow(
-                    color: LumiLivreTheme.primary.withOpacity(0.4),
+                    color: backgroundColor.withOpacity(0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
-                ],
+                ]
+              : [],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              _isPressed
-                  ? 'assets/icons/loans-active.svg'
-                  : 'assets/icons/loans.svg',
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
+            if (status == LoanStatus.available)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: SvgPicture.asset(
+                  iconPath,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'SOLICITAR EMPRÉSTIMO',
+            Text(
+              text,
               style: TextStyle(
-                color: Colors.white,
+                color: textColor,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ],

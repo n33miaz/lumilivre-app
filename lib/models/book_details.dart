@@ -18,6 +18,7 @@ class BookDetails {
   final String tipoCapa;
   final String? imagem;
   final List<String> generos;
+  final int exemplaresDisponiveis;
 
   BookDetails({
     required this.isbn,
@@ -34,6 +35,7 @@ class BookDetails {
     required this.tipoCapa,
     this.imagem,
     required this.generos,
+    required this.exemplaresDisponiveis,
   });
 
   factory BookDetails.fromJson(Map<String, dynamic> json) {
@@ -41,7 +43,10 @@ class BookDetails {
       if (dateVal == null) return DateTime(1900, 1, 1);
       try {
         if (dateVal is List) {
-          return DateTime(dateVal[0], dateVal[1], dateVal[2]);
+          final y = dateVal.isNotEmpty ? (dateVal[0] as int) : 1900;
+          final m = dateVal.length > 1 ? (dateVal[1] as int) : 1;
+          final d = dateVal.length > 2 ? (dateVal[2] as int) : 1;
+          return DateTime(y, m, d);
         }
         return DateTime.parse(dateVal.toString());
       } catch (e) {
@@ -64,8 +69,12 @@ class BookDetails {
       tipoCapa: json["tipoCapa"] ?? 'Capa comum',
       imagem: json["imagem"],
       generos: json["generos"] != null
-          ? List<String>.from(json["generos"])
+          ? (json["generos"] as List)
+                .map((e) => e?.toString() ?? "")
+                .where((e) => e.isNotEmpty)
+                .toList()
           : [],
+      exemplaresDisponiveis: json["exemplaresDisponiveis"] ?? 0,
     );
   }
 }
