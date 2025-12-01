@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
@@ -15,28 +15,14 @@ class BookDetailsScreen extends StatefulWidget {
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
 }
 
-class _BookDetailsScreenState extends State<BookDetailsScreen>
-    with TickerProviderStateMixin {
+class _BookDetailsScreenState extends State<BookDetailsScreen> {
   final ApiService _apiService = ApiService();
   Future<BookDetails>? _bookDetailsFuture;
-
-  late AnimationController _shakeController;
 
   @override
   void initState() {
     super.initState();
     _bookDetailsFuture = _apiService.getBookDetails(widget.book.id);
-
-    _shakeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-  }
-
-  @override
-  void dispose() {
-    _shakeController.dispose();
-    super.dispose();
   }
 
   @override
@@ -59,12 +45,12 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
 
           return CustomScrollView(
             slivers: [
-              _buildSliverAppBar(context, details),
+              _buildSliverAppBar(context),
               SliverList(
                 delegate: SliverChildListDelegate([
                   _buildHeaderSection(context, details),
                   const SizedBox(height: 24),
-                  _buildInfoCards(context, details),
+                  _buildInfoRow(context, details),
                   const SizedBox(height: 24),
                   _buildActionButtons(context),
                   const SizedBox(height: 24),
@@ -79,8 +65,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
-  // header da página
-  SliverAppBar _buildSliverAppBar(BuildContext context, BookDetails details) {
+  SliverAppBar _buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
       pinned: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -90,24 +75,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
-        IconButton(icon: const Icon(Icons.search), onPressed: () {}),
         PopupMenuButton<String>(
           onSelected: (value) {
+            // TODO: "Livros do mesmo autor"
             print('Selecionado: $value');
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
             const PopupMenuItem<String>(
               value: 'author',
               child: ListTile(
+                contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.person_search),
                 title: Text('Livros do mesmo autor'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Compartilhar'),
               ),
             ),
           ],
@@ -116,29 +95,47 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
-  // capa, título, autor e lançamento
   Widget _buildHeaderSection(BuildContext context, BookDetails details) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // capa
-          Card(
-            elevation: 8,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Image.network(
-              details.imagem ?? widget.book.imageUrl,
-              height: 180,
-              width: 120,
-              fit: BoxFit.cover,
+          SizedBox(
+            width: 120,
+            height: 180,
+            child: Card(
+              elevation: 8,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Image.network(
+                (details.imagem != null && details.imagem!.isNotEmpty)
+                    ? details.imagem!
+                    : widget.book.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image_not_supported, color: Colors.grey),
+                        SizedBox(height: 4),
+                        Text(
+                          'Sem Capa',
+                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(width: 20),
-          // info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,6 +146,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -156,6 +155,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: LumiLivreTheme.primary,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -172,81 +173,71 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
-  // cards de detalhes
-  Widget _buildInfoCards(BuildContext context, BookDetails details) {
-    // API do Google Books fornece, mas a nossa não.
-    const double mockRating = 4.6;
+  Widget _buildInfoRow(BuildContext context, BookDetails details) {
+    final tipoCapaFormatado = details.tipoCapa
+        .replaceFirst('Capa ', '')
+        .toUpperCase();
+
+    final normalizedClassificacao = details.classificacaoEtaria
+        .toLowerCase()
+        .trim()
+        .replaceAll(' ', '_');
+
+    final classificacaoAsset = 'assets/images/$normalizedClassificacao.png';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        alignment: WrapAlignment.spaceAround,
-        spacing: 12,
-        runSpacing: 12,
-        children: [
-          _InfoCard(top: '★ $mockRating', bottom: 'Avaliações'), // retirar mock
-          _InfoCard(top: details.tipoCapa, bottom: 'Tipo'),
-          _InfoCard(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
-          _InfoCard(top: details.classificacaoEtaria, bottom: 'Classificação'),
-        ],
-      ),
-    );
-  }
-
-  // botões like, favorito e empréstimos
-  Widget _buildActionButtons(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ActionButton(
-            icon: Icons.favorite_border,
-            onTap: () {},
-            type: 'like',
-          ),
-          _ActionButton(
-            icon: Icons.star_border,
-            onTap: () {},
-            type: 'favorite',
-          ),
+          const _InfoItem(top: '★ 4.6', bottom: 'Avaliações'),
 
-          GestureDetector(
-            onTap: () {
-              // animação de shake
-              _shakeController.forward(from: 0.0);
-              // TODO: lógica para solicitar empréstimo
-            },
-            child: AnimatedBuilder(
-              animation: _shakeController,
-              builder: (context, child) {
-                final sineValue = sin(2 * pi * 2 * _shakeController.value);
-                return Transform.translate(
-                  offset: Offset(sineValue * 8, 0),
-                  child: child,
-                );
-              },
-              child: Material(
-                elevation: 8,
-                shape: const CircleBorder(),
-                color: LumiLivreTheme.primary,
-                child: const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Icon(
-                    Icons.add_shopping_cart,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+          _InfoItem(top: tipoCapaFormatado, bottom: 'Tipo da Capa'),
+
+          _InfoItem(top: details.numeroPaginas.toString(), bottom: 'Páginas'),
+
+          Column(
+            children: [
+              SizedBox(
+                height: 24,
+                child: Image.asset(
+                  classificacaoAsset,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.info_outline,
+                      size: 24,
+                      color: Colors.grey[600],
+                    );
+                  },
                 ),
               ),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                'Faixa Etária',
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  // sinopse e outros
+  Widget _buildActionButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      child: Row(
+        children: [
+          const _LikeButton(),
+          const SizedBox(width: 16),
+          const Expanded(child: _BorrowButton()),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAdditionalInfo(BuildContext context, BookDetails details) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -255,7 +246,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
         children: [
           _InfoRow(label: 'Editora', value: details.editora),
           const Divider(height: 32),
-
           Row(
             children: [
               Text('Gêneros', style: TextStyle(color: Colors.grey[600])),
@@ -271,7 +261,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
               ),
             ],
           ),
-
           const Divider(height: 32),
           Text(
             'Sinopse',
@@ -292,18 +281,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   }
 }
 
-class _InfoCard extends StatelessWidget {
+class _InfoItem extends StatelessWidget {
   final String top;
   final String bottom;
-  const _InfoCard({required this.top, required this.bottom});
+  const _InfoItem({required this.top, required this.bottom});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          top,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        SizedBox(
+          height: 24,
+          child: Center(
+            child: Text(
+              top,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
         ),
         const SizedBox(height: 4),
         Text(bottom, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
@@ -312,98 +306,108 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatefulWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final String type; // 'like', 'favorite', ou 'borrow'
-
-  const _ActionButton({
-    required this.icon,
-    required this.onTap,
-    required this.type,
-  });
+class _LikeButton extends StatefulWidget {
+  const _LikeButton();
 
   @override
-  State<_ActionButton> createState() => _ActionButtonState();
+  State<_LikeButton> createState() => _LikeButtonState();
 }
 
-class _ActionButtonState extends State<_ActionButton> {
-  bool _isTapped = false;
-
-  void _handleTap() {
-    setState(() => _isTapped = true);
-    // A animação acontece, e depois de um tempo, volta ao estado original
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        setState(() => _isTapped = false);
-      }
-    });
-    widget.onTap();
-  }
+class _LikeButtonState extends State<_LikeButton> {
+  bool _isLiked = false;
 
   @override
   Widget build(BuildContext context) {
-    // coração pulsando
-    if (widget.type == 'like') {
-      return GestureDetector(
-        onTap: _handleTap,
-        child: AnimatedScale(
-          scale: _isTapped ? 1.3 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          child: Material(
-            color: Theme.of(context).cardColor,
-            shape: const CircleBorder(),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Icon(
-                _isTapped ? Icons.favorite : Icons.favorite_border,
-                color: _isTapped ? Colors.redAccent : LumiLivreTheme.primary,
-                size: 28,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // estrela girando
-    if (widget.type == 'favorite') {
-      return GestureDetector(
-        onTap: _handleTap,
-        child: AnimatedRotation(
-          turns: _isTapped ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOutBack,
-          child: Material(
-            color: Theme.of(context).cardColor,
-            shape: const CircleBorder(),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Icon(
-                _isTapped ? Icons.star : Icons.star_border,
-                color: _isTapped ? Colors.amber : LumiLivreTheme.primary,
-                size: 28,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // sem animação, por enquanto
     return Material(
       color: Theme.of(context).cardColor,
-      shape: const CircleBorder(),
-      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade300),
+      ),
+      elevation: 2,
       child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          setState(() {
+            _isLiked = !_isLiked;
+          });
+        },
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Icon(widget.icon, color: LumiLivreTheme.primary, size: 28),
+          padding: const EdgeInsets.all(14.0),
+          child: Icon(
+            _isLiked ? Icons.favorite : Icons.favorite_border,
+            color: _isLiked ? Colors.redAccent : LumiLivreTheme.primary,
+            size: 28,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BorrowButton extends StatefulWidget {
+  const _BorrowButton();
+
+  @override
+  State<_BorrowButton> createState() => _BorrowButtonState();
+}
+
+class _BorrowButtonState extends State<_BorrowButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        // TODO: Lógica de solicitar empréstimo
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Solicitação enviada!')));
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        height: 56,
+        decoration: BoxDecoration(
+          color: _isPressed
+              ? LumiLivreTheme.primary.withOpacity(0.9)
+              : LumiLivreTheme.primary,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: _isPressed
+              ? []
+              : [
+                  BoxShadow(
+                    color: LumiLivreTheme.primary.withOpacity(0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              _isPressed
+                  ? 'assets/icons/loans-active.svg'
+                  : 'assets/icons/loans.svg',
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'SOLICITAR EMPRÉSTIMO',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -4,22 +4,20 @@ BookDetails bookDetailsFromJson(String str) =>
     BookDetails.fromJson(json.decode(str));
 
 class BookDetails {
-  final String isbn; // inutilizavel?
+  final String isbn;
   final String nome;
   final DateTime dataLancamento;
   final int numeroPaginas;
   final String cdd;
   final String editora;
   final String classificacaoEtaria;
-  final String edicao; // inutilizavel?
-  final int? volume; // inutilizavel?
+  final String edicao;
+  final int? volume;
   final String sinopse;
   final String autor;
   final String tipoCapa;
   final String? imagem;
   final List<String> generos;
-  // final double? averageRating;
-  // final int? ratingsCount;
 
   BookDetails({
     required this.isbn,
@@ -38,20 +36,36 @@ class BookDetails {
     required this.generos,
   });
 
-  factory BookDetails.fromJson(Map<String, dynamic> json) => BookDetails(
-    isbn: json["isbn"] ?? 'N/A',
-    nome: json["nome"],
-    dataLancamento: DateTime.parse(json["data_lancamento"]),
-    numeroPaginas: json["numero_paginas"],
-    cdd: json["cdd"] != null ? json["cdd"]["codigo"] : 'N/A',
-    editora: json["editora"],
-    classificacaoEtaria: json["classificacao_etaria"],
-    edicao: json["edicao"] ?? 'N/A',
-    volume: json["volume"],
-    sinopse: json["sinopse"] ?? 'Sinopse não disponível.',
-    autor: json["autor"],
-    tipoCapa: json["tipo_capa"],
-    imagem: json["imagem"],
-    generos: List<String>.from(json["generos"].map((x) => x['nome'])),
-  );
+  factory BookDetails.fromJson(Map<String, dynamic> json) {
+    DateTime parseDate(dynamic dateVal) {
+      if (dateVal == null) return DateTime(1900, 1, 1);
+      try {
+        if (dateVal is List) {
+          return DateTime(dateVal[0], dateVal[1], dateVal[2]);
+        }
+        return DateTime.parse(dateVal.toString());
+      } catch (e) {
+        return DateTime(1900, 1, 1);
+      }
+    }
+
+    return BookDetails(
+      isbn: json["isbn"] ?? 'N/A',
+      nome: json["nome"] ?? 'Título Indisponível',
+      dataLancamento: parseDate(json["dataLancamento"]),
+      numeroPaginas: json["numeroPaginas"] ?? 0,
+      cdd: json["cdd"] ?? 'N/A',
+      editora: json["editora"] ?? 'Editora não informada',
+      classificacaoEtaria: json["classificacaoEtaria"] ?? 'Livre',
+      edicao: json["edicao"]?.toString() ?? 'N/A',
+      volume: json["volume"],
+      sinopse: json["sinopse"] ?? 'Sinopse não disponível.',
+      autor: json["autor"] ?? 'Autor desconhecido',
+      tipoCapa: json["tipoCapa"] ?? 'Capa comum',
+      imagem: json["imagem"],
+      generos: json["generos"] != null
+          ? List<String>.from(json["generos"])
+          : [],
+    );
+  }
 }
