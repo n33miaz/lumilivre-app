@@ -75,7 +75,7 @@ class _MainNavigatorState extends State<MainNavigator> {
               child: const Text('ALTERAR AGORA'),
               onPressed: () {
                 _launchURL(
-                  'https://lumilivre-web.onrender.com/mudar-senha',
+                  'https://lumilivre.com.br/mudar-senha',
                 ); // URL vai mudar
                 Navigator.of(context).pop();
               },

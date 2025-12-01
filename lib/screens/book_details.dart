@@ -50,12 +50,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      // 1. Carrega Detalhes do Livro
       print("DEBUG: Carregando detalhes do livro...");
       final details = await _apiService.getBookDetails(widget.book.id);
       print("DEBUG: Detalhes carregados com sucesso.");
 
-      // Verificação de Segurança: Usuário Logado?
       if (!authProvider.isAuthenticated || authProvider.user == null) {
         print("DEBUG: Usuário não autenticado ou nulo.");
         if (mounted) {
@@ -68,16 +66,14 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         return;
       }
 
-      // Verificação de Segurança: Matrícula existe?
       final user = authProvider.user!;
       if (user.matriculaAluno == null || user.matriculaAluno!.isEmpty) {
-        print(
-          "DEBUG: Usuário logado, mas sem matrícula (provavelmente Admin).",
-        );
+        // print(
+        //   "DEBUG: Usuário logado, mas sem matrícula (provavelmente Admin).",
+        // );
         if (mounted) {
           setState(() {
             _details = details;
-            // Se não tem matrícula, não pode pedir emprestado, tratamos como guest ou unavailable
             _status = LoanStatus.guest;
             _hasError = false;
           });
@@ -88,25 +84,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       final matricula = user.matriculaAluno!;
       final token = user.token;
 
-      // 2. Carrega Empréstimos
-      print("DEBUG: Carregando empréstimos para matrícula: $matricula...");
+      // print("DEBUG: Carregando empréstimos para matrícula: $matricula...");
       List<Loan> loans = [];
       try {
         loans = await _apiService.getMyLoans(matricula, token);
-        print("DEBUG: Empréstimos carregados: ${loans.length}");
+        // print("DEBUG: Empréstimos carregados: ${loans.length}");
       } catch (e) {
-        print("ERRO NÃO FATAL (Empréstimos): $e");
+        // print("ERRO NÃO FATAL (Empréstimos): $e");
         loans = [];
       }
 
-      // 3. Carrega Solicitações
-      print("DEBUG: Carregando solicitações...");
+      // print("DEBUG: Carregando solicitações...");
       List<dynamic> requests = [];
       try {
         requests = await _apiService.getMyRequests(matricula, token);
-        print("DEBUG: Solicitações carregadas: ${requests.length}");
+        // print("DEBUG: Solicitações carregadas: ${requests.length}");
       } catch (e) {
-        print("ERRO NÃO FATAL (Solicitações): $e");
+        // print("ERRO NÃO FATAL (Solicitações): $e");
         requests = [];
       }
 
@@ -114,10 +108,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         _calculateStatus(details, loans, requests);
         setState(() => _hasError = false);
       }
-    } catch (e, stackTrace) {
-      // Esse print vai nos mostrar exatamente onde quebrou se acontecer de novo
-      print('ERRO CRÍTICO GERAL: $e');
-      print(stackTrace);
+    } catch (e) {
+      // , stackTrace
+      // print('ERRO CRÍTICO GERAL: $e');
+      // print(stackTrace);
 
       if (mounted) {
         setState(() {

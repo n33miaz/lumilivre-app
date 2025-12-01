@@ -21,13 +21,14 @@ class _ProfileScreenState extends State<ProfileScreen>
   late TabController _tabController;
   final ApiService _apiService = ApiService();
   Future<List<Loan>>? _loansFuture;
+  String? _studentName;
 
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
       setState(() {
@@ -38,10 +39,21 @@ class _ProfileScreenState extends State<ProfileScreen>
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
         authProvider.user?.matriculaAluno != null) {
-      _loansFuture = _apiService.getMyLoans(
-        authProvider.user!.matriculaAluno!,
-        authProvider.user!.token,
-      );
+      final matricula = authProvider.user!.matriculaAluno!;
+      final token = authProvider.user!.token;
+      
+      _loansFuture = _apiService.getMyLoans(matricula, token);
+      _fetchStudentName(matricula, token);
+    }
+  }
+
+  // TODO: ajustar método auxiliar para buscar o nome
+  Future<void> _fetchStudentName(String matricula, String token) async {
+    final name = await _apiService.getStudentName(matricula, token);
+    if (mounted && name != null) {
+      setState(() {
+        _studentName = name;
+      });
     }
   }
 
@@ -73,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             (_) => Colors.transparent,
           ),
           tabs: [
+            // EMPRÉSTIMOS
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -88,6 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
             ),
+            // CURTIDOS
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -98,25 +112,19 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
             ),
+            // RANKING
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(
-                  _currentIndex == 2 ? Icons.star : Icons.star_border,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-            ),
-            Tab(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(
-                  _currentIndex == 3
-                      ? Icons.how_to_vote
-                      : Icons.how_to_vote_outlined,
-                  color: Colors.white,
-                  size: 28,
+                child: SvgPicture.asset(
+                  _currentIndex == 2
+                      ? 'assets/icons/ranking-active.svg'
+                      : 'assets/icons/ranking.svg',
+                  height: 28,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -127,15 +135,17 @@ class _ProfileScreenState extends State<ProfileScreen>
         controller: _tabController,
         children: [
           _buildLoansList(),
-          const Center(child: Text('Livros Favoritos')),
           const Center(child: Text('Livros Curtidos')),
-          const Center(child: Text('Livros Votados')),
+          const Center(child: Text('Ranking de Leitores')),
         ],
       ),
     );
   }
 
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
+    String displayName =
+        _studentName ?? authProvider.user?.email.split('@')[0] ?? 'Aluno';
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -151,11 +161,13 @@ class _ProfileScreenState extends State<ProfileScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                authProvider.user?.email.split('@')[0] ?? 'Aluno',
+                displayName, // TODO: Usar o nome do aluno
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
                 'Ranking: #12 de 345', // MOCK
@@ -166,34 +178,42 @@ class _ProfileScreenState extends State<ProfileScreen>
             ],
           ),
         ),
-        IconButton(
-          icon: const Icon(
-            Icons.settings_outlined,
-            color: Colors.white,
-            size: 30,
+
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(12),
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const SettingsScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-                      final tween = Tween(
-                        begin: begin,
-                        end: end,
-                      ).chain(CurveTween(curve: curve));
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-              ),
-            );
-          },
+          margin: const EdgeInsets.only(left: 8),
+          child: IconButton(
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: Colors.white,
+              size: 26,
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const SettingsScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(1.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
+                        final tween = Tween(
+                          begin: begin,
+                          end: end,
+                        ).chain(CurveTween(curve: curve));
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                ),
+              );
+            },
+          ),
         ),
       ],
     );

@@ -194,8 +194,6 @@ class ApiService {
     }
   }
 
-  // --- MÉTODOS ADICIONADOS DENTRO DA CLASSE ---
-
   Future<List<dynamic>> getMyRequests(String matricula, String token) async {
     final url = Uri.parse('$apiBaseUrl/solicitacoes/aluno/$matricula');
     try {
@@ -252,5 +250,29 @@ class ApiService {
       print('Erro ao solicitar: $e');
       return false;
     }
+  }
+
+  Future<String?> getStudentName(String matricula, String token) async {
+    final url = Uri.parse('$apiBaseUrl/alunos/$matricula');
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
+        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          return jsonResponse['data']['nomeCompleto'];
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao buscar nome do aluno: $e');
+      }
+    }
+    return null;
   }
 }
