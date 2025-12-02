@@ -24,9 +24,9 @@ class ApiService {
 
   void clearCatalogCache() {
     _cachedCatalog = null;
-    if (kDebugMode) {
-      print('--- CACHE DO CATÁLOGO LIMPO ---');
-    }
+    // if (kDebugMode) {
+    //   print('--- CACHE DO CATÁLOGO LIMPO ---');
+    // }
   }
 
   Future<LoginResponse> login(String user, String password) async {
@@ -50,6 +50,40 @@ class ApiService {
       throw Exception(
         'Não foi possível conectar ao servidor. Tente novamente.',
       );
+    }
+  }
+
+  Future<bool> changePassword(
+    String matricula,
+    String currentPassword,
+    String newPassword,
+    String token,
+  ) async {
+    final url = Uri.parse('$apiBaseUrl/usuarios/alterar-senha');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'matricula': matricula,
+          'senhaAtual': currentPassword,
+          'novaSenha': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        final errorData = jsonDecode(utf8.decode(response.bodyBytes));
+        throw Exception(errorData['message'] ?? 'Erro ao alterar senha');
+      }
+    } catch (e) {
+      print('Erro changePassword: $e');
+      rethrow;
     }
   }
 

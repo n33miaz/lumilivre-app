@@ -40,6 +40,11 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void completeInitialPasswordChange() {
+    _isInitialPassword = false;
+    notifyListeners();
+  }
+
   Future<void> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('authToken') || !prefs.containsKey('userData')) {

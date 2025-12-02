@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/header.dart';
+import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
 
 import 'catalog.dart';
 import 'search.dart';
@@ -36,51 +36,19 @@ class _MainNavigatorState extends State<MainNavigator> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
       if (authProvider.isAuthenticated && authProvider.isInitialPassword) {
-        _showChangePasswordDialog(context);
+        _showMandatoryPasswordDialog(context);
       }
     });
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Não foi possível abrir $url';
-    }
-  }
-
-  void _showChangePasswordDialog(BuildContext context) {
+  void _showMandatoryPasswordDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alterar Senha'),
-          content: const Text(
-            'Percebemos que você está usando uma senha inicial. Para sua segurança, recomendamos alterá-la agora.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('DEIXAR PARA DEPOIS'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text('ALTERAR AGORA'),
-              onPressed: () {
-                _launchURL('https://lumilivre.com.br/mudar-senha');
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return const MandatoryPasswordDialog();
       },
     );
   }
@@ -128,8 +96,31 @@ class _MainNavigatorState extends State<MainNavigator> {
 
   @override
   Widget build(BuildContext context) {
-    String headerTitle = 'LumiLivre';
+    final auth = Provider.of<AuthProvider>(context);
 
+    if (auth.isInitialPassword) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/logo.svg',
+                height: 100,
+                colorFilter: const ColorFilter.mode(
+                  LumiLivreTheme.primary,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text("Aguardando alteração de senha..."),
+            ],
+          ),
+        ),
+      );
+    }
+
+    String headerTitle = 'LumiLivre';
     bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(

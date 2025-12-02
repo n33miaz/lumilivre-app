@@ -20,14 +20,16 @@ class LoginResponse {
     required this.isInitialPassword,
   });
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
-    id: json["id"],
-    email: json["email"],
-    role: json["role"],
-    matriculaAluno: json["matriculaAluno"],
-    token: json["token"],
-    isInitialPassword: json["isInitialPassword"] ?? false,
-  );
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      id: json["id"],
+      email: json["email"],
+      role: json["role"],
+      matriculaAluno: json["matriculaAluno"],
+      token: json["token"],
+      isInitialPassword: json["isInitialPassword"] ?? false,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "id": id,
