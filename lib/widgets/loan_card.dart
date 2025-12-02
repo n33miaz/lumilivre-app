@@ -143,7 +143,7 @@ class LoanCard extends StatelessWidget {
                       Text(
                         isRequest
                             ? 'Solicitado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}'
-                            : 'Retirado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
+                            : 'Emprestado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Colors.grey,
                         ),

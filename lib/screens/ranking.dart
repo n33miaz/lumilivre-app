@@ -56,7 +56,6 @@ class _RankingScreenState extends State<RankingScreen> {
         _cursos = results[0] as List<FilterItem>;
         _modulos = results[1] as List<FilterItem>;
         _turnos = results[2] as List<FilterItem>;
-        // O ranking já é setado dentro de _fetchRankingData, mas aqui garantimos o loading
         _isLoading = false;
       });
     }
@@ -68,7 +67,7 @@ class _RankingScreenState extends State<RankingScreen> {
       cursoId: _selectedCursoId,
       moduloId: _selectedModuloId,
       turnoId: _selectedTurnoId,
-      top: 50, // Trazemos top 50 para a lista
+      top: 50,
     );
     _ranking = data;
     return data;

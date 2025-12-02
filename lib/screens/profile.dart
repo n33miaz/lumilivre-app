@@ -1,5 +1,7 @@
+import 'dart:io'; // Agora será usado!
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart'; // Importante
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/services/api.dart';
@@ -22,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   final ApiService _apiService = ApiService();
 
   String? _studentName;
+  String? _profileImageUrl; // Variável para a foto
   int _currentIndex = 0;
 
   // Dados do Ranking para o Header
@@ -45,30 +48,30 @@ class _ProfileScreenState extends State<ProfileScreen>
     _loadHeaderData();
   }
 
-  void _loadHeaderData() {
+  // --- AQUI ESTAVA O ERRO: Agora só existe UMA definição desta função ---
+  void _loadHeaderData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
         authProvider.user?.matriculaAluno != null) {
       final matricula = authProvider.user!.matriculaAluno!;
       final token = authProvider.user!.token;
 
-      _fetchStudentName(matricula, token);
-      _fetchMyRank(matricula, token);
-    }
-  }
+      // Busca dados completos (Nome + Foto)
+      final data = await _apiService.getStudentData(matricula, token);
 
-  Future<void> _fetchStudentName(String matricula, String token) async {
-    try {
-      final name = await _apiService.getStudentName(matricula, token);
-      if (mounted && name != null) setState(() => _studentName = name);
-    } catch (e) {
-      print('Erro ao buscar nome: $e');
+      if (mounted && data != null) {
+        setState(() {
+          _studentName = data['nomeCompleto'];
+          _profileImageUrl = data['foto']; // Pega a URL da foto
+        });
+      }
+
+      _fetchMyRank(matricula, token);
     }
   }
 
   Future<void> _fetchMyRank(String matricula, String token) async {
     try {
-      // Busca o ranking geral (top 100 para garantir)
       final ranking = await _apiService.getRanking(token: token, top: 100);
       final index = ranking.indexWhere((r) => r.matricula == matricula);
 
@@ -82,6 +85,43 @@ class _ProfileScreenState extends State<ProfileScreen>
       }
     } catch (e) {
       print('Erro ao buscar ranking: $e');
+    }
+  }
+
+  // Função para escolher e enviar foto
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    // Abre a galeria
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+
+      // Mostra loading ou feedback visual se desejar
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enviando foto...')));
+
+      final success = await _apiService.uploadProfilePicture(
+        auth.user!.matriculaAluno!,
+        auth.user!.token,
+        image.path,
+      );
+
+      if (success) {
+        _loadHeaderData(); // Recarrega para mostrar a nova foto
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto atualizada com sucesso!')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao atualizar foto.')),
+          );
+        }
+      }
     }
   }
 
@@ -99,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.primaryColor,
-        toolbarHeight: 150,
+        toolbarHeight: 140, // Altura ajustada
         elevation: 0,
         title: _buildProfileHeader(authProvider, theme),
         bottom: TabBar(
@@ -113,7 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen>
             (_) => Colors.transparent,
           ),
           tabs: [
-            // EMPRÉSTIMOS
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -129,7 +168,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
             ),
-            // CURTIDOS
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -140,7 +178,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
             ),
-            // RANKING
             Tab(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -162,50 +199,82 @@ class _ProfileScreenState extends State<ProfileScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 1. Aba de Empréstimos (Refatorada)
           const LoansTab(),
-
-          // 2. Aba de Curtidos (Placeholder)
           const Center(child: Text('Livros Curtidos')),
-
-          // 3. Aba de Ranking (Já criada anteriormente)
           const RankingScreen(),
         ],
       ),
     );
   }
 
+  // HEADER REFATORADO
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
     String displayName =
         _studentName ?? authProvider.user?.email.split('@')[0] ?? 'Aluno';
+    String matricula = authProvider.user?.matriculaAluno ?? '---';
+    String rankingText = _myRankPosition != null ? '#$_myRankPosition' : '--';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 30,
-          backgroundColor: Colors.white.withOpacity(0.3),
-          child: const Icon(Icons.person, size: 40, color: Colors.white),
+        // FOTO COM CLIQUE PARA EDITAR
+        Stack(
+          children: [
+            GestureDetector(
+              onTap: _pickAndUploadImage,
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundImage: _profileImageUrl != null
+                    ? NetworkImage(_profileImageUrl!)
+                    : null,
+                child: _profileImageUrl == null
+                    ? const Icon(Icons.person, size: 40, color: Colors.white)
+                    : null,
+              ),
+            ),
+            Positioned(
+              right: -2,
+              bottom: -2,
+              child: GestureDetector(
+                onTap: _pickAndUploadImage,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: const Icon(Icons.edit, size: 10, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
         ),
+
         const SizedBox(width: 16),
+
+        // TEXTOS
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Nome menor
               Text(
                 displayName,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              const SizedBox(height: 4),
+              // Matrícula e Ranking na mesma linha
               Text(
-                _myRankPosition != null
-                    ? 'Ranking: #$_myRankPosition'
-                    : 'Ranking: --',
+                '$matricula - Ranking: $rankingText',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white70,
                 ),
@@ -213,17 +282,22 @@ class _ProfileScreenState extends State<ProfileScreen>
             ],
           ),
         ),
+
+        // BOTÃO CONFIGURAÇÕES COMPACTO
         Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
           ),
           margin: const EdgeInsets.only(left: 8),
+          width: 40,
+          height: 40,
           child: IconButton(
+            padding: EdgeInsets.zero,
             icon: const Icon(
               Icons.settings_outlined,
               color: Colors.white,
-              size: 26,
+              size: 22,
             ),
             onPressed: () {
               Navigator.of(context).push(

@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:http_parser/http_parser.dart';
+import 'dart:io';
 
 import '../utils/constants.dart';
 import '../models/user.dart';
@@ -371,6 +374,67 @@ class ApiService {
     } catch (e) {
       print('Erro ao buscar cursos: $e');
       return [];
+    }
+  }
+
+  Future<Map<String, dynamic>?> getStudentData(
+    String matricula,
+    String token,
+  ) async {
+    final url = Uri.parse('$apiBaseUrl/alunos/$matricula');
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
+        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          return jsonResponse['data'];
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao buscar dados do aluno: $e');
+      }
+    }
+    return null;
+  }
+
+  Future<bool> uploadProfilePicture(
+    String matricula,
+    String token,
+    String filePath,
+  ) async {
+    final url = Uri.parse('$apiBaseUrl/alunos/$matricula/foto');
+    final request = http.MultipartRequest('POST', url);
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'file',
+        filePath,
+        contentType: MediaType('image', 'jpeg'),
+      ),
+    );
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro upload: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao enviar foto: $e');
+      return false;
     }
   }
 }

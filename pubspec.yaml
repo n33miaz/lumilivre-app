@@ -36,6 +36,8 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.3.0
   local_auth: ^2.2.0
+  image_picker: ^1.2.1
+  http_parser: ^4.1.2
 
 dev_dependencies:
   flutter_test:
