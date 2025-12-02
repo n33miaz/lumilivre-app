@@ -7,7 +7,7 @@ import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/screens/settings.dart';
-import 'package:lumilivre/screens/ranking.dart';
+import 'package:lumilivre/screens/ranking_tab.dart';
 import 'package:lumilivre/screens/loans_tab.dart';
 import 'package:lumilivre/screens/likes_tab.dart';
 

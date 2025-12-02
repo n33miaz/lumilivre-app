@@ -188,22 +188,19 @@ class _RankingScreenState extends State<RankingScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Separa top 3 e o resto
     final top3 = _ranking.take(3).toList();
     final restList = _ranking.skip(3).toList();
 
-    // Verifica posição do usuário logado
     final myMatricula = auth.user?.matriculaAluno;
     int myRankIndex = _ranking.indexWhere((r) => r.matricula == myMatricula);
     RankingItem? myRankItem = myRankIndex != -1 ? _ranking[myRankIndex] : null;
     bool amIInTop3 = myRankIndex != -1 && myRankIndex < 3;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _showFilterModal,
         backgroundColor: LumiLivreTheme.label,
-        icon: const Icon(Icons.filter_list, color: Colors.white),
-        label: const Text('Filtrar', style: TextStyle(color: Colors.white)),
+        child: const Icon(Icons.filter_list, color: Colors.white),
       ),
       body: RefreshIndicator(
         onRefresh: _applyFilters,
@@ -222,7 +219,7 @@ class _RankingScreenState extends State<RankingScreen> {
               ),
             ),
 
-            // Lista do 4º em diante
+            // 4º em diante
             SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
                 final item = restList[index];
@@ -233,12 +230,10 @@ class _RankingScreenState extends State<RankingScreen> {
               }, childCount: restList.length),
             ),
 
-            // Espaço extra para o FAB não cobrir o último item
             const SliverToBoxAdapter(child: SizedBox(height: 80)),
           ],
         ),
       ),
-      // Barra fixa inferior se o usuário estiver no ranking mas não no top 3
       bottomNavigationBar: (myRankItem != null && !amIInTop3)
           ? Container(
               decoration: BoxDecoration(

@@ -129,7 +129,6 @@ class _MainNavigatorState extends State<MainNavigator> {
   @override
   Widget build(BuildContext context) {
     String headerTitle = 'LumiLivre';
-    if (_selectedIndex == 0) headerTitle = 'Categorias';
 
     bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
 

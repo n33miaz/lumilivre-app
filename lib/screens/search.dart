@@ -65,9 +65,9 @@ class SearchScreen extends StatelessWidget {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.8,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 6,
+                childAspectRatio: 1.6,
               ),
               delegate: SliverChildBuilderDelegate((context, index) {
                 final category = searchCategories[index];
@@ -84,7 +84,7 @@ class SearchScreen extends StatelessWidget {
               }, childCount: searchCategories.length),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
     );
