@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -96,17 +97,31 @@ class _MainNavigatorState extends State<MainNavigator> {
     );
   }
 
-  Widget _buildIcon(String name, int index) {
+  Widget _buildIcon(String name, int index, {bool isLogo = false}) {
     final isActive = _selectedIndex == index;
-    final iconPath = isActive
-        ? 'assets/icons/$name-active.svg'
-        : 'assets/icons/$name.svg';
 
-    final color = isActive ? Colors.white : Colors.grey.shade400;
+    final color = isLogo
+        ? (isActive ? LumiLivreTheme.label : Colors.grey.shade400)
+        : (isActive ? Colors.white : Colors.grey.shade400);
+
+    final iconPath = isLogo
+        ? 'assets/icons/logo.svg'
+        : (isActive
+              ? 'assets/icons/$name-active.svg'
+              : 'assets/icons/$name.svg');
+
+    double size;
+    if (isLogo) {
+      size = 32;
+    } else if (name == 'search-category') {
+      size = 20;
+    } else {
+      size = 24;
+    }
 
     return SvgPicture.asset(
       iconPath,
-      height: 24,
+      height: size,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
   }
@@ -118,56 +133,65 @@ class _MainNavigatorState extends State<MainNavigator> {
 
     bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
 
-    return Theme(
-      data: Theme.of(context).copyWith(
-        splashColor: Colors.white.withOpacity(0.1),
-        highlightColor: Colors.transparent,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: LumiLivreTheme.primary,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.transparent,
       ),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              children: _screens,
-            ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.white.withOpacity(0.1),
+          highlightColor: Colors.transparent,
+        ),
+        child: Scaffold(
+          body: Stack(
+            children: [
+              PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+                children: _screens,
+              ),
 
-            if (showHeader)
-              Positioned(
-                top: 0,
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                top: showHeader ? 0 : -160,
                 left: 0,
                 right: 0,
                 child: CustomHeader(title: headerTitle),
               ),
-          ],
-        ),
+            ],
+          ),
 
-        bottomNavigationBar: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: _buildIcon('search', 0),
-              label: 'Pesquisa',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon('home', 1),
-              label: 'Catálogo',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildIcon('profile', 2),
-              label: 'Perfil',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey.shade400,
-          onTap: _onItemTapped,
-          backgroundColor: LumiLivreTheme.primary,
-          type: BottomNavigationBarType.fixed,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          bottomNavigationBar: BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: _buildIcon('search-category', 0),
+                label: 'Categorias',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon('logo', 1, isLogo: true),
+                label: 'Catálogo',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon('profile', 2),
+                label: 'Perfil',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.grey.shade400,
+            onTap: _onItemTapped,
+            backgroundColor: LumiLivreTheme.primary,
+            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            showUnselectedLabels: true,
+          ),
         ),
       ),
     );
