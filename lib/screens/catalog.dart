@@ -4,7 +4,6 @@ import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
-import 'package:lumilivre/widgets/header.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -37,10 +36,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
     try {
       final catalogData = await _apiService.getCatalog();
       _allCategories = catalogData.entries.toList();
-      
+
       final nextEnd = 4.clamp(0, _allCategories.length);
       _displayedCategories = _allCategories.sublist(0, nextEnd);
-
     } catch (e) {
       print('Erro na UI ao buscar catálogo: $e');
       if (mounted) {
@@ -103,12 +101,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          if (_initialLoad && _displayedCategories.isEmpty)
-            const Center(child: CircularProgressIndicator())
-          else
-            RefreshIndicator(
+      body: _initialLoad && _displayedCategories.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
               onRefresh: _handleRefresh,
               color: LumiLivreTheme.primary,
               child: _allCategories.isEmpty
@@ -119,9 +114,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       controller: _scrollController,
                       itemCount: _displayedCategories.length + 2,
                       itemBuilder: (context, index) {
+                        // Espaço para o Header fixo
                         if (index == 0) {
                           return const SizedBox(height: 160);
                         }
+
+                        // Conteúdo real
                         if (index <= _displayedCategories.length) {
                           final category = _displayedCategories[index - 1];
                           return BookCarousel(
@@ -130,6 +128,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             books: category.value,
                           );
                         }
+
+                        // Loader final
                         if (_displayedCategories.length <
                             _allCategories.length) {
                           return const Padding(
@@ -141,9 +141,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       },
                     ),
             ),
-          const CustomHeader(title: 'LumiLivre'),
-        ],
-      ),
     );
   }
 }
