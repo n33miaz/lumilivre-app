@@ -120,13 +120,22 @@ class ApiService {
         for (var genreData in data) {
           String genreName = genreData['nome'];
           List<Book> books = (genreData['livros'] as List).map((bookData) {
+            String rawImage = bookData['imagem']?.toString() ?? '';
+            String finalImage = '';
+
+            if (rawImage.isNotEmpty) {
+              if (rawImage.startsWith('http://')) {
+                finalImage = rawImage.replaceFirst('http://', 'https://');
+              } else {
+                finalImage = rawImage;
+              }
+            }
+
             return Book(
               id: (bookData['id'] as num?)?.toInt() ?? 0,
               title: bookData['titulo'] ?? 'Título Desconhecido',
               author: bookData['autor'] ?? 'Autor Desconhecido',
-              imageUrl:
-                  bookData['imagem'] ??
-                  'https://via.placeholder.com/140x210.png?text=Lumi',
+              imageUrl: finalImage, // Usa a imagem tratada
               rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
             );
           }).toList();

@@ -10,6 +10,10 @@ class BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool temImagemValida =
+        book.imageUrl.isNotEmpty &&
+        !book.imageUrl.contains('via.placeholder.com');
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
@@ -44,32 +48,41 @@ class BookCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Image.network(
-                book.imageUrl,
+              child: SizedBox(
                 height: 210,
                 width: 140,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 210,
-                    width: 140,
-                    color: Colors.grey[300],
-                    child: const Icon(
-                      Icons.image_not_supported_outlined,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    height: 210,
-                    width: 140,
-                    color: Colors.grey[200],
-                  );
-                },
+                child: temImagemValida
+                    ? Image.network(
+                        book.imageUrl,
+                        height: 210,
+                        width: 140,
+                        fit: BoxFit.cover,
+
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'images/capa-padrao.png',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 210,
+                            width: 140,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'images/capa-padrao.png',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
+
             const SizedBox(height: 8),
 
             SizedBox(
