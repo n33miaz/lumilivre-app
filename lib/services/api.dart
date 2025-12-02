@@ -127,6 +127,7 @@ class ApiService {
               imageUrl:
                   bookData['imagem'] ??
                   'https://via.placeholder.com/140x210.png?text=Lumi',
+              rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
             );
           }).toList();
           catalog[genreName] = books;
@@ -196,6 +197,7 @@ class ApiService {
             imageUrl:
                 bookData['imagem'] ??
                 'https://via.placeholder.com/140x210.png?text=Lumi',
+            rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
           );
         }).toList();
       } else if (response.statusCode == 204) {

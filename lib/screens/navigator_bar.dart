@@ -82,7 +82,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     if (isLogo) {
       size = 32;
     } else if (name == 'search-category') {
-      size = 20;
+      size = 22;
     } else {
       size = 24;
     }

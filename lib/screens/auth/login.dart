@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen>
                           child: TextButton(
                             onPressed: () {
                               _launchURL(
-                                'https://lumilivre-web.onrender.com/esqueci-a-senha', // URL vai mudar
+                                'https://lumilivre.com.br/esqueci-a-senha',
                               );
                             },
                             child: const Text(

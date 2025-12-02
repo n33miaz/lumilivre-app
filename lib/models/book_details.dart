@@ -19,6 +19,7 @@ class BookDetails {
   final String? imagem;
   final List<String> generos;
   final int exemplaresDisponiveis;
+  final double rating;
 
   BookDetails({
     required this.isbn,
@@ -36,6 +37,7 @@ class BookDetails {
     this.imagem,
     required this.generos,
     required this.exemplaresDisponiveis,
+    required this.rating,
   });
 
   factory BookDetails.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,7 @@ class BookDetails {
                 .toList()
           : [],
       exemplaresDisponiveis: json["exemplaresDisponiveis"] ?? 0,
+      rating: (json["avaliacao"] as num?)?.toDouble() ?? 4.6,
     );
   }
 }

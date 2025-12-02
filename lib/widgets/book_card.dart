@@ -103,14 +103,13 @@ class BookCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Row(
-                        // MOCK
+                      Row(
                         children: [
-                          Icon(Icons.star, color: Colors.amber, size: 16),
-                          SizedBox(width: 2),
+                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                          const SizedBox(width: 2),
                           Text(
-                            '4.5',
-                            style: TextStyle(
+                            book.rating.toString(),
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),

@@ -51,12 +51,12 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      print("DEBUG: Carregando detalhes do livro...");
+      // print("DEBUG: Carregando detalhes do livro...");
       final details = await _apiService.getBookDetails(widget.book.id);
-      print("DEBUG: Detalhes carregados com sucesso.");
+      // print("DEBUG: Detalhes carregados com sucesso.");
 
       if (!authProvider.isAuthenticated || authProvider.user == null) {
-        print("DEBUG: Usuário não autenticado ou nulo.");
+        // print("DEBUG: Usuário não autenticado ou nulo.");
         if (mounted) {
           setState(() {
             _details = details;
@@ -366,7 +366,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _InfoItem(top: '★ 4.6', bottom: 'Avaliações'),
+          _InfoItem(top: '★ ${details.rating}', bottom: 'Avaliações'),
 
           _InfoItem(top: tipoCapaFormatado, bottom: 'Tipo da Capa'),
 
