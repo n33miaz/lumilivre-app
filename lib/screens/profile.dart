@@ -9,6 +9,7 @@ import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/screens/settings.dart';
 import 'package:lumilivre/screens/ranking.dart';
 import 'package:lumilivre/screens/loans_tab.dart';
+import 'package:lumilivre/screens/likes_tab.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -193,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         controller: _tabController,
         children: [
           const LoansTab(),
-          const Center(child: Text('Livros Curtidos')),
+          const LikesTab(),
           const RankingScreen(),
         ],
       ),

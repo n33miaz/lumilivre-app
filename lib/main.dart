@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/utils/constants.dart';
-
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
 
@@ -14,6 +14,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => FavoritesProvider()),
       ],
       child: const LumiLivreApp(),
     ),

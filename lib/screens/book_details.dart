@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'package:lumilivre/services/api.dart';
-import 'package:provider/provider.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/utils/constants.dart';
 
 enum LoanStatus {
@@ -68,9 +69,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
       final user = authProvider.user!;
       if (user.matriculaAluno == null || user.matriculaAluno!.isEmpty) {
-        // print(
-        //   "DEBUG: Usuário logado, mas sem matrícula (provavelmente Admin).",
-        // );
         if (mounted) {
           setState(() {
             _details = details;
@@ -84,23 +82,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       final matricula = user.matriculaAluno!;
       final token = user.token;
 
-      // print("DEBUG: Carregando empréstimos para matrícula: $matricula...");
       List<Loan> loans = [];
       try {
         loans = await _apiService.getMyLoans(matricula, token);
-        // print("DEBUG: Empréstimos carregados: ${loans.length}");
       } catch (e) {
-        // print("ERRO NÃO FATAL (Empréstimos): $e");
         loans = [];
       }
 
-      // print("DEBUG: Carregando solicitações...");
       List<dynamic> requests = [];
       try {
         requests = await _apiService.getMyRequests(matricula, token);
-        // print("DEBUG: Solicitações carregadas: ${requests.length}");
       } catch (e) {
-        // print("ERRO NÃO FATAL (Solicitações): $e");
         requests = [];
       }
 
@@ -109,10 +101,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         setState(() => _hasError = false);
       }
     } catch (e) {
-      // , stackTrace
-      // print('ERRO CRÍTICO GERAL: $e');
-      // print(stackTrace);
-
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -210,7 +198,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TRATAMENTO DE ERRO
     if (_hasError && _details == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Detalhes')),
@@ -416,7 +403,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: Row(
         children: [
-          const _LikeButton(),
+          _LikeButton(book: widget.book),
           const SizedBox(width: 16),
           Expanded(
             child: _BorrowButton(
@@ -498,18 +485,16 @@ class _InfoItem extends StatelessWidget {
   }
 }
 
-class _LikeButton extends StatefulWidget {
-  const _LikeButton();
+class _LikeButton extends StatelessWidget {
+  final Book book;
 
-  @override
-  State<_LikeButton> createState() => _LikeButtonState();
-}
-
-class _LikeButtonState extends State<_LikeButton> {
-  bool _isLiked = false;
+  const _LikeButton({required this.book});
 
   @override
   Widget build(BuildContext context) {
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final isLiked = favoritesProvider.isFavorite(book.id);
+
     return Material(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
@@ -520,15 +505,13 @@ class _LikeButtonState extends State<_LikeButton> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          setState(() {
-            _isLiked = !_isLiked;
-          });
+          favoritesProvider.toggleFavorite(book);
         },
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: Icon(
-            _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.redAccent : LumiLivreTheme.primary,
+            isLiked ? Icons.favorite : Icons.favorite_border,
+            color: isLiked ? Colors.redAccent : LumiLivreTheme.primary,
             size: 28,
           ),
         ),
