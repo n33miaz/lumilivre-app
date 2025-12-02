@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/header.dart';
 
 import 'catalog.dart';
 import 'search.dart';
@@ -27,7 +28,6 @@ class _MainNavigatorState extends State<MainNavigator> {
     const ProfileScreen(),
   ];
 
-  // popup de mudar senha, caso seja o primeiro login
   @override
   void initState() {
     super.initState();
@@ -74,9 +74,7 @@ class _MainNavigatorState extends State<MainNavigator> {
             ElevatedButton(
               child: const Text('ALTERAR AGORA'),
               onPressed: () {
-                _launchURL(
-                  'https://lumilivre.com.br/mudar-senha',
-                ); // URL vai mudar
+                _launchURL('https://lumilivre.com.br/mudar-senha');
                 Navigator.of(context).pop();
               },
             ),
@@ -115,20 +113,37 @@ class _MainNavigatorState extends State<MainNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    String headerTitle = 'LumiLivre';
+    if (_selectedIndex == 0) headerTitle = 'Categorias';
+
+    bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
+
     return Theme(
       data: Theme.of(context).copyWith(
         splashColor: Colors.white.withOpacity(0.1),
         highlightColor: Colors.transparent,
       ),
       child: Scaffold(
-        body: PageView(
-          controller: _pageController,
-          children: _screens,
-          onPageChanged: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
+        body: Stack(
+          children: [
+            PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              children: _screens,
+            ),
+
+            if (showHeader)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: CustomHeader(title: headerTitle),
+              ),
+          ],
         ),
 
         bottomNavigationBar: BottomNavigationBar(
