@@ -1,11 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:http_parser/http_parser.dart';
-import 'dart:io';
 
 import '../utils/constants.dart';
 import '../models/user.dart';
@@ -59,30 +56,30 @@ class ApiService {
   Future<Map<String, List<Book>>> getCatalog() async {
     if (_cachedCatalog != null) {
       if (kDebugMode) {
-        print('--- RETORNANDO CATÁLOGO DO CACHE ---');
+        // print('--- RETORNANDO CATÁLOGO DO CACHE ---');
       }
       return _cachedCatalog!;
     }
     if (kDebugMode) {
-      print('--- BUSCANDO CATÁLOGO DA API ---');
+      // print('--- BUSCANDO CATÁLOGO DA API ---');
     }
     final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
     try {
-      print('--- INICIANDO REQUEST HTTP ---');
+      // print('--- INICIANDO REQUEST HTTP ---');
       final response = await http.get(
         url,
         headers: token != null ? {'Authorization': 'Bearer $token'} : {},
       );
 
-      print('--- STATUS CODE: ${response.statusCode} ---');
+      // print('--- STATUS CODE: ${response.statusCode} ---');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
 
-        print('--- ITENS RECEBIDOS: ${data.length} ---');
+        // print('--- ITENS RECEBIDOS: ${data.length} ---');
 
         Map<String, List<Book>> catalog = {};
 
@@ -103,16 +100,17 @@ class ApiService {
         _cachedCatalog = catalog;
         return catalog;
       } else if (response.statusCode == 204) {
-        print('--- STATUS 204: CONTEÚDO VAZIO ---');
+        // print('--- STATUS 204: CONTEÚDO VAZIO ---');
         return {};
       } else {
         throw Exception('Falha ao carregar o catálogo: ${response.statusCode}');
       }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        print('*** ERRO AO BUSCAR CATÁLOGO: $e');
-        print('*** STACKTRACE: $stackTrace');
-      }
+      // , stackTrace
+    } catch (e) {
+      // if (kDebugMode) {
+      //   print('*** ERRO AO BUSCAR CATÁLOGO: $e');
+      //   print('*** STACKTRACE: $stackTrace');
+      // }
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
@@ -337,7 +335,6 @@ class ApiService {
     }
   }
 
-  // Busca genérica para filtros simples (Turno, Modulo)
   Future<List<FilterItem>> getSimpleList(String endpoint, String token) async {
     final url = Uri.parse('$apiBaseUrl/$endpoint');
     try {

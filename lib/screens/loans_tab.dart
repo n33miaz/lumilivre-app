@@ -58,7 +58,6 @@ class _LoansTabState extends State<LoansTab> {
     return Column(
       children: [
         const SizedBox(height: 16),
-        // Botões de Filtro (Toggle)
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(4),
@@ -86,7 +85,6 @@ class _LoansTabState extends State<LoansTab> {
           ),
         ),
         const SizedBox(height: 8),
-        // Lista de Empréstimos
         Expanded(child: _buildLoansList()),
       ],
     );

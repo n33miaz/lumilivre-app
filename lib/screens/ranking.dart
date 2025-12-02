@@ -201,7 +201,7 @@ class _RankingScreenState extends State<RankingScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showFilterModal,
-        backgroundColor: LumiLivreTheme.primary,
+        backgroundColor: LumiLivreTheme.label,
         icon: const Icon(Icons.filter_list, color: Colors.white),
         label: const Text('Filtrar', style: TextStyle(color: Colors.white)),
       ),

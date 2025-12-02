@@ -1,7 +1,6 @@
-import 'dart:io'; // Agora será usado!
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:image_picker/image_picker.dart'; // Importante
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/services/api.dart';
@@ -24,10 +23,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   final ApiService _apiService = ApiService();
 
   String? _studentName;
-  String? _profileImageUrl; // Variável para a foto
+  String? _profileImageUrl;
   int _currentIndex = 0;
 
-  // Dados do Ranking para o Header
   int? _myRankPosition;
   // ignore: unused_field
   int? _totalStudents;
@@ -48,7 +46,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     _loadHeaderData();
   }
 
-  // --- AQUI ESTAVA O ERRO: Agora só existe UMA definição desta função ---
   void _loadHeaderData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
@@ -56,13 +53,12 @@ class _ProfileScreenState extends State<ProfileScreen>
       final matricula = authProvider.user!.matriculaAluno!;
       final token = authProvider.user!.token;
 
-      // Busca dados completos (Nome + Foto)
       final data = await _apiService.getStudentData(matricula, token);
 
       if (mounted && data != null) {
         setState(() {
           _studentName = data['nomeCompleto'];
-          _profileImageUrl = data['foto']; // Pega a URL da foto
+          _profileImageUrl = data['foto'];
         });
       }
 
@@ -88,16 +84,13 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  // Função para escolher e enviar foto
   Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
-    // Abre a galeria
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       final auth = Provider.of<AuthProvider>(context, listen: false);
 
-      // Mostra loading ou feedback visual se desejar
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Enviando foto...')));
@@ -109,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
 
       if (success) {
-        _loadHeaderData(); // Recarrega para mostrar a nova foto
+        _loadHeaderData();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Foto atualizada com sucesso!')),
@@ -207,7 +200,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // HEADER REFATORADO
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
     String displayName =
         _studentName ?? authProvider.user?.email.split('@')[0] ?? 'Aluno';
@@ -217,8 +209,8 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // FOTO COM CLIQUE PARA EDITAR
         Stack(
+          clipBehavior: Clip.none,
           children: [
             GestureDetector(
               onTap: _pickAndUploadImage,
@@ -272,7 +264,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              // Matrícula e Ranking na mesma linha
               Text(
                 '$matricula - Ranking: $rankingText',
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -283,7 +274,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ),
 
-        // BOTÃO CONFIGURAÇÕES COMPACTO
         Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
