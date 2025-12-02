@@ -103,6 +103,10 @@ class _LoginScreenState extends State<LoginScreen>
                           'assets/icons/logo.svg',
                           height: 200,
                           semanticsLabel: 'Logo LumiLivre',
+                          colorFilter: const ColorFilter.mode(
+                            LumiLivreTheme.primary,
+                            BlendMode.srcIn,
+                          ),
                         ),
                         const Text(
                           'LumiLivre',

@@ -114,12 +114,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       controller: _scrollController,
                       itemCount: _displayedCategories.length + 2,
                       itemBuilder: (context, index) {
-                        // Espaço para o Header fixo
                         if (index == 0) {
                           return const SizedBox(height: 160);
                         }
 
-                        // Conteúdo real
                         if (index <= _displayedCategories.length) {
                           final category = _displayedCategories[index - 1];
                           return BookCarousel(
@@ -129,7 +127,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           );
                         }
 
-                        // Loader final
                         if (_displayedCategories.length <
                             _allCategories.length) {
                           return const Padding(
