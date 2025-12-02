@@ -176,7 +176,8 @@ class ApiService {
   }
 
   Future<List<Loan>> getMyLoans(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula/ativos');
+    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula');
+
     try {
       final response = await http.get(
         url,
@@ -186,11 +187,13 @@ class ApiService {
       if (response.statusCode == 200) {
         return loanFromJson(utf8.decode(response.bodyBytes));
       } else {
-        throw Exception('Falha ao carregar empréstimos.');
+        throw Exception(
+          'Falha ao carregar empréstimos: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Erro em getMyLoans: $e');
-      throw Exception('Não foi possível conectar ao servidor.');
+      return [];
     }
   }
 

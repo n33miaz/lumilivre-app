@@ -2,111 +2,187 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/loan.dart';
+import '../utils/constants.dart';
+
+enum LoanCardStatus { active, dueToday, overdue, pending, rejected, returned }
 
 class LoanCard extends StatelessWidget {
   final Loan loan;
+  final bool isRequest;
 
-  const LoanCard({super.key, required this.loan});
+  const LoanCard({super.key, required this.loan, this.isRequest = false});
 
-  (String, Color) _getRemainingTime() {
+  (LoanCardStatus, Color, String, IconData) _getStatusAttributes() {
+    if (isRequest) {
+      if (loan.status == 'REJEITADA') {
+        return (
+          LoanCardStatus.rejected,
+          Colors.grey.shade600,
+          'Solicitação Recusada',
+          Icons.cancel_outlined,
+        );
+      }
+      return (
+        LoanCardStatus.pending,
+        LumiLivreTheme.primary,
+        'Aguardando Aprovação',
+        Icons.hourglass_empty,
+      );
+    }
+
+    if (loan.status == 'CONCLUIDO') {
+      return (
+        LoanCardStatus.returned,
+        Colors.grey,
+        'Devolvido',
+        Icons.check_circle_outline,
+      );
+    }
+
     final now = DateTime.now();
-    final difference = loan.dataDevolucao.difference(now);
-    final days = difference.inDays;
+    final today = DateTime(now.year, now.month, now.day);
+    final due = DateTime(
+      loan.dataDevolucao.year,
+      loan.dataDevolucao.month,
+      loan.dataDevolucao.day,
+    );
 
-    if (days < 0) {
+    final difference = due.difference(today).inDays;
+
+    if (difference < 0) {
       return (
-        'Atrasado ${days.abs()} ${days.abs() == 1 ? 'dia' : 'dias'}',
+        LoanCardStatus.overdue,
         Colors.redAccent,
+        'Atrasado (${difference.abs()} dias)',
+        Icons.warning_amber_rounded,
       );
-    }
-    if (days == 0) {
-      return ('Vence hoje', Colors.orangeAccent);
-    }
-    if (days <= 7) {
+    } else if (difference == 0) {
       return (
-        '${days + 1} ${days + 1 == 1 ? 'dia' : 'dias'} restantes',
-        Colors.orangeAccent,
+        LoanCardStatus.dueToday,
+        Colors.orange,
+        'Vence Hoje!',
+        Icons.access_time,
+      );
+    } else {
+      return (
+        LoanCardStatus.active,
+        Colors.green,
+        'Devolve em $difference dias',
+        Icons.calendar_today,
       );
     }
-    return ('${(days / 7).ceil()} semanas restantes', Colors.green);
   }
 
   @override
   Widget build(BuildContext context) {
-    final (remainingTime, timeColor) = _getRemainingTime();
+    final (statusEnum, statusColor, statusText, statusIcon) =
+        _getStatusAttributes();
     final theme = Theme.of(context);
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            // Capa do Livro
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                loan.imagemUrl ??
-                    'https://via.placeholder.com/80x120.png?text=Lumi',
-                width: 80,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
+      height: 130,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // --- CAPA ---
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
             ),
-            const SizedBox(width: 16),
-            // Detalhes
-            Expanded(
+            child: Image.network(
+              loan.imagemUrl ??
+                  'https://via.placeholder.com/100x150.png?text=Lumi',
+              width: 90,
+              height: 130,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 90,
+                  height: 130,
+                  color: Colors.grey.shade300,
+                  child: const Icon(Icons.book, color: Colors.grey),
+                );
+              },
+            ),
+          ),
+
+          // --- INFORMAÇÕES ---
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    loan.livroTitulo,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Retirado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const Divider(height: 16),
-                  Row(
+                  // Título e Data
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.label_outline,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
                       Text(
-                        'Tags',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                      const Spacer(),
-                      Icon(Icons.timer_outlined, size: 16, color: timeColor),
-                      const SizedBox(width: 4),
-                      Text(
-                        remainingTime,
-                        style: TextStyle(
-                          color: timeColor,
-                          fontSize: 12,
+                        loan.livroTitulo,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        isRequest
+                            ? 'Solicitado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}'
+                            : 'Retirado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
+
+                  // Status Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: statusColor.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(statusIcon, size: 14, color: statusColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          statusText,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
