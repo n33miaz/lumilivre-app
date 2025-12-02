@@ -278,4 +278,24 @@ class ApiService {
     }
     return null;
   }
+
+  Future<List<Loan>> getMyLoansHistory(String matricula, String token) async {
+    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula/historico');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        return loanFromJson(utf8.decode(response.bodyBytes));
+      } else {
+        throw Exception('Falha ao carregar histórico: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro em getMyLoansHistory: $e');
+      return [];
+    }
+  }
 }
