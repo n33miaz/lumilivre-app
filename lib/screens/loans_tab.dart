@@ -16,18 +16,30 @@ class LoansTab extends StatefulWidget {
 
 class _LoansTabState extends State<LoansTab> {
   final ApiService _apiService = ApiService();
-  Future<List<Loan>>? _loansFuture;
-  bool _showHistory = false;
+
+  Future<List<Loan>>? _activeLoansFuture;
+  Future<List<Loan>>? _historyLoansFuture;
+
+  late PageController _pageController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 0);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadLoans();
+      _loadAllLoans();
     });
   }
 
-  void _loadLoans() {
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _loadAllLoans() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
         authProvider.user?.matriculaAluno != null) {
@@ -35,22 +47,21 @@ class _LoansTabState extends State<LoansTab> {
       final token = authProvider.user!.token;
 
       setState(() {
-        if (_showHistory) {
-          _loansFuture = _apiService.getMyLoansHistory(matricula, token);
-        } else {
-          _loansFuture = _apiService.getMyLoans(matricula, token);
-        }
+        _activeLoansFuture = _apiService.getMyLoans(matricula, token);
+        _historyLoansFuture = _apiService.getMyLoansHistory(matricula, token);
       });
     }
   }
 
-  void _toggleLoanView(bool showHistory) {
-    if (_showHistory != showHistory) {
-      setState(() {
-        _showHistory = showHistory;
-      });
-      _loadLoans();
-    }
+  void _onTabChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -70,33 +81,71 @@ class _LoansTabState extends State<LoansTab> {
               Expanded(
                 child: _FilterButton(
                   label: 'Em Andamento',
-                  isSelected: !_showHistory,
-                  onTap: () => _toggleLoanView(false),
+                  isSelected: _currentIndex == 0,
+                  onTap: () => _onTabChanged(0),
                 ),
               ),
               Expanded(
                 child: _FilterButton(
                   label: 'Histórico',
-                  isSelected: _showHistory,
-                  onTap: () => _toggleLoanView(true),
+                  isSelected: _currentIndex == 1,
+                  onTap: () => _onTabChanged(1),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        Expanded(child: _buildLoansList()),
+
+        // --- PAGEVIEW COM AS LISTAS ---
+        Expanded(
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            children: [
+              // Página 0: Em Andamento
+              _LoansListBuilder(
+                future: _activeLoansFuture,
+                isHistory: false,
+                onRetry: _loadAllLoans,
+              ),
+              // Página 1: Histórico
+              _LoansListBuilder(
+                future: _historyLoansFuture,
+                isHistory: true,
+                onRetry: _loadAllLoans,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
+}
 
-  Widget _buildLoansList() {
-    if (_loansFuture == null) {
+class _LoansListBuilder extends StatelessWidget {
+  final Future<List<Loan>>? future;
+  final bool isHistory;
+  final VoidCallback onRetry;
+
+  const _LoansListBuilder({
+    required this.future,
+    required this.isHistory,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (future == null) {
       return const Center(child: Text('Faça login para ver seus empréstimos.'));
     }
 
     return FutureBuilder<List<Loan>>(
-      future: _loansFuture,
+      future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -117,7 +166,7 @@ class _LoansTabState extends State<LoansTab> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   TextButton(
-                    onPressed: _loadLoans,
+                    onPressed: onRetry,
                     child: const Text('Tentar Novamente'),
                   ),
                 ],
@@ -132,13 +181,13 @@ class _LoansTabState extends State<LoansTab> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  _showHistory ? Icons.history : Icons.book_outlined,
+                  isHistory ? Icons.history : Icons.book_outlined,
                   size: 64,
                   color: Colors.grey.shade300,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  _showHistory
+                  isHistory
                       ? 'Nenhum empréstimo no histórico.'
                       : 'Nenhum empréstimo ativo no momento.',
                   style: TextStyle(color: Colors.grey[600]),

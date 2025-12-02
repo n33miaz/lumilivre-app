@@ -190,7 +190,7 @@ class _MainNavigatorState extends State<MainNavigator> {
             backgroundColor: LumiLivreTheme.primary,
             type: BottomNavigationBarType.fixed,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            showUnselectedLabels: true,
+            showUnselectedLabels: false,
           ),
         ),
       ),
