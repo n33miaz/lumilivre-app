@@ -44,6 +44,8 @@ class SearchScreen extends StatelessWidget {
       'Fantasia',
       'Terror',
       'Poesia',
+      'Ciência e Tecnologia',
+      'Infantojuvenil',
     ];
 
     return Scaffold(
