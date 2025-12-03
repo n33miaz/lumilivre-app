@@ -130,8 +130,7 @@ class ApiService {
               }
 
               if (finalImage.contains('books.google.com') &&
-                  finalImage.contains('&zoom=1')) {
-              }
+                  finalImage.contains('&zoom=1')) {}
             }
 
             return Book(
@@ -190,8 +189,9 @@ class ApiService {
 
   Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
     final url = Uri.parse(
-      '$apiBaseUrl/livros/genero/$genre?page=$page&size=10',
+      '$apiBaseUrl/livros/genero/${Uri.encodeComponent(genre)}?page=$page&size=10',
     );
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
     try {
@@ -207,7 +207,7 @@ class ApiService {
         return bookList.map((bookData) {
           return Book(
             id: bookData['id'],
-            title: bookData['nome'],
+            title: bookData['titulo'] ?? bookData['nome'] ?? 'Sem Título',
             author: bookData['autor'] ?? 'Autor desconhecido',
             imageUrl:
                 bookData['imagem'] ??
