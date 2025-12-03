@@ -19,6 +19,7 @@ class BookDetails {
   final String? imagem;
   final List<String> generos;
   final int exemplaresDisponiveis;
+  final int totalExemplares;
   final double rating;
 
   BookDetails({
@@ -37,6 +38,7 @@ class BookDetails {
     this.imagem,
     required this.generos,
     required this.exemplaresDisponiveis,
+    required this.totalExemplares,
     required this.rating,
   });
 
@@ -77,6 +79,7 @@ class BookDetails {
                 .toList()
           : [],
       exemplaresDisponiveis: json["exemplaresDisponiveis"] ?? 0,
+      totalExemplares: json["totalExemplares"] ?? 0,
       rating: (json["avaliacao"] as num?)?.toDouble() ?? 4.6,
     );
   }

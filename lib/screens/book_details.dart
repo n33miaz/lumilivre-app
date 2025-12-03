@@ -14,10 +14,13 @@ enum LoanStatus {
   loading,
   available,
   unavailable,
+  noCopies,
   pending,
   active,
   overdue,
   guest,
+  blockedPenalty,
+  limitReached,
 }
 
 class BookDetailsScreen extends StatefulWidget {
@@ -51,12 +54,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      // print("DEBUG: Carregando detalhes do livro...");
       final details = await _apiService.getBookDetails(widget.book.id);
-      // print("DEBUG: Detalhes carregados com sucesso.");
 
       if (!authProvider.isAuthenticated || authProvider.user == null) {
-        // print("DEBUG: Usuário não autenticado ou nulo.");
         if (mounted) {
           setState(() {
             _details = details;
@@ -68,36 +68,21 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       }
 
       final user = authProvider.user!;
-      if (user.matriculaAluno == null || user.matriculaAluno!.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _details = details;
-            _status = LoanStatus.guest;
-            _hasError = false;
-          });
-        }
-        return;
-      }
-
       final matricula = user.matriculaAluno!;
       final token = user.token;
 
-      List<Loan> loans = [];
-      try {
-        loans = await _apiService.getMyLoans(matricula, token);
-      } catch (e) {
-        loans = [];
-      }
+      final results = await Future.wait([
+        _apiService.getMyLoans(matricula, token),
+        _apiService.getMyRequests(matricula, token),
+        _apiService.getStudentData(matricula, token),
+      ]);
 
-      List<dynamic> requests = [];
-      try {
-        requests = await _apiService.getMyRequests(matricula, token);
-      } catch (e) {
-        requests = [];
-      }
+      final loans = results[0] as List<Loan>;
+      final requests = results[1] as List<dynamic>;
+      final studentData = results[2] as Map<String, dynamic>?;
 
       if (mounted) {
-        _calculateStatus(details, loans, requests);
+        _calculateStatus(details, loans, requests, studentData);
         setState(() => _hasError = false);
       }
     } catch (e) {
@@ -114,6 +99,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     BookDetails details,
     List<Loan> loans,
     List<dynamic> requests,
+    Map<String, dynamic>? studentData,
   ) {
     LoanStatus newStatus = LoanStatus.available;
     DateTime? date;
@@ -138,17 +124,26 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     } else {
       final hasPendingRequest = requests.any((r) {
         if (r == null || r is! Map) return false;
-
         final reqLivroId = (r['livroId'] as num?)?.toInt() ?? -1;
         final reqStatus = r['status']?.toString() ?? '';
-
         return (reqLivroId == widget.book.id) && (reqStatus == 'PENDENTE');
       });
 
       if (hasPendingRequest) {
         newStatus = LoanStatus.pending;
       } else {
-        if (details.exemplaresDisponiveis <= 0) {
+        String? penalidade = studentData?['penalidade'];
+        bool hasPenalty = penalidade != null && penalidade != "null";
+
+        int activeLoansCount = loans.length;
+
+        if (details.totalExemplares == 0) {
+          newStatus = LoanStatus.noCopies;
+        } else if (hasPenalty) {
+          newStatus = LoanStatus.blockedPenalty;
+        } else if (activeLoansCount >= 3) {
+          newStatus = LoanStatus.limitReached;
+        } else if (details.exemplaresDisponiveis <= 0) {
           newStatus = LoanStatus.unavailable;
         } else {
           newStatus = LoanStatus.available;
@@ -290,6 +285,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                     ? details.imagem!
                     : widget.book.imageUrl,
                 fit: BoxFit.cover,
+                width: 120,
+                height: 180,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: Colors.grey[300],
@@ -547,6 +544,22 @@ class _BorrowButton extends StatelessWidget {
         text = 'FAÇA LOGIN PARA SOLICITAR';
         break;
 
+      case LoanStatus.noCopies:
+        backgroundColor = Colors.grey.shade400;
+        text = 'SEM EXEMPLARES CADASTRADOS';
+        iconPath = 'assets/icons/cancel.svg';
+        break;
+
+      case LoanStatus.blockedPenalty:
+        backgroundColor = Colors.redAccent;
+        text = 'CONTA COM PENALIDADE';
+        break;
+
+      case LoanStatus.limitReached:
+        backgroundColor = Colors.orange.shade800;
+        text = 'LIMITE DE EMPRÉSTIMOS ATINGIDO';
+        break;
+
       case LoanStatus.available:
         backgroundColor = LumiLivreTheme.primary;
         text = 'SOLICITAR EMPRÉSTIMO';
@@ -578,7 +591,7 @@ class _BorrowButton extends StatelessWidget {
           String dateStr = '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}';
           text = 'DISPONÍVEL A PARTIR DE: $dateStr';
         } else {
-          text = 'EMPRESTADO (SEM PREVISÃO)';
+          text = 'INDISPONÍVEL NO MOMENTO';
         }
         break;
     }

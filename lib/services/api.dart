@@ -113,12 +113,11 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
 
-        // print('--- ITENS RECEBIDOS: ${data.length} ---');
-
         Map<String, List<Book>> catalog = {};
 
         for (var genreData in data) {
           String genreName = genreData['nome'];
+
           List<Book> books = (genreData['livros'] as List).map((bookData) {
             String rawImage = bookData['imagem']?.toString() ?? '';
             String finalImage = '';
@@ -129,17 +128,24 @@ class ApiService {
               } else {
                 finalImage = rawImage;
               }
+
+              if (finalImage.contains('books.google.com') &&
+                  finalImage.contains('&zoom=1')) {
+              }
             }
 
             return Book(
               id: (bookData['id'] as num?)?.toInt() ?? 0,
               title: bookData['titulo'] ?? 'Título Desconhecido',
               author: bookData['autor'] ?? 'Autor Desconhecido',
-              imageUrl: finalImage, // Usa a imagem tratada
-              rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
+              imageUrl: finalImage,
+              rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
             );
           }).toList();
-          catalog[genreName] = books;
+
+          if (books.isNotEmpty) {
+            catalog[genreName] = books;
+          }
         }
         _cachedCatalog = catalog;
         return catalog;

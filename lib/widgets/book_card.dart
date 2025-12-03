@@ -76,10 +76,7 @@ class BookCard extends StatelessWidget {
                           );
                         },
                       )
-                    : Image.asset(
-                        'images/capa-padrao.png',
-                        fit: BoxFit.cover,
-                      ),
+                    : Image.asset('images/capa-padrao.png', fit: BoxFit.cover),
               ),
             ),
 
