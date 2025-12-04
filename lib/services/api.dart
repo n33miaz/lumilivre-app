@@ -102,65 +102,74 @@ class ApiService {
     final token = prefs.getString('authToken');
 
     try {
-      // print('--- INICIANDO REQUEST HTTP ---');
-      final response = await http.get(
-        url,
-        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-      );
-
-      // print('--- STATUS CODE: ${response.statusCode} ---');
+      final response = await http
+          .get(
+            url,
+            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+          )
+          .timeout(
+            const Duration(seconds: 10),
+          );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        if (response.bodyBytes.isEmpty) return {};
 
-        Map<String, List<Book>> catalog = {};
+        try {
+          final List<dynamic> data = json.decode(
+            utf8.decode(response.bodyBytes),
+          );
 
-        for (var genreData in data) {
-          String genreName = genreData['nome'];
+          Map<String, List<Book>> catalog = {};
 
-          List<Book> books = (genreData['livros'] as List).map((bookData) {
-            String rawImage = bookData['imagem']?.toString() ?? '';
-            String finalImage = '';
+          for (var genreData in data) {
+            if (genreData['nome'] == null || genreData['livros'] == null)
+              continue;
 
-            if (rawImage.isNotEmpty) {
-              if (rawImage.startsWith('http://')) {
-                finalImage = rawImage.replaceFirst('http://', 'https://');
-              } else {
-                finalImage = rawImage;
+            String genreName = genreData['nome'];
+
+            List<Book> books = (genreData['livros'] as List).map((bookData) {
+              String rawImage = bookData['imagem']?.toString() ?? '';
+              String finalImage = '';
+
+              if (rawImage.isNotEmpty) {
+                if (rawImage.startsWith('http://')) {
+                  finalImage = rawImage.replaceFirst('http://', 'https://');
+                } else {
+                  finalImage = rawImage;
+                }
+
+                if (finalImage.contains('books.google.com') &&
+                    finalImage.contains('&zoom=1')) {}
               }
 
-              if (finalImage.contains('books.google.com') &&
-                  finalImage.contains('&zoom=1')) {}
+              return Book(
+                id: (bookData['id'] as num?)?.toInt() ?? 0,
+                title: bookData['titulo']?.toString() ?? 'Título Desconhecido',
+                author: bookData['autor']?.toString() ?? 'Autor Desconhecido',
+                imageUrl: finalImage,
+                rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
+              );
+            }).toList();
+
+            if (books.isNotEmpty) {
+              catalog[genreName] = books;
             }
-
-            return Book(
-              id: (bookData['id'] as num?)?.toInt() ?? 0,
-              title: bookData['titulo'] ?? 'Título Desconhecido',
-              author: bookData['autor'] ?? 'Autor Desconhecido',
-              imageUrl: finalImage,
-              rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
-            );
-          }).toList();
-
-          if (books.isNotEmpty) {
-            catalog[genreName] = books;
           }
+          _cachedCatalog = catalog;
+          return catalog;
+        } catch (e) {
+          print('Erro ao processar JSON do catálogo: $e');
+          throw Exception('Dados inválidos recebidos do servidor.');
         }
-        _cachedCatalog = catalog;
-        return catalog;
       } else if (response.statusCode == 204) {
-        // print('--- STATUS 204: CONTEÚDO VAZIO ---');
         return {};
       } else {
+        print('Erro API: ${response.statusCode} - ${response.body}');
         throw Exception('Falha ao carregar o catálogo: ${response.statusCode}');
       }
-      // , stackTrace
     } catch (e) {
-      // if (kDebugMode) {
-      //   print('*** ERRO AO BUSCAR CATÁLOGO: $e');
-      //   print('*** STACKTRACE: $stackTrace');
-      // }
-      throw Exception('Não foi possível conectar ao servidor.');
+      print('Erro de conexão ou processamento: $e');
+      throw Exception('Não foi possível carregar o catálogo.');
     }
   }
 
@@ -187,10 +196,7 @@ class ApiService {
         return bookList.map((bookData) {
           return Book(
             id: bookData['id'],
-            title:
-                bookData['titulo'] ??
-                bookData['nome'] ??
-                'Sem Título',
+            title: bookData['titulo'] ?? bookData['nome'] ?? 'Sem Título',
             author: bookData['autor'] ?? 'Autor desconhecido',
             imageUrl: bookData['imagem'] ?? '',
             rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
