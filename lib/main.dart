@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,16 +10,32 @@ import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
-        ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => FavoritesProvider()),
-      ],
-      child: const LumiLivreApp(),
-    ),
-  );
+  // Garante que a engine do Flutter esteja pronta antes de tudo
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Captura erros de renderização (Tela vermelha da morte em dev, cinza em prod)
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    // Aqui você poderia enviar para um serviço de logs (Sentry, Firebase Crashlytics)
+    debugPrint("Erro de Flutter capturado: ${details.exception}");
+  };
+
+  // 2. Captura erros assíncronos que não foram tratados por try-catch
+  runZonedGuarded(() {
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => AuthProvider()),
+          ChangeNotifierProvider(create: (context) => ThemeProvider()),
+          ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+        ],
+        child: const LumiLivreApp(),
+      ),
+    );
+  }, (error, stack) {
+    debugPrint("Erro Assíncrono Global: $error");
+    // Evita que o app feche abruptamente em alguns casos
+  });
 }
 
 class LumiLivreApp extends StatelessWidget {

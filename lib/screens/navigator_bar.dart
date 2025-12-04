@@ -7,6 +7,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/header.dart';
 import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
+import 'package:lumilivre/widgets/offline_banner.dart';
 
 import 'catalog.dart';
 import 'search.dart';
@@ -134,53 +135,56 @@ class _MainNavigatorState extends State<MainNavigator> {
           splashColor: Colors.white.withOpacity(0.1),
           highlightColor: Colors.transparent,
         ),
-        child: Scaffold(
-          body: Stack(
-            children: [
-              PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                children: _screens,
-              ),
 
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                top: showHeader ? 0 : -160,
-                left: 0,
-                right: 0,
-                child: CustomHeader(title: headerTitle),
-              ),
-            ],
-          ),
+        child: OfflineBanner(
+          child: Scaffold(
+            body: Stack(
+              children: [
+                PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  children: _screens,
+                ),
 
-          bottomNavigationBar: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: _buildIcon('search-category', 0),
-                label: 'Categorias',
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon('logo', 1, isLogo: true),
-                label: 'Catálogo',
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon('profile', 2),
-                label: 'Perfil',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey.shade400,
-            onTap: _onItemTapped,
-            backgroundColor: LumiLivreTheme.primary,
-            type: BottomNavigationBarType.fixed,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            showUnselectedLabels: false,
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  top: showHeader ? 0 : -160,
+                  left: 0,
+                  right: 0,
+                  child: CustomHeader(title: headerTitle),
+                ),
+              ],
+            ),
+
+            bottomNavigationBar: BottomNavigationBar(
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: _buildIcon('search-category', 0),
+                  label: 'Categorias',
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon('logo', 1, isLogo: true),
+                  label: 'Catálogo',
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon('profile', 2),
+                  label: 'Perfil',
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.grey.shade400,
+              onTap: _onItemTapped,
+              backgroundColor: LumiLivreTheme.primary,
+              type: BottomNavigationBarType.fixed,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              showUnselectedLabels: false,
+            ),
           ),
         ),
       ),
