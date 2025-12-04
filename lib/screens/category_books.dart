@@ -59,16 +59,19 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar livros: ${e.toString()}')),
-        );
-      }
-    } finally {
+      print(
+        'Erro ao buscar livros: $e',
+      );
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _hasMore = false;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar livros. Verifique a conexão.'),
+          ),
+        );
       }
     }
   }
@@ -109,7 +112,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.5, // Ajuste para caber o texto padronizado
+        childAspectRatio: 0.5,
       ),
       itemCount: _books.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {

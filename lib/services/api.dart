@@ -250,7 +250,7 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> getMyRequests(String matricula, String token) async {
+  Future<List<Loan>> getMyRequests(String matricula, String token) async {
     final url = Uri.parse('$apiBaseUrl/solicitacoes/aluno/$matricula');
     try {
       final response = await http.get(
@@ -259,7 +259,8 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        return data.map((item) => Loan.fromRequestJson(item)).toList();
       } else {
         return [];
       }

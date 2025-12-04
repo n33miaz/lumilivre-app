@@ -17,8 +17,9 @@ class LoansTab extends StatefulWidget {
 class _LoansTabState extends State<LoansTab> {
   final ApiService _apiService = ApiService();
 
-  Future<List<Loan>>? _activeLoansFuture;
-  Future<List<Loan>>? _historyLoansFuture;
+  bool _isLoading = true;
+  List<Loan> _activeList = [];
+  List<Loan> _historyList = [];
 
   late PageController _pageController;
   int _currentIndex = 0;
@@ -39,17 +40,43 @@ class _LoansTabState extends State<LoansTab> {
     super.dispose();
   }
 
-  void _loadAllLoans() {
+  void _loadAllLoans() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
         authProvider.user?.matriculaAluno != null) {
       final matricula = authProvider.user!.matriculaAluno!;
       final token = authProvider.user!.token;
 
-      setState(() {
-        _activeLoansFuture = _apiService.getMyLoans(matricula, token);
-        _historyLoansFuture = _apiService.getMyLoansHistory(matricula, token);
-      });
+      setState(() => _isLoading = true);
+
+      try {
+        final results = await Future.wait([
+          _apiService.getMyLoans(matricula, token),
+          _apiService.getMyLoansHistory(matricula, token),
+          _apiService.getMyRequests(matricula, token),
+        ]);
+
+        final activeLoans = results[0];
+        final historyLoans = results[1];
+        final allRequests = results[2];
+
+        final pendingRequests = allRequests
+            .where((r) => r.status == 'PENDENTE')
+            .toList();
+        final rejectedRequests = allRequests
+            .where((r) => r.status == 'REJEITADA' || r.status == 'CANCELADA')
+            .toList();
+
+        setState(() {
+          _activeList = [...pendingRequests, ...activeLoans];
+          _historyList = [...historyLoans, ...rejectedRequests];
+
+          _isLoading = false;
+        });
+      } catch (e) {
+        print("Erro ao carregar empréstimos: $e");
+        if (mounted) setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -97,115 +124,84 @@ class _LoansTabState extends State<LoansTab> {
         ),
         const SizedBox(height: 8),
 
-        // --- PAGEVIEW COM AS LISTAS ---
         Expanded(
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            children: [
-              // Página 0: Em Andamento
-              _LoansListBuilder(
-                future: _activeLoansFuture,
-                isHistory: false,
-                onRetry: _loadAllLoans,
-              ),
-              // Página 1: Histórico
-              _LoansListBuilder(
-                future: _historyLoansFuture,
-                isHistory: true,
-                onRetry: _loadAllLoans,
-              ),
-            ],
-          ),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                  children: [
+                    _LoansListSimple(
+                      loans: _activeList,
+                      isHistory: false,
+                      onRetry: _loadAllLoans,
+                    ),
+                    _LoansListSimple(
+                      loans: _historyList,
+                      isHistory: true,
+                      onRetry: _loadAllLoans,
+                    ),
+                  ],
+                ),
         ),
       ],
     );
   }
 }
 
-class _LoansListBuilder extends StatelessWidget {
-  final Future<List<Loan>>? future;
+class _LoansListSimple extends StatelessWidget {
+  final List<Loan> loans;
   final bool isHistory;
   final VoidCallback onRetry;
 
-  const _LoansListBuilder({
-    required this.future,
+  const _LoansListSimple({
+    required this.loans,
     required this.isHistory,
     required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (future == null) {
-      return const Center(child: Text('Faça login para ver seus empréstimos.'));
+    if (loans.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isHistory ? Icons.history : Icons.book_outlined,
+              size: 64,
+              color: Colors.grey.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isHistory
+                  ? 'Nenhum histórico encontrado.'
+                  : 'Nenhum empréstimo ou solicitação ativa.',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            TextButton(onPressed: onRetry, child: const Text('Atualizar')),
+          ],
+        ),
+      );
     }
 
-    return FutureBuilder<List<Loan>>(
-      future: future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Não foi possível carregar os dados.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  TextButton(
-                    onPressed: onRetry,
-                    child: const Text('Tentar Novamente'),
-                  ),
-                ],
-              ),
-            ),
+    return RefreshIndicator(
+      onRefresh: () async => onRetry(),
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 20, top: 8),
+        itemCount: loans.length,
+        itemBuilder: (context, index) {
+          final loan = loans[index];
+          return LoanCard(
+            loan: loan,
+            isRequest: loan.isRequest, // Passa a flag corretamente
           );
-        }
-
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  isHistory ? Icons.history : Icons.book_outlined,
-                  size: 64,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  isHistory
-                      ? 'Nenhum empréstimo no histórico.'
-                      : 'Nenhum empréstimo ativo no momento.',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final loans = snapshot.data!;
-        return ListView.builder(
-          padding: const EdgeInsets.only(bottom: 20, top: 8),
-          itemCount: loans.length,
-          itemBuilder: (context, index) {
-            return LoanCard(loan: loans[index]);
-          },
-        );
-      },
+        },
+      ),
     );
   }
 }

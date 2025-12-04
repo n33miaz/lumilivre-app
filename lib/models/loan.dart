@@ -16,6 +16,7 @@ class Loan {
   final int livroId;
   final String livroTitulo;
   final String? imagemUrl;
+  final bool isRequest;
 
   Loan({
     required this.id,
@@ -26,6 +27,7 @@ class Loan {
     required this.livroId,
     required this.livroTitulo,
     this.imagemUrl,
+    this.isRequest = false, 
   });
 
   factory Loan.fromJson(Map<String, dynamic> json) {
@@ -61,6 +63,32 @@ class Loan {
       livroId: parseInt(json["livroId"]),
       livroTitulo: json["livroTitulo"]?.toString() ?? "Livro sem título",
       imagemUrl: json["imagemUrl"]?.toString(),
+      isRequest: false,
+    );
+  }
+
+  factory Loan.fromRequestJson(Map<String, dynamic> json) {
+    DateTime parseDate(dynamic dateVal) {
+      if (dateVal == null) return DateTime.now();
+      try {
+        return DateTime.parse(dateVal.toString());
+      } catch (e) {
+        return DateTime.now();
+      }
+    }
+
+    return Loan(
+      id: json["id"] ?? 0,
+      dataEmprestimo: parseDate(
+        json["dataSolicitacao"],
+      ),
+      dataDevolucao: DateTime(2100), 
+      status: json["status"] ?? "PENDENTE",
+      livroId: json["livroId"] ?? 0,
+      livroTitulo: json["livroNome"] ?? "Solicitação",
+      imagemUrl:
+          null,
+      isRequest: true,
     );
   }
 }
