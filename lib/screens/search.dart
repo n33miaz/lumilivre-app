@@ -4,6 +4,13 @@ import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/genre_card.dart';
 import 'package:lumilivre/screens/category_books.dart';
 
+class CategoryItem {
+  final String title;
+  final String imagePath;
+
+  CategoryItem({required this.title, required this.imagePath});
+}
+
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
 
@@ -31,21 +38,66 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> searchCategories = [
-      'TCCs',
-      'Aventura',
-      'Romance',
-      'Educativo',
-      'Suspense',
-      'Biografia',
-      'Ficção',
-      'História',
-      'Autoajuda',
-      'Fantasia',
-      'Terror',
-      'Poesia',
-      'Ciência e Tecnologia',
-      'Infantojuvenil',
+    final List<CategoryItem> categories = [
+      CategoryItem(
+        title: 'TCCs',
+        imagePath: 'assets/images/categories/TCCs.png',
+      ),
+      CategoryItem(
+        title: 'Aventura',
+        imagePath: 'assets/images/categories/Aventura.png',
+      ),
+      CategoryItem(
+        title: 'Romance',
+        imagePath: 'assets/images/categories/Romance.png',
+      ),
+      CategoryItem(
+        title: 'Educativo',
+        imagePath: 'assets/images/categories/Educativo.png',
+      ),
+      CategoryItem(
+        title: 'Suspense',
+        imagePath: 'assets/images/categories/Suspense.png',
+      ),
+      CategoryItem(
+        title: 'Biografia',
+        imagePath: 'assets/images/categories/Biografia.png',
+      ),
+      CategoryItem(
+        title: 'Ficção',
+        imagePath:
+            'assets/images/categories/Ficcao.png',
+      ),
+      CategoryItem(
+        title: 'História',
+        imagePath: 'assets/images/categories/História.png',
+      ),
+      CategoryItem(
+        title: 'Autoajuda',
+        imagePath: 'assets/images/categories/Autoajuda.png',
+      ),
+      CategoryItem(
+        title: 'Fantasia',
+        imagePath: 'assets/images/categories/Fantasia.png',
+      ),
+      CategoryItem(
+        title: 'Terror',
+        imagePath: 'assets/images/categories/Terror.png',
+      ),
+      CategoryItem(
+        title: 'Poesia',
+        imagePath: 'assets/images/categories/Poesia.png',
+      ),
+      CategoryItem(
+        title: 'Ciência e Tecnologia',
+        imagePath:
+            'assets/images/categories/Ciencia.png',
+      ),
+      CategoryItem(
+        title: 'Infantojuvenil',
+        imagePath:
+            'assets/images/categories/Infantojuvenil.jpg',
+      ),
     ];
 
     return Scaffold(
@@ -72,18 +124,20 @@ class SearchScreen extends StatelessWidget {
                 childAspectRatio: 1.6,
               ),
               delegate: SliverChildBuilderDelegate((context, index) {
-                final category = searchCategories[index];
+                final category = categories[index];
+
                 return GestureDetector(
-                  onTap: () => _navigateToCategory(context, category),
+                  onTap: () => _navigateToCategory(context, category.title),
                   child: GenreCard(
-                    title: category,
+                    title: category.title,
                     color:
                         LumiLivreTheme.genreCardColors[index %
                             LumiLivreTheme.genreCardColors.length],
-                    imagePath: 'assets/images/mock.png',
+                    imagePath:
+                        category.imagePath,
                   ),
                 );
-              }, childCount: searchCategories.length),
+              }, childCount: categories.length),
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
