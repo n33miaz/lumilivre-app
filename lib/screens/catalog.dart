@@ -115,7 +115,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       itemCount: _displayedCategories.length + 2,
                       itemBuilder: (context, index) {
                         if (index == 0) {
-                          return const SizedBox(height: 160);
+                          return const SizedBox(height: 140);
                         }
 
                         if (index <= _displayedCategories.length) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/screens/search_results.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/constants.dart';
 
@@ -123,9 +124,14 @@ class _SearchFieldState extends State<_SearchField> {
   void _onSearch() {
     _focusNode.unfocus();
     final texto = _controller.text.trim();
+
     if (texto.isNotEmpty) {
-      debugPrint('Pesquisando por: $texto');
-      // TODO: chamar função real de busca
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SearchResultsScreen(query: texto),
+        ),
+      );
+      _controller.clear();
     }
   }
 

@@ -245,23 +245,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         icon: const Icon(Icons.arrow_back),
         onPressed: () => Navigator.of(context).pop(),
       ),
-      actions: [
-        PopupMenuButton<String>(
-          onSelected: (value) {
-            print('Selecionado: $value');
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'author',
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.person_search),
-                title: Text('Livros do mesmo autor'),
-              ),
-            ),
-          ],
-        ),
-      ],
+      // actions: [
+      //   PopupMenuButton<String>(
+      //     onSelected: (value) {
+      //       print('Selecionado: $value');
+      //     },
+      //     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+      //       const PopupMenuItem<String>(
+      //         value: 'author',
+      //         child: ListTile(
+      //           contentPadding: EdgeInsets.zero,
+      //           leading: Icon(Icons.person_search),
+      //           title: Text('Livros do mesmo autor'),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ],
     );
   }
 

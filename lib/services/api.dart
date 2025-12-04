@@ -164,6 +164,51 @@ class ApiService {
     }
   }
 
+  Future<List<Book>> searchBooks(String query, {int page = 0}) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/livros/mobile/buscar?texto=${Uri.encodeComponent(query)}&page=$page&size=20',
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> pageData = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
+        final List<dynamic> bookList = pageData['content'];
+
+        return bookList.map((bookData) {
+          return Book(
+            id: bookData['id'],
+            title:
+                bookData['titulo'] ??
+                bookData['nome'] ??
+                'Sem Título',
+            author: bookData['autor'] ?? 'Autor desconhecido',
+            imageUrl: bookData['imagem'] ?? '',
+            rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
+          );
+        }).toList();
+      } else if (response.statusCode == 204) {
+        return [];
+      } else {
+        throw Exception('Erro na busca: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro em searchBooks: $e');
+      }
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
   Future<BookDetails> getBookDetails(int bookId) async {
     final url = Uri.parse('$apiBaseUrl/livros/$bookId');
     final prefs = await SharedPreferences.getInstance();
