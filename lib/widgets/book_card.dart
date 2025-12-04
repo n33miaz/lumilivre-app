@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/screens/book_details.dart';
@@ -52,31 +53,28 @@ class BookCard extends StatelessWidget {
                 height: 210,
                 width: 140,
                 child: temImagemValida
-                    ? Image.network(
-                        book.imageUrl,
+                    ? CachedNetworkImage(
+                        imageUrl: book.imageUrl,
                         height: 210,
                         width: 140,
                         fit: BoxFit.cover,
-
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'images/capa-padrao.png',
-                            fit: BoxFit.cover,
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 210,
-                            width: 140,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        },
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/images/capa-padrao.png',
+                          fit: BoxFit.cover,
+                        ),
+                        memCacheWidth:
+                            420,
                       )
-                    : Image.asset('images/capa-padrao.png', fit: BoxFit.cover),
+                    : Image.asset(
+                        'assets/images/capa-padrao.png',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
 
