@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // adb reverse tcp:8080 tcp:8080
-// https://api.lumilivre.com.br:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile emulador) - http://192.168.56.1:8080 - http://127.0.0.1:8080
-const String apiBaseUrl = 'http://localhost:8080'; // https://api.lumilivre.com.br:8080
+// https://lumilivre-api.onrender.com:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile emulador) - http://192.168.56.1:8080 - http://127.0.0.1:8080
+const String apiBaseUrl = 'https://lumilivre-api.onrender.com';
 
 class LumiLivreTheme {
   // cores do tema claro
