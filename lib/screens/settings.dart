@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
@@ -108,34 +109,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Card(
-            shape: roundedShape,
-            clipBehavior: Clip.antiAlias,
-            child: SwitchListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              title: const Text('Acesso com Biometria'),
-              subtitle: const Text('Entrar com digital ou rosto.'),
-              value: _isBiometricsEnabled,
-              onChanged: _toggleBiometrics,
-              secondary: SizedBox(
-                width: 40,
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/icons/biometric.svg',
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.onSurface,
-                      BlendMode.srcIn,
+          if (!kIsWeb) ...[
+            Card(
+              shape: roundedShape,
+              clipBehavior: Clip.antiAlias,
+              child: SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                title: const Text('Acesso com Biometria'),
+                subtitle: const Text('Entrar com digital ou rosto.'),
+                value: _isBiometricsEnabled,
+                onChanged: _toggleBiometrics,
+                secondary: SizedBox(
+                  width: 40,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/biometric.svg',
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.onSurface,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
+          ],
 
           Text(
             'Conta',
