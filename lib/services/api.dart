@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../utils/constants.dart';
 import '../models/user.dart';
@@ -20,12 +21,10 @@ class ApiService {
 
   ApiService._internal();
 
-  // Chave para salvar o JSON no disco
   static const String _catalogCacheKey = 'catalog_cache_v1';
 
-  // --- MÉTODOS DE CACHE E CATÁLOGO (OTIMIZADOS) ---
+  // --- MÉTODOS DE CACHE E CATÁLOGO ---
 
-  /// 1. Tenta ler o catálogo salvo no dispositivo (Instantâneo)
   Future<Map<String, List<Book>>?> getCatalogLocal() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -41,7 +40,6 @@ class ApiService {
     return null;
   }
 
-  /// 2. Busca na API, SALVA no disco e retorna os dados (Atualização)
   Future<Map<String, List<Book>>> fetchAndSaveCatalog() async {
     final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
     final prefs = await SharedPreferences.getInstance();
@@ -59,7 +57,6 @@ class ApiService {
         final String body = utf8.decode(response.bodyBytes);
 
         if (body.isNotEmpty) {
-          // Salva o JSON puro para uso offline futuro
           await prefs.setString(_catalogCacheKey, body);
 
           final List<dynamic> data = json.decode(body);
@@ -73,22 +70,19 @@ class ApiService {
       }
     } catch (e) {
       if (kDebugMode) print('Erro na requisição do catálogo: $e');
-      rethrow; // Repassa o erro para a UI tratar (ex: mostrar snackbar)
+      rethrow;
     }
   }
 
-  /// Método auxiliar para converter JSON em Objetos com segurança
   Map<String, List<Book>> _parseCatalogJson(List<dynamic> data) {
     Map<String, List<Book>> catalog = {};
 
     for (var genreData in data) {
-      // Blindagem: verifica se as chaves existem
       if (genreData['nome'] == null || genreData['livros'] == null) continue;
 
       String genreName = genreData['nome'];
 
       List<Book> books = (genreData['livros'] as List).map((bookData) {
-        // Tratamento de imagem
         String rawImage = bookData['imagem']?.toString() ?? '';
         String finalImage = '';
         if (rawImage.isNotEmpty) {
@@ -97,7 +91,6 @@ class ApiService {
               : rawImage;
         }
 
-        // Blindagem de tipos (num? -> int/double)
         return Book(
           id: (bookData['id'] as num?)?.toInt() ?? 0,
           title: bookData['titulo']?.toString() ?? 'Título Desconhecido',
@@ -506,25 +499,39 @@ class ApiService {
   Future<bool> uploadProfilePicture(
     String matricula,
     String token,
-    String filePath,
-  ) async {
+    String filePath, {
+    Uint8List? webBytes,
+  }) async {
     final url = Uri.parse('$apiBaseUrl/alunos/$matricula/foto');
     final request = http.MultipartRequest('POST', url);
 
     request.headers['Authorization'] = 'Bearer $token';
 
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'file',
-        filePath,
-        contentType: MediaType('image', 'jpeg'),
-      ),
-    );
+    if (kIsWeb && webBytes != null) {
+      // Web
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          webBytes,
+          filename: 'profile.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+    } else {
+      // Mobile 
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          filePath,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+    }
 
     try {
       final streamedResponse = await request.send().timeout(
         const Duration(seconds: 30),
-      ); // Upload pode demorar mais
+      ); 
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {

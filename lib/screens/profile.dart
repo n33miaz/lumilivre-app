@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
 
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/providers/auth.dart';
@@ -96,10 +98,16 @@ class _ProfileScreenState extends State<ProfileScreen>
         context,
       ).showSnackBar(const SnackBar(content: Text('Enviando foto...')));
 
+      Uint8List? bytes;
+      if (kIsWeb) {
+        bytes = await image.readAsBytes();
+      }
+
       final success = await _apiService.uploadProfilePicture(
         auth.user!.matriculaAluno!,
         auth.user!.token,
         image.path,
+        webBytes: bytes,
       );
 
       if (success) {
@@ -192,11 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          const LoansTab(),
-          const LikesTab(),
-          const RankingScreen(),
-        ],
+        children: [const LoansTab(), const LikesTab(), const RankingScreen()],
       ),
     );
   }
