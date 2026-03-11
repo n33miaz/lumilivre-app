@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/change_password_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -162,8 +163,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: const Text('Mudar Senha'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 20),
               onTap: () {
-                _launchURL(
-                  'https://lumilivre-web.onrender.com/esqueci-a-senha', // TODO: direto para /mudar-senha
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const ChangePasswordDialog();
+                  },
                 );
               },
             ),
