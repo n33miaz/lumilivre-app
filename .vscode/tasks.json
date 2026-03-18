@@ -1,0 +1,157 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Flutter: Clean",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["clean"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false
+    },
+    {
+      "label": "Flutter: Pub Get",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "get"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false
+    },
+    {
+      "label": "Flutter: Pub Upgrade",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "upgrade"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false
+    },
+    {
+      "label": "Flutter: Clean Build Cache",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["clean"],
+      "dependsOn": ["Flutter: Pub Get"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false
+    },
+    {
+      "label": "ADB: Reverse TCP (USB)",
+      "type": "shell",
+      "command": "adb",
+      "args": ["reverse", "tcp:8080", "tcp:8080"],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false,
+      "runOptions": {
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "Dart: Analyze",
+      "type": "shell",
+      "command": "dart",
+      "args": ["analyze", "--fatal-infos"],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+    },
+    {
+      "label": "Dart: Format Check",
+      "type": "shell",
+      "command": "dart",
+      "args": ["format", "--set-exit-if-changed", "."],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Get Pubspec",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "get"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Flutter: Generate Icons & Splash",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "pub",
+        "run",
+        "flutter_launcher_icons:main",
+        "&&",
+        "flutter",
+        "pub",
+        "run",
+        "flutter_native_splash:create"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "isBackground": false
+    }
+  ]
+}

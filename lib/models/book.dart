@@ -31,7 +31,8 @@ class Book {
   factory Book.fromMap(Map<String, dynamic> map) {
     return Book(
       id: safeParseInt(map['id']),
-      title: map['title'] ?? map['titulo'] ?? map['nome'] ?? 'Título Desconhecido',
+      title:
+          map['title'] ?? map['titulo'] ?? map['nome'] ?? 'Título Desconhecido',
       author: map['author'] ?? map['autor'] ?? 'Autor Desconhecido',
       imageUrl: map['imageUrl'] ?? map['imagem'] ?? '',
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),
@@ -42,7 +43,9 @@ class Book {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) { return true; }
+    if (identical(this, other)) {
+      return true;
+    }
     return other is Book &&
         other.id == id &&
         other.title == title &&
@@ -53,9 +56,19 @@ class Book {
 
   @override
   int get hashCode =>
-      id.hashCode ^ title.hashCode ^ author.hashCode ^ imageUrl.hashCode ^ rating.hashCode;
+      id.hashCode ^
+      title.hashCode ^
+      author.hashCode ^
+      imageUrl.hashCode ^
+      rating.hashCode;
 
-  Book copyWith({int? id, String? title, String? author, String? imageUrl, double? rating}) {
+  Book copyWith({
+    int? id,
+    String? title,
+    String? author,
+    String? imageUrl,
+    double? rating,
+  }) {
     return Book(
       id: id ?? this.id,
       title: title ?? this.title,
