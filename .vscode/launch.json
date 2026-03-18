@@ -1,0 +1,26 @@
+// BUILD APK: flutter build apk --flavor JC --release --dart-define=app.flavor=prod
+{
+  "version": "1.0.0",
+  "configurations": [
+    {
+      "name": "Dev - Emulador",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define=app.flavor=dev"]
+    },
+    // adb reverse tcp:8080 tcp:8080
+    {
+      "name": "Dev - Via USB",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define=app.flavor=dev"]
+    },
+    {
+      "name": "Produção",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": ["--dart-define=app.flavor=prod"]
+    }
+  ]
+}
