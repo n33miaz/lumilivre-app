@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/widgets/book_card.dart';
@@ -59,9 +59,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         });
       }
     } catch (e) {
-      print(
-        'Erro ao buscar livros: $e',
-      );
+      debugPrint('Erro ao buscar livros: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

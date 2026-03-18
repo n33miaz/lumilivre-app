@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -61,20 +60,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           }
         }
       } catch (e) {
-        print(e);
+        debugPrint('$e');
       }
     } else {
       setState(() {
         _isBiometricsEnabled = false;
       });
       await _saveBiometricsPreference(false);
-    }
-  }
-
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Não foi possível abrir $url';
     }
   }
 
@@ -100,7 +92,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 8),
           _buildThemeSelector(context),
           const SizedBox(height: 24),
-
           Text(
             'Segurança',
             style: TextStyle(
@@ -140,7 +131,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 24),
           ],
-
           Text(
             'Conta',
             style: TextStyle(
@@ -260,10 +250,9 @@ class _ThemeOptionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isSelected = themeProvider.themeOption == option;
-
     final color = isSelected
         ? LumiLivreTheme.primary
-        : Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
 
     return GestureDetector(
       onTap: () => themeProvider.setTheme(option),
@@ -272,7 +261,7 @@ class _ThemeOptionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? LumiLivreTheme.primary.withOpacity(0.1)
+              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(

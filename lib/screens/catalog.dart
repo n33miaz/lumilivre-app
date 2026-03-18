@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
@@ -49,7 +49,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
         }
       }
     } catch (e) {
-      print('Erro ao ler cache local: $e');
+      debugPrint('Erro ao ler cache local: $e');
       // Não fazemos nada, apenas seguimos para a API
     }
 
@@ -71,7 +71,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
         });
       }
     } catch (e) {
-      print('Erro na UI ao buscar catálogo remoto: $e');
+      debugPrint('Erro na UI ao buscar catálogo remoto: $e');
 
       if (mounted) {
         setState(() {

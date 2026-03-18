@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/models/loan.dart';
@@ -74,7 +74,7 @@ class _LoansTabState extends State<LoansTab> {
           _isLoading = false;
         });
       } catch (e) {
-        print("Erro ao carregar empréstimos: $e");
+        debugPrint("Erro ao carregar empréstimos: $e");
         if (mounted) setState(() => _isLoading = false);
       }
     }
@@ -230,7 +230,7 @@ class _FilterButton extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

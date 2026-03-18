@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:lumilivre/models/ranking.dart';
@@ -61,7 +61,7 @@ class _PodiumBar extends StatelessWidget {
     final iconWidget = SvgPicture.asset(
       medalIcon,
       height: 40,
-      color: color,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
       placeholderBuilder: (_) =>
           Icon(Icons.emoji_events, size: 40, color: color),
     );
@@ -103,7 +103,7 @@ class _PodiumBar extends StatelessWidget {
           width: double.infinity,
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8),
               topRight: Radius.circular(8),
@@ -112,7 +112,10 @@ class _PodiumBar extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [color.withOpacity(0.4), color.withOpacity(0.05)],
+              colors: [
+                color.withValues(alpha: 0.4),
+                color.withValues(alpha: 0.05),
+              ],
             ),
           ),
           child: Center(
@@ -121,7 +124,7 @@ class _PodiumBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.w900,
-                color: color.withOpacity(0.5),
+                color: color.withValues(alpha: 0.5),
               ),
             ),
           ),

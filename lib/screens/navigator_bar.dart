@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -132,7 +132,7 @@ class _MainNavigatorState extends State<MainNavigator> {
       ),
       child: Theme(
         data: Theme.of(context).copyWith(
-          splashColor: Colors.white.withOpacity(0.1),
+          splashColor: Colors.white.withValues(alpha: 0.1),
           highlightColor: Colors.transparent,
         ),
 

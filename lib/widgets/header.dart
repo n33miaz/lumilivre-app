@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +39,7 @@ class CustomHeader extends StatelessWidget {
                 children: [
                   // botão tema
                   Material(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(50),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(50),
@@ -149,7 +149,7 @@ class _SearchFieldState extends State<_SearchField> {
         borderRadius: BorderRadius.circular(borderRadiusValue),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -216,12 +216,12 @@ class _SearchFieldState extends State<_SearchField> {
                       curve: Curves.easeOut,
                       decoration: BoxDecoration(
                         color: _isPressed
-                            ? LumiLivreTheme.primary.withOpacity(0.85)
+                            ? LumiLivreTheme.primary.withValues(alpha: 0.85)
                             : LumiLivreTheme.primary,
                         boxShadow: _isPressed
                             ? [
                                 BoxShadow(
-                                  color: LumiLivreTheme.primary.withOpacity(
+                                  color: LumiLivreTheme.primary.withValues(alpha: 
                                     0.4,
                                   ),
                                   blurRadius: 12,
@@ -244,7 +244,7 @@ class _SearchFieldState extends State<_SearchField> {
                               height: 22,
                               colorFilter: ColorFilter.mode(
                                 _isPressed
-                                    ? Colors.white.withOpacity(0.5)
+                                    ? Colors.white.withValues(alpha: 0.5)
                                     : Colors.white,
                                 BlendMode.srcIn,
                               ),

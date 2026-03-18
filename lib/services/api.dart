@@ -1,9 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../utils/constants.dart';
 import '../models/user.dart';
@@ -35,7 +34,7 @@ class ApiService {
         return _parseCatalogJson(data);
       }
     } catch (e) {
-      if (kDebugMode) print('Erro ao ler cache local: $e');
+      if (kDebugMode) debugPrint('Erro ao ler cache local: $e');
     }
     return null;
   }
@@ -69,7 +68,7 @@ class ApiService {
         throw Exception('Falha ao carregar o catálogo: ${response.statusCode}');
       }
     } catch (e) {
-      if (kDebugMode) print('Erro na requisição do catálogo: $e');
+      if (kDebugMode) debugPrint('Erro na requisição do catálogo: $e');
       rethrow;
     }
   }
@@ -128,7 +127,7 @@ class ApiService {
         throw Exception(errorData['message'] ?? 'Falha no login');
       }
     } catch (e) {
-      print('Erro na chamada de login: $e');
+      debugPrint('Erro na chamada de login: $e');
       throw Exception(
         'Não foi possível conectar ao servidor. Tente novamente.',
       );
@@ -166,7 +165,7 @@ class ApiService {
         throw Exception(errorData['message'] ?? 'Erro ao alterar senha');
       }
     } catch (e) {
-      print('Erro changePassword: $e');
+      debugPrint('Erro changePassword: $e');
       rethrow;
     }
   }
@@ -210,7 +209,7 @@ class ApiService {
         throw Exception('Erro na busca: ${response.statusCode}');
       }
     } catch (e) {
-      if (kDebugMode) print('Erro em searchBooks: $e');
+      if (kDebugMode) debugPrint('Erro em searchBooks: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
@@ -234,7 +233,7 @@ class ApiService {
         throw Exception('Falha ao carregar detalhes do livro.');
       }
     } catch (e) {
-      if (kDebugMode) print('Erro em getBookDetails: $e');
+      if (kDebugMode) debugPrint('Erro em getBookDetails: $e');
       throw Exception('Falha ao carregar detalhes do livro.');
     }
   }
@@ -276,7 +275,7 @@ class ApiService {
         throw Exception('Falha ao carregar livros do gênero: $genre');
       }
     } catch (e) {
-      if (kDebugMode) print('Erro em getBooksByGenre: $e');
+      if (kDebugMode) debugPrint('Erro em getBooksByGenre: $e');
       throw Exception('Não foi possível conectar ao servidor.');
     }
   }
@@ -299,7 +298,7 @@ class ApiService {
         );
       }
     } catch (e) {
-      print('Erro em getMyLoans: $e');
+      debugPrint('Erro em getMyLoans: $e');
       return [];
     }
   }
@@ -318,7 +317,7 @@ class ApiService {
         return [];
       }
     } catch (e) {
-      print('Erro ao buscar solicitações: $e');
+      debugPrint('Erro ao buscar solicitações: $e');
       return [];
     }
   }
@@ -334,7 +333,7 @@ class ApiService {
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e) {
-      print('Erro ao solicitar: $e');
+      debugPrint('Erro ao solicitar: $e');
       return false;
     }
   }
@@ -355,7 +354,7 @@ class ApiService {
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print('Erro ao solicitar: $e');
+      debugPrint('Erro ao solicitar: $e');
       return false;
     }
   }
@@ -374,7 +373,7 @@ class ApiService {
         throw Exception('Falha ao carregar histórico: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erro em getMyLoansHistory: $e');
+      debugPrint('Erro em getMyLoansHistory: $e');
       return [];
     }
   }
@@ -397,7 +396,7 @@ class ApiService {
         }
       }
     } catch (e) {
-      if (kDebugMode) print('Erro ao buscar nome do aluno: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar nome do aluno: $e');
     }
     return null;
   }
@@ -430,7 +429,7 @@ class ApiService {
         throw Exception('Erro ao buscar ranking');
       }
     } catch (e) {
-      print('Erro getRanking: $e');
+      debugPrint('Erro getRanking: $e');
       return [];
     }
   }
@@ -447,7 +446,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Erro ao buscar $endpoint: $e');
+      debugPrint('Erro ao buscar $endpoint: $e');
       return [];
     }
   }
@@ -467,7 +466,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Erro ao buscar cursos: $e');
+      debugPrint('Erro ao buscar cursos: $e');
       return [];
     }
   }
@@ -491,7 +490,7 @@ class ApiService {
         }
       }
     } catch (e) {
-      if (kDebugMode) print('Erro ao buscar dados do aluno: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar dados do aluno: $e');
     }
     return null;
   }
@@ -518,7 +517,7 @@ class ApiService {
         ),
       );
     } else {
-      // Mobile 
+      // Mobile
       request.files.add(
         await http.MultipartFile.fromPath(
           'file',
@@ -531,17 +530,17 @@ class ApiService {
     try {
       final streamedResponse = await request.send().timeout(
         const Duration(seconds: 30),
-      ); 
+      );
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
         return true;
       } else {
-        print('Erro upload: ${response.body}');
+        debugPrint('Erro upload: ${response.body}');
         return false;
       }
     } catch (e) {
-      print('Erro ao enviar foto: $e');
+      debugPrint('Erro ao enviar foto: $e');
       return false;
     }
   }

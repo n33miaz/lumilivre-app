@@ -95,9 +95,18 @@ void main() {
 
       test('deve usar fallbacks para campos de livro nulos', () {
         final catalog = parseCatalog([
-          {'nome': 'Teste', 'livros': [
-            {'id': null, 'titulo': null, 'autor': null, 'imagem': null, 'avaliacao': null},
-          ]},
+          {
+            'nome': 'Teste',
+            'livros': [
+              {
+                'id': null,
+                'titulo': null,
+                'autor': null,
+                'imagem': null,
+                'avaliacao': null,
+              },
+            ],
+          },
         ]);
         final book = catalog['Teste']![0];
         expect(book.id, 0);
@@ -110,18 +119,26 @@ void main() {
 
     group('conversão de URL de imagem', () {
       String normalizeImageUrl(String? rawImage) {
-        if (rawImage == null || rawImage.isEmpty) { return ''; }
+        if (rawImage == null || rawImage.isEmpty) {
+          return '';
+        }
         return rawImage.startsWith('http://')
             ? rawImage.replaceFirst('http://', 'https://')
             : rawImage;
       }
 
       test('deve converter http:// para https://', () {
-        expect(normalizeImageUrl('http://example.com/img.jpg'), 'https://example.com/img.jpg');
+        expect(
+          normalizeImageUrl('http://example.com/img.jpg'),
+          'https://example.com/img.jpg',
+        );
       });
 
       test('deve manter https:// intacto', () {
-        expect(normalizeImageUrl('https://example.com/img.jpg'), 'https://example.com/img.jpg');
+        expect(
+          normalizeImageUrl('https://example.com/img.jpg'),
+          'https://example.com/img.jpg',
+        );
       });
 
       test('deve retornar vazio para null', () {
@@ -133,7 +150,10 @@ void main() {
       });
 
       test('deve manter URLs sem protocolo', () {
-        expect(normalizeImageUrl('//cdn.example.com/img.jpg'), '//cdn.example.com/img.jpg');
+        expect(
+          normalizeImageUrl('//cdn.example.com/img.jpg'),
+          '//cdn.example.com/img.jpg',
+        );
       });
     });
   });

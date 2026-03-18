@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -248,7 +248,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       // actions: [
       //   PopupMenuButton<String>(
       //     onSelected: (value) {
-      //       print('Selecionado: $value');
+      //       debugPrint('Selecionado: $value');
       //     },
       //     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
       //       const PopupMenuItem<String>(
@@ -607,7 +607,7 @@ class _BorrowButton extends StatelessWidget {
           boxShadow: isClickable
               ? [
                   BoxShadow(
-                    color: backgroundColor.withOpacity(0.4),
+                    color: backgroundColor.withValues(alpha: 0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

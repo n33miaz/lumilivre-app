@@ -1,4 +1,4 @@
-name: lumilivre
+﻿name: lumilivre
 description: "Vitrine de livros da sua biblioteca."
 publish_to: "none"
 version: 1.0.0+1
@@ -27,6 +27,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
   cupertino_icons: ^1.0.8
   http: ^1.5.0

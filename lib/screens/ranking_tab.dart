@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/models/ranking.dart';
@@ -156,7 +156,7 @@ class _RankingScreenState extends State<RankingScreen> {
     Function(int?) onChanged,
   ) {
     return DropdownButtonFormField<int>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: label,
         contentPadding: const EdgeInsets.symmetric(
@@ -283,7 +283,7 @@ class _RankingCard extends StatelessWidget {
       color:
           backgroundColor ??
           (isMe
-              ? LumiLivreTheme.primary.withOpacity(0.1)
+              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
               : Theme.of(context).cardColor),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

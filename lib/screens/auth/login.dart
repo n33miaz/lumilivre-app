@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen>
           listen: false,
         ).login(_userController.text, _passwordController.text);
       } catch (e) {
+        if (!mounted) { return; }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
@@ -158,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 _keepConnected = value;
                               });
                             },
-                            activeColor: LumiLivreTheme.primary,
+                            activeThumbColor: LumiLivreTheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),
@@ -225,7 +226,6 @@ class _LoginScreenState extends State<LoginScreen>
           ),
 
           Consumer<ThemeProvider>(
-            // TODO: deixar icone fixo
             builder: (context, themeProvider, child) {
               final buttonBackgroundColor = themeProvider.isDarkMode
                   ? Colors.grey.shade800
