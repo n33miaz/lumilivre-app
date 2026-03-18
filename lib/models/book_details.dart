@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:lumilivre/utils/parsers.dart';
 
 BookDetails bookDetailsFromJson(String str) =>
     BookDetails.fromJson(json.decode(str));
@@ -43,25 +44,13 @@ class BookDetails {
   });
 
   factory BookDetails.fromJson(Map<String, dynamic> json) {
-    DateTime parseDate(dynamic dateVal) {
-      if (dateVal == null) return DateTime(1900, 1, 1);
-      try {
-        if (dateVal is List) {
-          final y = dateVal.isNotEmpty ? (dateVal[0] as int) : 1900;
-          final m = dateVal.length > 1 ? (dateVal[1] as int) : 1;
-          final d = dateVal.length > 2 ? (dateVal[2] as int) : 1;
-          return DateTime(y, m, d);
-        }
-        return DateTime.parse(dateVal.toString());
-      } catch (e) {
-        return DateTime(1900, 1, 1);
-      }
-    }
-
     return BookDetails(
       isbn: json["isbn"] ?? 'N/A',
       nome: json["nome"] ?? 'Título Indisponível',
-      dataLancamento: parseDate(json["dataLancamento"]),
+      dataLancamento: parseDate(
+        json["dataLancamento"],
+        fallback: () => DateTime(1900, 1, 1),
+      ),
       numeroPaginas: json["numeroPaginas"] ?? 0,
       cdd: json["cdd"] ?? 'N/A',
       editora: json["editora"] ?? 'Editora não informada',

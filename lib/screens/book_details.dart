@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/services/loan_status_calculator.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
@@ -101,60 +102,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     List<dynamic> requests,
     Map<String, dynamic>? studentData,
   ) {
-    LoanStatus newStatus = LoanStatus.available;
-    DateTime? date;
-
-    final activeLoan = loans.firstWhere(
-      (l) => l.livroId == widget.book.id,
-      orElse: () => Loan(
-        id: -1,
-        dataEmprestimo: DateTime.now(),
-        dataDevolucao: DateTime(1900),
-        status: '',
-        livroId: -1,
-        livroTitulo: '',
-      ),
+    final result = LoanStatusCalculator.calculate(
+      details: details,
+      loans: loans,
+      requests: requests,
+      targetBookId: widget.book.id,
+      studentData: studentData,
     );
-
-    if (activeLoan.id != -1) {
-      date = activeLoan.dataDevolucao;
-      newStatus = DateTime.now().isAfter(activeLoan.dataDevolucao)
-          ? LoanStatus.overdue
-          : LoanStatus.active;
-    } else {
-      final hasPendingRequest = requests.any((r) {
-        if (r == null || r is! Map) return false;
-        final reqLivroId = (r['livroId'] as num?)?.toInt() ?? -1;
-        final reqStatus = r['status']?.toString() ?? '';
-        return (reqLivroId == widget.book.id) && (reqStatus == 'PENDENTE');
-      });
-
-      if (hasPendingRequest) {
-        newStatus = LoanStatus.pending;
-      } else {
-        String? penalidade = studentData?['penalidade'];
-        bool hasPenalty = penalidade != null && penalidade != "null";
-
-        int activeLoansCount = loans.length;
-
-        if (details.totalExemplares == 0) {
-          newStatus = LoanStatus.noCopies;
-        } else if (hasPenalty) {
-          newStatus = LoanStatus.blockedPenalty;
-        } else if (activeLoansCount >= 3) {
-          newStatus = LoanStatus.limitReached;
-        } else if (details.exemplaresDisponiveis <= 0) {
-          newStatus = LoanStatus.unavailable;
-        } else {
-          newStatus = LoanStatus.available;
-        }
-      }
-    }
 
     setState(() {
       _details = details;
-      _status = newStatus;
-      _dueDate = date;
+      _status = result.status;
+      _dueDate = result.dueDate;
     });
   }
 
