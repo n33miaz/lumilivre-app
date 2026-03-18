@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -93,7 +93,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      if (!mounted) { return; }
+      if (!mounted) {
+        return;
+      }
       final auth = Provider.of<AuthProvider>(context, listen: false);
 
       messenger.showSnackBar(const SnackBar(content: Text('Enviando foto...')));

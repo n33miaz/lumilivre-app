@@ -1,3 +1,109 @@
 {
-  "java.configuration.updateBuildConfiguration": "interactive"
+  // JAVA - Configuração do Android
+  "java.configuration.updateBuildConfiguration": "interactive",
+
+  // DART / FLUTTER - Configurações principais
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [80, 120],
+    "editor.defaultFormatter": "Dart-Code.dart-code"
+  },
+
+  "dart.flutterSdkPath": "",
+  "dart.sdkPath": "",
+  "dart.debugExternalPackageLibraries": true,
+  "dart.debugExternalPackageSources": true,
+  "dart.showTodos": true,
+  "dart.previewLsp": true,
+
+  // FLUTTER - Configurações de desenvolvimento
+  "flutter.sdk": "",
+  "flutter.debugLoggingForWrongFlutterCwd": true,
+  "flutter.showWebServerDevToolsDebugOption": true,
+  "flutter.enableBuildRunnerNullSafety": true,
+  "flutter.hotRestartOnSave": true,
+
+  // EDITOR - Padrões visuais
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 100,
+  "editor.detectIndentation": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.trimAutoWhitespace": true,
+  "editor.trimFinalNewlines": true,
+  "editor.insertFinalNewline": true,
+  "editor.suggestSelection": "recentlyUsed",
+  "editor.quickSuggestionsDelay": 300,
+
+  // FILES - Configurações de arquivo
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/build": false,
+    "**/.dart_tool": false,
+    "**/pubspec.lock": false
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/build/**": true,
+    "**/.dart_tool/**": true,
+    "**/.idea/**": true
+  },
+  "files.trimTrailingWhitespace": true,
+
+  // TERMINAL - Configuração do terminal integrado
+  "terminal.integrated.shell.windows": "pwershell.exe",
+  "terminal.integrated.shellArgs.windows": ["-NoExit", "-Command", "& 'C:\\Program Files\\Git\\bin\\bash.exe' -i"],
+  "terminal.integrated.fontFamily": "Fira Code",
+  "terminal.integrated.fontSize": 12,
+  "terminal.integrated.lineHeight": 1.5,
+
+  // EXTENSIONS - Configurações específicas
+  "errorLens.enabledDiagnosticLevels": ["warning", "error"],
+  "errorLens.excludeBySource": [],
+
+  // SEARCH - Configurações de busca
+  "search.exclude": {
+    "**/build": true,
+    "**/.dart_tool": true,
+    "**/pubspec.lock": true,
+    "**/.idea": true,
+    "**/.vscode": true,
+    "**/ios/Pods": true,
+    "**/android/.gradle": true
+  },
+
+  // SOURCE CONTROL - Git
+  "git.ignoreLimitWarning": true,
+  "git.autorefresh": true,
+
+  // FORMATTERS - Formatação de código
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": false
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": false
+  }
 }
