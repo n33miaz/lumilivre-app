@@ -1,6 +1,14 @@
 {
-  // JAVA - Configuração do Android
-  "java.configuration.updateBuildConfiguration": "interactive",
+  // JAVA E GRADLE - Configuração do Android
+  "gradle.autoDetect": "off",
+  "java.import.gradle.enabled": false,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.exclusions": [
+    "**/android/**",
+    "**/gradle/**",
+    "c:/flutter/**",
+    "c:/Users/neemias.manso/AppData/Local/Pub/Cache/**"
+  ],
 
   // DART / FLUTTER - Configurações principais
   "[dart]": {
@@ -9,8 +17,8 @@
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     },
-    "editor.rulers": [80, 120],
-    "editor.defaultFormatter": "Dart-Code.dart-code"
+    "editor.rulers": [80, 120]
+    // "editor.defaultFormatter": "Dart-Code.dart-code"
   },
 
   "dart.flutterSdkPath": "",
@@ -65,7 +73,11 @@
 
   // TERMINAL - Configuração do terminal integrado
   "terminal.integrated.shell.windows": "pwershell.exe",
-  "terminal.integrated.shellArgs.windows": ["-NoExit", "-Command", "& 'C:\\Program Files\\Git\\bin\\bash.exe' -i"],
+  "terminal.integrated.shellArgs.windows": [
+    "-NoExit",
+    "-Command",
+    "& 'C:\\Program Files\\Git\\bin\\bash.exe' -i"
+  ],
   "terminal.integrated.fontFamily": "Fira Code",
   "terminal.integrated.fontSize": 12,
   "terminal.integrated.lineHeight": 1.5,
@@ -91,11 +103,11 @@
 
   // FORMATTERS - Formatação de código
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    // "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    // "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[yaml]": {
     "editor.insertSpaces": true,

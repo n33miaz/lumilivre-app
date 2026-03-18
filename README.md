@@ -74,19 +74,19 @@ flowchart TD
 
     UserMobile["Application (Aluno)"]:::mobile
     UserWeb["WebSite (Bibliotecário)"]:::web
-    
+
     subgraph Cloud["-"]
         direction TB
         API["API RestFull"]:::api
         DB[("PostgreSQL")]:::db
         Storage["Supabase Storage"]:::storage
     end
-    
+
     External["Google Books / BrasilAPI"]:::external
 
     UserMobile -->|REST API / JSON| API
     UserWeb -->|REST API / JSON| API
-    
+
     API -->|JPA / Hibernate| DB
     API -->|Upload Capas e PDF's| Storage
     API -.->|Consulta Metadados| External
@@ -105,7 +105,7 @@ flowchart TD
 <br/>
 
 <div align="center">
-  <sub>LumiLivre © 2025 - Todos os direitos reservados.</sub>
+  <sub>LumiLivre © 2026 - Todos os direitos reservados.</sub>
 </div>
 
 
