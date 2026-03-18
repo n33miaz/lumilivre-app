@@ -71,14 +71,18 @@ class LoanStatusCalculator {
 
   static Loan? _findActiveLoan(List<Loan> loans, int targetBookId) {
     for (final loan in loans) {
-      if (loan.livroId == targetBookId) { return loan; }
+      if (loan.livroId == targetBookId) {
+        return loan;
+      }
     }
     return null;
   }
 
   static bool _hasPendingRequest(List<dynamic> requests, int targetBookId) {
     return requests.any((r) {
-      if (r == null || r is! Map) { return false; }
+      if (r == null || r is! Map) {
+        return false;
+      }
       final reqLivroId = (r['livroId'] as num?)?.toInt() ?? -1;
       final reqStatus = r['status']?.toString() ?? '';
       return reqLivroId == targetBookId && reqStatus == 'PENDENTE';
