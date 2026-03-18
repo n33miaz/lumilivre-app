@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_web_plugins/url_strategy.dart'; 
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
@@ -20,20 +20,23 @@ void main() {
     debugPrint("Erro de Flutter capturado: ${details.exception}");
   };
 
-  runZonedGuarded(() {
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => AuthProvider()),
-          ChangeNotifierProvider(create: (context) => ThemeProvider()),
-          ChangeNotifierProvider(create: (context) => FavoritesProvider()),
-        ],
-        child: const LumiLivreApp(),
-      ),
-    );
-  }, (error, stack) {
-    debugPrint("Erro Assíncrono Global: $error");
-  });
+  runZonedGuarded(
+    () {
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => AuthProvider()),
+            ChangeNotifierProvider(create: (context) => ThemeProvider()),
+            ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+          ],
+          child: const LumiLivreApp(),
+        ),
+      );
+    },
+    (error, stack) {
+      debugPrint("Erro Assíncrono Global: $error");
+    },
+  );
 }
 
 class LumiLivreApp extends StatelessWidget {

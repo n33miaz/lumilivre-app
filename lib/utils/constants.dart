@@ -1,37 +1,29 @@
 import 'package:flutter/material.dart';
 
-// adb reverse tcp:8080 tcp:8080
-// https://lumilivre-api.onrender.com:8080 (prod) - http://localhost:8080 (web) - http://10.0.2.2:8080 (mobile emulador) - http://192.168.56.1:8080 - http://127.0.0.1:8080
 const String apiBaseUrl = 'https://lumilivre-api.onrender.com';
 
 class LumiLivreTheme {
-  // cores do tema claro
   static const Color primary = Color(0xFF762075);
   static const Color label = Color(0xFFC964C5);
   static const Color lightBackground = Color(0xFFF3F4F6);
   static const Color lightText = Color(0xFF1F2937);
   static const Color lightCard = Colors.white;
 
-  // cores do tema escuro
   static const Color darkBackground = Color(0xFF111827);
   static const Color darkText = Colors.white;
   static const Color darkCard = Color(0xFF1F2937);
 
-  // tema claro
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: primary,
     scaffoldBackgroundColor: lightBackground,
     cardColor: lightCard,
-
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
       brightness: Brightness.light,
       primary: primary,
-      background: lightBackground,
       surface: lightCard,
     ),
-
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
@@ -51,21 +43,17 @@ class LumiLivreTheme {
     cardTheme: const CardThemeData(color: lightCard),
   );
 
-  // tema escuro
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColor: primary,
     scaffoldBackgroundColor: darkBackground,
     cardColor: darkCard,
-
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
       brightness: Brightness.dark,
       primary: primary,
-      background: darkBackground,
       surface: darkCard,
     ),
-
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primary,
@@ -90,7 +78,6 @@ class LumiLivreTheme {
     cardTheme: const CardThemeData(color: darkCard),
   );
 
-  // tela de busca
   static const List<Color> genreCardColors = [
     Color(0xFFE13300),
     Color(0xFF006450),

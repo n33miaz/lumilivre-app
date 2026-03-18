@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -83,20 +83,20 @@ class _ProfileScreenState extends State<ProfileScreen>
         });
       }
     } catch (e) {
-      print('Erro ao buscar ranking: $e');
+      debugPrint('Erro ao buscar ranking: $e');
     }
   }
 
   Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
+    final messenger = ScaffoldMessenger.of(context);
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      if (!mounted) { return; }
       final auth = Provider.of<AuthProvider>(context, listen: false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Enviando foto...')));
+      messenger.showSnackBar(const SnackBar(content: Text('Enviando foto...')));
 
       Uint8List? bytes;
       if (kIsWeb) {
@@ -113,13 +113,13 @@ class _ProfileScreenState extends State<ProfileScreen>
       if (success) {
         _loadHeaderData();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             const SnackBar(content: Text('Foto atualizada com sucesso!')),
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             const SnackBar(content: Text('Erro ao atualizar foto.')),
           );
         }
@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           indicatorPadding: const EdgeInsets.symmetric(horizontal: 0),
           indicatorSize: TabBarIndicatorSize.label,
           splashFactory: NoSplash.splashFactory,
-          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
             (_) => Colors.transparent,
           ),
           tabs: [
@@ -221,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               onTap: _pickAndUploadImage,
               child: CircleAvatar(
                 radius: 30,
-                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundColor: Colors.white.withValues(alpha: 0.3),
                 backgroundImage: _profileImageUrl != null
                     ? NetworkImage(_profileImageUrl!)
                     : null,
@@ -281,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           margin: const EdgeInsets.only(left: 8),

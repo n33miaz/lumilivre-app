@@ -27,7 +27,7 @@ class Loan {
     required this.livroId,
     required this.livroTitulo,
     this.imagemUrl,
-    this.isRequest = false, 
+    this.isRequest = false,
   });
 
   factory Loan.fromJson(Map<String, dynamic> json) {
@@ -79,15 +79,12 @@ class Loan {
 
     return Loan(
       id: json["id"] ?? 0,
-      dataEmprestimo: parseDate(
-        json["dataSolicitacao"],
-      ),
-      dataDevolucao: DateTime(2100), 
+      dataEmprestimo: parseDate(json["dataSolicitacao"]),
+      dataDevolucao: DateTime(2100),
       status: json["status"] ?? "PENDENTE",
       livroId: json["livroId"] ?? 0,
       livroTitulo: json["livroNome"] ?? "Solicitação",
-      imagemUrl:
-          null,
+      imagemUrl: null,
       isRequest: true,
     );
   }

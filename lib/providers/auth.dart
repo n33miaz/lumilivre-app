@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,8 +52,6 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return;
     }
-
-    // TODO resolvido (por enquanto, confiamos nos dados salvos)
     final userDataString = prefs.getString('userData');
     if (userDataString != null) {
       final userData = jsonDecode(userDataString);

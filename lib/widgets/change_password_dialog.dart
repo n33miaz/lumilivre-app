@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/providers/auth.dart';
@@ -85,8 +85,9 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 decoration: const InputDecoration(labelText: 'Senha Atual'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return 'Informe a senha atual';
+                  }
                   return null;
                 },
               ),
@@ -96,8 +97,9 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 decoration: const InputDecoration(labelText: 'Nova Senha'),
                 obscureText: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return 'Informe a nova senha';
+                  }
                   if (value.length < 6) return 'Mínimo de 6 caracteres';
                   return null;
                 },
@@ -110,8 +112,9 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 ),
                 obscureText: true,
                 validator: (value) {
-                  if (value != _newPasswordController.text)
+                  if (value != _newPasswordController.text) {
                     return 'As senhas não conferem';
+                  }
                   return null;
                 },
               ),

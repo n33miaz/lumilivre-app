@@ -9,9 +9,27 @@ void main() {
   group('FavoritesProvider', () {
     late FavoritesProvider provider;
 
-    const bookA = Book(id: 1, title: 'Livro A', author: 'Autor A', imageUrl: '', rating: 4.0);
-    const bookB = Book(id: 2, title: 'Livro B', author: 'Autor B', imageUrl: '', rating: 3.5);
-    const bookADuplicate = Book(id: 1, title: 'Livro A', author: 'Autor A', imageUrl: '', rating: 4.0);
+    const bookA = Book(
+      id: 1,
+      title: 'Livro A',
+      author: 'Autor A',
+      imageUrl: '',
+      rating: 4.0,
+    );
+    const bookB = Book(
+      id: 2,
+      title: 'Livro B',
+      author: 'Autor B',
+      imageUrl: '',
+      rating: 3.5,
+    );
+    const bookADuplicate = Book(
+      id: 1,
+      title: 'Livro A',
+      author: 'Autor A',
+      imageUrl: '',
+      rating: 4.0,
+    );
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});

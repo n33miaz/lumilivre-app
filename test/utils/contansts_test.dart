@@ -97,7 +97,10 @@ void main() {
 
   group('LumiLivreTheme - consistência', () {
     test('ambos os temas devem usar o mesmo primary', () {
-      expect(LumiLivreTheme.lightTheme.primaryColor, LumiLivreTheme.darkTheme.primaryColor);
+      expect(
+        LumiLivreTheme.lightTheme.primaryColor,
+        LumiLivreTheme.darkTheme.primaryColor,
+      );
     });
     test('ambos devem ter elevatedButtonTheme configurado', () {
       expect(LumiLivreTheme.lightTheme.elevatedButtonTheme.style, isNotNull);

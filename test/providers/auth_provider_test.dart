@@ -97,7 +97,8 @@ void main() {
       test('deve restaurar usuário de dados salvos', () async {
         SharedPreferences.setMockInitialValues({
           'authToken': 'jwt-token-mock-123',
-          'userData': '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
+          'userData':
+              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
         });
         final provider = AuthProvider();
         await provider.tryAutoLogin();

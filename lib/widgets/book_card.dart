@@ -68,8 +68,7 @@ class BookCard extends StatelessWidget {
                           'assets/images/capa-padrao.png',
                           fit: BoxFit.cover,
                         ),
-                        memCacheWidth:
-                            420,
+                        memCacheWidth: 420,
                       )
                     : Image.asset(
                         'assets/images/capa-padrao.png',

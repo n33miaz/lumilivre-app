@@ -34,7 +34,7 @@ class ThemeProvider with ChangeNotifier, WidgetsBindingObserver {
         notifyListeners();
       }
     }
-  }        
+  }
 
   ThemeOption get themeOption => _themeOption;
 

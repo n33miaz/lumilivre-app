@@ -65,8 +65,7 @@ class SearchScreen extends StatelessWidget {
       ),
       CategoryItem(
         title: 'Ficção',
-        imagePath:
-            'assets/images/categories/Ficcao.png',
+        imagePath: 'assets/images/categories/Ficcao.png',
       ),
       CategoryItem(
         title: 'História',
@@ -90,13 +89,11 @@ class SearchScreen extends StatelessWidget {
       ),
       CategoryItem(
         title: 'Ciência e Tecnologia',
-        imagePath:
-            'assets/images/categories/Ciencia.png',
+        imagePath: 'assets/images/categories/Ciencia.png',
       ),
       CategoryItem(
         title: 'Infantojuvenil',
-        imagePath:
-            'assets/images/categories/Infantojuvenil.jpg',
+        imagePath: 'assets/images/categories/Infantojuvenil.jpg',
       ),
     ];
 
@@ -133,8 +130,7 @@ class SearchScreen extends StatelessWidget {
                     color:
                         LumiLivreTheme.genreCardColors[index %
                             LumiLivreTheme.genreCardColors.length],
-                    imagePath:
-                        category.imagePath,
+                    imagePath: category.imagePath,
                   ),
                 );
               }, childCount: categories.length),

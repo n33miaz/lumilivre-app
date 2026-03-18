@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/screens/book_details.dart';
@@ -13,7 +13,7 @@ import '../helpers/test_helpers.dart';
 /// Recriamos a lógica aqui de forma testável (mesma implementação)
 /// já que o método original é privado (`_calculateStatus`).
 ///
-/// TODO: Refatorar para extrair essa lógica em um use case/service
+/// Nota: Ideal refatorar para extrair essa lógica em um use case/service
 /// testável diretamente (ex: LoanStatusCalculator).
 void main() {
   group('Lógica de cálculo de status do empréstimo', () {
