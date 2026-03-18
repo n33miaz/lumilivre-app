@@ -3,8 +3,12 @@ import 'package:lumilivre/utils/parsers.dart';
 
 List<Loan> loanFromJson(String str) {
   final decoded = json.decode(str);
-  if (decoded == null) { return []; }
-  if (decoded is! List) { return []; }
+  if (decoded == null) {
+    return [];
+  }
+  if (decoded is! List) {
+    return [];
+  }
   return List<Loan>.from(decoded.map((x) => Loan.fromJson(x)));
 }
 
@@ -48,7 +52,10 @@ class Loan {
   factory Loan.fromRequestJson(Map<String, dynamic> json) {
     return Loan(
       id: json["id"] ?? 0,
-      dataEmprestimo: parseDate(json["dataSolicitacao"], fallback: DateTime.now),
+      dataEmprestimo: parseDate(
+        json["dataSolicitacao"],
+        fallback: DateTime.now,
+      ),
       dataDevolucao: DateTime(2100),
       status: json["status"] ?? "PENDENTE",
       livroId: json["livroId"] ?? 0,
