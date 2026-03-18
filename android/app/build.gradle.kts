@@ -20,7 +20,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.lumilivre.lumilivre" // rmv duplicado
+    namespace = "br.com.lumilivre.lumilivre"
     compileSdk = 36
 
     compileOptions {
@@ -60,6 +60,32 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    flavorDimensions.add("environment")
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "LumiLivre Dev")
+            manifestPlaceholders["appTitle"] = "LumiLivre Dev"
+        }
+
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            resValue("string", "app_name", "LumiLivre Staging")
+            manifestPlaceholders["appTitle"] = "LumiLivre Staging"
+        }
+
+        create("prod") {
+            dimension = "environment"
+            resValue("string", "app_name", "LumiLivre")
+            manifestPlaceholders["appTitle"] = "LumiLivre"
         }
     }
 }
