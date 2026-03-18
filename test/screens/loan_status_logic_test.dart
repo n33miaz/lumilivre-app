@@ -46,18 +46,23 @@ void main() {
       );
     }
 
-    test('deve retornar AVAILABLE quando livro tem exemplares e aluno pode emprestar', () {
-      final result = calc(details: availableBook);
-      expect(result.status, LoanStatus.available);
-      expect(result.dueDate, isNull);
-    });
+    test(
+      'deve retornar AVAILABLE quando livro tem exemplares e aluno pode emprestar',
+      () {
+        final result = calc(details: availableBook);
+        expect(result.status, LoanStatus.available);
+        expect(result.dueDate, isNull);
+      },
+    );
 
     test('deve retornar ACTIVE quando aluno tem empréstimo ativo do livro', () {
       final loan = Loan(
         id: 1,
         dataEmprestimo: DateTime.now().subtract(const Duration(days: 5)),
         dataDevolucao: DateTime.now().add(const Duration(days: 10)),
-        status: 'ATIVO', livroId: 1, livroTitulo: 'Duna',
+        status: 'ATIVO',
+        livroId: 1,
+        livroTitulo: 'Duna',
       );
       final result = calc(details: availableBook, loans: [loan]);
       expect(result.status, LoanStatus.active);
@@ -69,7 +74,9 @@ void main() {
         id: 1,
         dataEmprestimo: DateTime.now().subtract(const Duration(days: 30)),
         dataDevolucao: DateTime.now().subtract(const Duration(days: 1)),
-        status: 'ATIVO', livroId: 1, livroTitulo: 'Duna',
+        status: 'ATIVO',
+        livroId: 1,
+        livroTitulo: 'Duna',
       );
       final result = calc(details: availableBook, loans: [loan]);
       expect(result.status, LoanStatus.overdue);
@@ -78,7 +85,9 @@ void main() {
     test('deve retornar PENDING quando há solicitação pendente', () {
       final result = calc(
         details: availableBook,
-        requests: [{'livroId': 1, 'status': 'PENDENTE'}],
+        requests: [
+          {'livroId': 1, 'status': 'PENDENTE'},
+        ],
       );
       expect(result.status, LoanStatus.pending);
     });
@@ -86,7 +95,9 @@ void main() {
     test('não deve considerar solicitação de outro livro', () {
       final result = calc(
         details: availableBook,
-        requests: [{'livroId': 99, 'status': 'PENDENTE'}],
+        requests: [
+          {'livroId': 99, 'status': 'PENDENTE'},
+        ],
       );
       expect(result.status, LoanStatus.available);
     });
@@ -94,7 +105,9 @@ void main() {
     test('não deve considerar solicitação não-pendente', () {
       final result = calc(
         details: availableBook,
-        requests: [{'livroId': 1, 'status': 'REJEITADA'}],
+        requests: [
+          {'livroId': 1, 'status': 'REJEITADA'},
+        ],
       );
       expect(result.status, LoanStatus.available);
     });
@@ -121,21 +134,33 @@ void main() {
     });
 
     test('deve retornar LIMIT_REACHED quando aluno tem 3+ empréstimos', () {
-      final loans = List.generate(3, (i) => Loan(
-        id: i, dataEmprestimo: DateTime.now(),
-        dataDevolucao: DateTime.now().add(const Duration(days: 14)),
-        status: 'ATIVO', livroId: 100 + i, livroTitulo: 'Livro $i',
-      ));
+      final loans = List.generate(
+        3,
+        (i) => Loan(
+          id: i,
+          dataEmprestimo: DateTime.now(),
+          dataDevolucao: DateTime.now().add(const Duration(days: 14)),
+          status: 'ATIVO',
+          livroId: 100 + i,
+          livroTitulo: 'Livro $i',
+        ),
+      );
       final result = calc(details: availableBook, loans: loans);
       expect(result.status, LoanStatus.limitReached);
     });
 
     test('não deve bloquear com 2 empréstimos', () {
-      final loans = List.generate(2, (i) => Loan(
-        id: i, dataEmprestimo: DateTime.now(),
-        dataDevolucao: DateTime.now().add(const Duration(days: 14)),
-        status: 'ATIVO', livroId: 100 + i, livroTitulo: 'Livro $i',
-      ));
+      final loans = List.generate(
+        2,
+        (i) => Loan(
+          id: i,
+          dataEmprestimo: DateTime.now(),
+          dataDevolucao: DateTime.now().add(const Duration(days: 14)),
+          status: 'ATIVO',
+          livroId: 100 + i,
+          livroTitulo: 'Livro $i',
+        ),
+      );
       final result = calc(details: availableBook, loans: loans);
       expect(result.status, LoanStatus.available);
     });
@@ -148,12 +173,16 @@ void main() {
     group('prioridade das regras', () {
       test('empréstimo ativo deve ter prioridade sobre penalidade', () {
         final loan = Loan(
-          id: 1, dataEmprestimo: DateTime.now(),
+          id: 1,
+          dataEmprestimo: DateTime.now(),
           dataDevolucao: DateTime.now().add(const Duration(days: 10)),
-          status: 'ATIVO', livroId: 1, livroTitulo: 'Duna',
+          status: 'ATIVO',
+          livroId: 1,
+          livroTitulo: 'Duna',
         );
         final result = calc(
-          details: availableBook, loans: [loan],
+          details: availableBook,
+          loans: [loan],
           studentData: {'penalidade': 'Multa'},
         );
         expect(result.status, LoanStatus.active);
@@ -162,7 +191,9 @@ void main() {
       test('solicitação pendente deve ter prioridade sobre noCopies', () {
         final result = calc(
           details: noCopiesBook,
-          requests: [{'livroId': 1, 'status': 'PENDENTE'}],
+          requests: [
+            {'livroId': 1, 'status': 'PENDENTE'},
+          ],
         );
         expect(result.status, LoanStatus.pending);
       });
@@ -176,13 +207,20 @@ void main() {
       });
 
       test('penalidade deve ter prioridade sobre limitReached', () {
-        final loans = List.generate(3, (i) => Loan(
-          id: i, dataEmprestimo: DateTime.now(),
-          dataDevolucao: DateTime.now().add(const Duration(days: 14)),
-          status: 'ATIVO', livroId: 100 + i, livroTitulo: 'Livro $i',
-        ));
+        final loans = List.generate(
+          3,
+          (i) => Loan(
+            id: i,
+            dataEmprestimo: DateTime.now(),
+            dataDevolucao: DateTime.now().add(const Duration(days: 14)),
+            status: 'ATIVO',
+            livroId: 100 + i,
+            livroTitulo: 'Livro $i',
+          ),
+        );
         final result = calc(
-          details: availableBook, loans: loans,
+          details: availableBook,
+          loans: loans,
           studentData: {'penalidade': 'Multa'},
         );
         expect(result.status, LoanStatus.blockedPenalty);
@@ -192,8 +230,11 @@ void main() {
     group('edge cases', () {
       test('studentData null não deve crashar', () {
         final result = LoanStatusCalculator.calculate(
-          details: availableBook, loans: [], requests: [],
-          targetBookId: 1, studentData: null,
+          details: availableBook,
+          loans: [],
+          requests: [],
+          targetBookId: 1,
+          studentData: null,
         );
         expect(result.status, LoanStatus.available);
       });
@@ -201,7 +242,9 @@ void main() {
       test('requests com dados inválidos não devem crashar', () {
         final result = calc(
           details: availableBook,
-          requests: [{'livroId': null, 'status': null}],
+          requests: [
+            {'livroId': null, 'status': null},
+          ],
         );
         expect(result.status, LoanStatus.available);
       });
@@ -209,8 +252,12 @@ void main() {
       test('dueDate deve ser preenchido em empréstimo ativo', () {
         final dueDate = DateTime.now().add(const Duration(days: 7));
         final loan = Loan(
-          id: 1, dataEmprestimo: DateTime.now(), dataDevolucao: dueDate,
-          status: 'ATIVO', livroId: 1, livroTitulo: 'Duna',
+          id: 1,
+          dataEmprestimo: DateTime.now(),
+          dataDevolucao: dueDate,
+          status: 'ATIVO',
+          livroId: 1,
+          livroTitulo: 'Duna',
         );
         final result = calc(details: availableBook, loans: [loan]);
         expect(result.dueDate, dueDate);
