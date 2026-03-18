@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -221,8 +221,8 @@ class _SearchFieldState extends State<_SearchField> {
                         boxShadow: _isPressed
                             ? [
                                 BoxShadow(
-                                  color: LumiLivreTheme.primary.withValues(alpha: 
-                                    0.4,
+                                  color: LumiLivreTheme.primary.withValues(
+                                    alpha: 0.4,
                                   ),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),

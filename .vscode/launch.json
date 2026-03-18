@@ -1,26 +1,80 @@
-// BUILD APK: flutter build apk --flavor JC --release --dart-define=app.flavor=prod
+// BUILD APK: flutter build apk --release --dart-define=app.flavor=prod
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "configurations": [
     {
-      "name": "Dev - Emulador",
+      "name": "Dev - Emulador Android",
       "request": "launch",
       "type": "dart",
-      "args": ["--dart-define=app.flavor=dev"]
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=app.flavor=dev",
+        "--dart-define=app.env=development",
+        "--verbose"
+      ],
+      "deviceId": "emulator-5554",
+      "flutterMode": "debug",
+      "cwd": "${workspaceFolder}"
     },
-    // adb reverse tcp:8080 tcp:8080
     {
-      "name": "Dev - Via USB",
+      "name": "Dev - Dispositivo USB", // adb reverse tcp:8080 tcp:8080
       "request": "launch",
       "type": "dart",
-      "args": ["--dart-define=app.flavor=dev"]
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=app.flavor=dev",
+        "--dart-define=app.env=development",
+        "--verbose"
+      ],
+      "flutterMode": "debug",
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "Produção",
+      "name": "Staging - Emulador",
       "request": "launch",
       "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=app.flavor=staging",
+        "--dart-define=app.env=staging"
+      ],
+      "deviceId": "emulator-5554",
+      "flutterMode": "debug",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Produção - Release",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=app.flavor=prod",
+        "--dart-define=app.env=production"
+      ],
       "flutterMode": "release",
-      "args": ["--dart-define=app.flavor=prod"]
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Web - Chrome",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=app.flavor=dev",
+        "--dart-define=app.env=development",
+        "-d",
+        "chrome"
+      ],
+      "flutterMode": "debug",
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Dev - Emulador + Logs",
+      "configurations": ["Dev - Emulador Android"],
+      "stopOnEntry": false,
+      "description": "Inicia debug completo com logs verbosos em emulador"
     }
   ]
 }
