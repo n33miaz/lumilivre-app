@@ -35,21 +35,16 @@ class _OfflineBannerState extends State<OfflineBanner> {
       final result = await Connectivity().checkConnectivity();
       _updateStatus(result);
     } catch (e) {
-      // Em caso de erro na verificação, assumimos que tem internet para não bloquear
       debugPrint('Erro ao verificar conectividade: $e');
     }
   }
 
-  // CORREÇÃO AQUI: Aceita ConnectivityResult (singular) em vez de List
   void _updateStatus(dynamic result) {
-    // Tratamento híbrido para garantir compatibilidade
     bool isOffline = false;
 
     if (result is List) {
-      // Caso atualize a lib no futuro
       isOffline = result.contains(ConnectivityResult.none);
     } else if (result is ConnectivityResult) {
-      // Versão atual (5.0.2)
       isOffline = result == ConnectivityResult.none;
     }
 

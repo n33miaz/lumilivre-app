@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:lumilivre/utils/parsers.dart';
 
 class Book {
   final int id;
@@ -29,54 +30,19 @@ class Book {
 
   factory Book.fromMap(Map<String, dynamic> map) {
     return Book(
-      id: _toInt(map['id']),
-      title:
-          map['title'] ?? map['titulo'] ?? map['nome'] ?? 'Título Desconhecido',
+      id: safeParseInt(map['id']),
+      title: map['title'] ?? map['titulo'] ?? map['nome'] ?? 'Título Desconhecido',
       author: map['author'] ?? map['autor'] ?? 'Autor Desconhecido',
       imageUrl: map['imageUrl'] ?? map['imagem'] ?? '',
-      rating: _toDouble(map['rating'] ?? map['avaliacao']),
+      rating: safeParseDouble(map['rating'] ?? map['avaliacao']),
     );
   }
 
   factory Book.fromJson(String source) => Book.fromMap(json.decode(source));
 
-  static int _toInt(dynamic value) {
-    if (value == null) {
-      return 0;
-    }
-    if (value is int) {
-      return value;
-    }
-    if (value is double) {
-      return value.toInt();
-    }
-    if (value is String) {
-      return int.tryParse(value) ?? 0;
-    }
-    return 0;
-  }
-
-  static double _toDouble(dynamic value) {
-    if (value == null) {
-      return 0.0;
-    }
-    if (value is double) {
-      return value;
-    }
-    if (value is int) {
-      return value.toDouble();
-    }
-    if (value is String) {
-      return double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
-    }
-    return 0.0;
-  }
-
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) { return true; }
     return other is Book &&
         other.id == id &&
         other.title == title &&
@@ -86,21 +52,10 @@ class Book {
   }
 
   @override
-  int get hashCode {
-    return id.hashCode ^
-        title.hashCode ^
-        author.hashCode ^
-        imageUrl.hashCode ^
-        rating.hashCode;
-  }
+  int get hashCode =>
+      id.hashCode ^ title.hashCode ^ author.hashCode ^ imageUrl.hashCode ^ rating.hashCode;
 
-  Book copyWith({
-    int? id,
-    String? title,
-    String? author,
-    String? imageUrl,
-    double? rating,
-  }) {
+  Book copyWith({int? id, String? title, String? author, String? imageUrl, double? rating}) {
     return Book(
       id: id ?? this.id,
       title: title ?? this.title,
