@@ -1,15 +1,16 @@
 ﻿import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utils/constants.dart';
-import '../models/user.dart';
 import '../models/book.dart';
 import '../models/book_details.dart';
 import '../models/loan.dart';
 import '../models/ranking.dart';
+import '../models/user.dart';
+import '../utils/constants.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -124,7 +125,9 @@ class ApiService {
         return loginResponseFromJson(response.body);
       } else {
         final errorData = jsonDecode(response.body);
-        throw Exception(errorData['message'] ?? 'Falha no login');
+        throw Exception(
+          errorData['mensagem'] ?? errorData['message'] ?? 'Falha no login',
+        );
       }
     } catch (e) {
       debugPrint('Erro na chamada de login: $e');

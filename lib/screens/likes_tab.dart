@@ -34,12 +34,12 @@ class LikesTab extends StatelessWidget {
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.55,
+            mainAxisSpacing: 24,
+            childAspectRatio: 0.5,
           ),
           itemCount: books.length,
           itemBuilder: (context, index) {

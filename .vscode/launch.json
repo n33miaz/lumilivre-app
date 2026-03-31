@@ -1,4 +1,4 @@
-// BUILD APK: flutter build apk --release --dart-define=app.flavor=prod
+// flutter build apk --release --dart-define=app.flavor=prod
 {
   "version": "1.1.0",
   "configurations": [
@@ -8,6 +8,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
+        "--flavor",
+        "dev",
         "--dart-define=app.flavor=dev",
         "--dart-define=app.env=development",
         "--verbose"
@@ -22,6 +24,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
+        "--flavor",
+        "dev",
         "--dart-define=app.flavor=dev",
         "--dart-define=app.env=development",
         "--verbose"
@@ -35,6 +39,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
+        "--flavor",
+        "staging",
         "--dart-define=app.flavor=staging",
         "--dart-define=app.env=staging"
       ],
@@ -48,6 +54,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
+        "--flavor",
+        "prod",
         "--dart-define=app.flavor=prod",
         "--dart-define=app.env=production"
       ],
@@ -60,6 +68,8 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
+        "--flavor",
+        "dev",
         "--dart-define=app.flavor=dev",
         "--dart-define=app.env=development",
         "-d",

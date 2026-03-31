@@ -1,14 +1,13 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/change_password_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -211,17 +210,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _ThemeOptionButton(
-                    label: 'Escuro',
-                    iconPath: 'assets/icons/moon.svg',
-                    option: ThemeOption.dark,
+                    label: 'Sistema',
+                    materialIcon: Icons.brightness_auto_outlined,
+                    option: ThemeOption.system,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _ThemeOptionButton(
-                    label: 'Sistema',
-                    materialIcon: Icons.brightness_auto_outlined,
-                    option: ThemeOption.system,
+                    label: 'Escuro',
+                    iconPath: 'assets/icons/moon.svg',
+                    option: ThemeOption.dark,
                   ),
                 ),
               ],
