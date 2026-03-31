@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +10,7 @@ import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/utils/parsers.dart';
 
 enum LoanStatus {
   loading,
@@ -306,8 +307,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   Widget _buildInfoRow(BuildContext context, BookDetails details) {
     final tipoCapaFormatado = details.tipoCapa
-        .replaceFirst('Capa ', '')
-        .toUpperCase();
+      .toCapitalized()
+      .replaceAll('_', ' ')
+      .replaceFirst('Capa ', '');
 
     final normalizedClassificacao = details.classificacaoEtaria
         .toLowerCase()

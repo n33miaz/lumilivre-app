@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-const String apiBaseUrl = 'https://lumilivre-api.onrender.com';
+// const String apiBaseUrl = 'https://lumilivre-api.onrender.com';
+const String apiBaseUrl = 'http://127.0.0.1:8080';
+// const String apiBaseUrl = 'http://localhost:8080';
 
 class LumiLivreTheme {
   static const Color primary = Color(0xFF762075);

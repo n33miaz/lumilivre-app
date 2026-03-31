@@ -56,3 +56,12 @@ double safeParseDouble(dynamic value) {
   }
   return 0.0;
 }
+
+extension StringExtension on String {
+  /// Retorna a string com a primeira letra em maiúscula e o restante em minúscula.
+  String toCapitalized() {
+    if (isEmpty) return '';
+    if (length == 1) return toUpperCase();
+    return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
+  }
+}

@@ -21,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen>
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
-  bool _keepConnected = true;
 
   // animação
   late AnimationController _animationController;
@@ -88,12 +87,17 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+                ),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Form(
@@ -142,29 +146,7 @@ class _LoginScreenState extends State<LoginScreen>
                               v!.isEmpty ? 'Digite sua senha' : null,
                         ),
 
-                        Theme(
-                          data: ThemeData(
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                          ),
-                          child: SwitchListTile(
-                            title: const Text(
-                              'Continuar Conectado',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
-                              ),
-                            ),
-                            value: _keepConnected,
-                            onChanged: (bool value) {
-                              setState(() {
-                                _keepConnected = value;
-                              });
-                            },
-                            activeThumbColor: LumiLivreTheme.primary,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
+                        const SizedBox(height: 16),
 
                         ElevatedButton(
                           onPressed: _isLoading ? null : _handleLogin,
@@ -234,38 +216,40 @@ class _LoginScreenState extends State<LoginScreen>
                   : Colors.grey.shade300;
 
               return Positioned(
-                left: 16,
-                bottom: 16,
-                child: Material(
-                  color: buttonBackgroundColor,
-                  borderRadius: BorderRadius.circular(50),
-                  child: InkWell(
+                left: 20,
+                bottom: 20,
+                child: SafeArea(
+                  child: Material(
+                    color: buttonBackgroundColor,
                     borderRadius: BorderRadius.circular(50),
-                    onTap: () {
-                      final newTheme = themeProvider.isDarkMode
-                          ? ThemeOption.light
-                          : ThemeOption.dark;
-                      themeProvider.setTheme(newTheme);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                        child: SvgPicture.asset(
-                          themeProvider.isDarkMode
-                              ? 'assets/icons/sun.svg'
-                              : 'assets/icons/moon.svg',
-                          key: ValueKey(themeProvider.isDarkMode),
-                          height: 28,
-                          colorFilter: ColorFilter.mode(
-                            Theme.of(context).iconTheme.color!,
-                            BlendMode.srcIn,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () {
+                        final newTheme = themeProvider.isDarkMode
+                            ? ThemeOption.light
+                            : ThemeOption.dark;
+                        themeProvider.setTheme(newTheme);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder: (child, animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                          child: SvgPicture.asset(
+                            themeProvider.isDarkMode
+                                ? 'assets/icons/sun.svg'
+                                : 'assets/icons/moon.svg',
+                            key: ValueKey(themeProvider.isDarkMode),
+                            height: 28,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).iconTheme.color!,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),

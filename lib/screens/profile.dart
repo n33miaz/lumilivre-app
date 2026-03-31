@@ -143,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.primaryColor,
-        toolbarHeight: 140, // Altura ajustada
+        toolbarHeight: 140,
         elevation: 0,
         title: _buildProfileHeader(authProvider, theme),
         bottom: TabBar(
@@ -250,7 +250,6 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ],
         ),
-
         const SizedBox(width: 16),
 
         // TEXTOS

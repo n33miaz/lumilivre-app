@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/models/loan.dart';
@@ -96,31 +96,62 @@ class _LoansTabState extends State<LoansTab> {
     return Column(
       children: [
         const SizedBox(height: 16),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: _FilterButton(
-                  label: 'Em Andamento',
-                  isSelected: _currentIndex == 0,
-                  onTap: () => _onTabChanged(0),
-                ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final tabWidth = (constraints.maxWidth - 32) / 2;
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
               ),
-              Expanded(
-                child: _FilterButton(
-                  label: 'Histórico',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => _onTabChanged(1),
-                ),
+              child: Stack(
+                children: [
+                  AnimatedAlign(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    alignment: _currentIndex == 0
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    child: Container(
+                      width: tabWidth,
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _FilterButton(
+                          label: 'Em Andamento',
+                          isSelected: _currentIndex == 0,
+                          onTap: () => _onTabChanged(0),
+                        ),
+                      ),
+                      Expanded(
+                        child: _FilterButton(
+                          label: 'Histórico',
+                          isSelected: _currentIndex == 1,
+                          onTap: () => _onTabChanged(1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
         const SizedBox(height: 8),
 
@@ -221,22 +252,8 @@ class _FilterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
-        ),
+      behavior: HitTestBehavior.opaque,
+      child: Center(
         child: Text(
           label,
           textAlign: TextAlign.center,

@@ -88,15 +88,11 @@ class _BookCarouselState extends State<BookCarousel> {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          // OTIMIZAÇÃO 1: RepaintBoundary isola a pintura deste widget.
-          // O scroll horizontal não forçará o redesenho da lista vertical pai.
           child: RepaintBoundary(
             child: ListView.builder(
               controller: _pageController,
               scrollDirection: Axis.horizontal,
-              // OTIMIZAÇÃO 2: BouncingScrollPhysics dá uma sensação mais fluida e nativa.
               physics: const BouncingScrollPhysics(),
-              // OTIMIZAÇÃO 3: Renderiza 200px fora da tela para evitar "buracos" ao rolar rápido.
               cacheExtent: 200,
               itemCount: _displayedBooks.length + (_hasMoreHorizontal ? 1 : 0),
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -112,7 +108,10 @@ class _BookCarouselState extends State<BookCarousel> {
                 final book = _displayedBooks[index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 16),
-                  child: BookCard(book: book),
+                  child: BookCard(
+                    book: book,
+                    isCompact: true,
+                  ),
                 );
               },
             ),
