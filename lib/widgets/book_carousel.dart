@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/screens/category_books.dart';
+import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 
 class BookCarousel extends StatefulWidget {
   final String title;
+
+  /// Livros iniciais vindos do cache do catálogo (página 0 já resolvida).
   final List<Book> books;
 
   const BookCarousel({super.key, required this.title, required this.books});
@@ -14,50 +17,77 @@ class BookCarousel extends StatefulWidget {
 }
 
 class _BookCarouselState extends State<BookCarousel> {
-  final PageController _pageController = PageController(viewportFraction: 0.4);
-  late List<Book> _displayedBooks;
-  bool _hasMoreHorizontal = true;
+  static const double _itemWidth = 150.0 + 16.0; // card + gap
+  static const double _prefetchThreshold = _itemWidth * 3; // busca 3 cards antes do fim
+
+  final ApiService _apiService = ApiService();
+  final ScrollController _scrollController = ScrollController();
+
+  late List<Book> _books;
+  int _nextPage = 1; // página 0 já veio no widget.books (seed do catálogo)
+  bool _isLoading = false;
+  bool _hasMore = true;
 
   @override
   void initState() {
     super.initState();
-    _displayedBooks = widget.books.take(6).toList();
-    _hasMoreHorizontal = widget.books.length > 6;
-
-    _pageController.addListener(() {
-      if (_pageController.position.pixels >=
-          _pageController.position.maxScrollExtent - 200) {
-        _loadMoreBooks();
-      }
-    });
+    _books = List<Book>.from(widget.books);
+    _scrollController.addListener(_onScroll);
   }
 
-  void _loadMoreBooks() {
-    if (!_hasMoreHorizontal) return;
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final distanceToEnd =
+        _scrollController.position.maxScrollExtent -
+        _scrollController.position.pixels;
 
-    setState(() {
-      final nextEnd = (_displayedBooks.length + 6).clamp(
-        0,
-        widget.books.length,
+    if (distanceToEnd <= _prefetchThreshold && !_isLoading && _hasMore) {
+      _fetchMore();
+    }
+  }
+
+  Future<void> _fetchMore() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final newBooks = await _apiService.getBooksByGenre(
+        widget.title,
+        page: _nextPage,
       );
-      _displayedBooks = widget.books.sublist(0, nextEnd);
-      if (_displayedBooks.length == widget.books.length) {
-        _hasMoreHorizontal = false;
-      }
-    });
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+        if (newBooks.isEmpty) {
+          _hasMore = false;
+        } else {
+          // Evita duplicatas por id
+          final existingIds = _books.map((b) => b.id).toSet();
+          final unique = newBooks.where((b) => !existingIds.contains(b.id));
+          _books.addAll(unique);
+          _nextPage++;
+        }
+      });
+    } catch (e) {
+      debugPrint('BookCarousel: erro ao buscar mais livros — $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
-  void _navigateToCategory(BuildContext context, String categoryName) {
+  void _navigateToCategory(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CategoryBooksScreen(categoryName: categoryName),
+        builder: (_) => CategoryBooksScreen(categoryName: widget.title),
       ),
     );
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -80,7 +110,7 @@ class _BookCarouselState extends State<BookCarousel> {
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward),
-                onPressed: () => _navigateToCategory(context, widget.title),
+                onPressed: () => _navigateToCategory(context),
               ),
             ],
           ),
@@ -89,32 +119,44 @@ class _BookCarouselState extends State<BookCarousel> {
         SizedBox(
           height: 300,
           child: RepaintBoundary(
-            child: ListView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              cacheExtent: 200,
-              itemCount: _displayedBooks.length + (_hasMoreHorizontal ? 1 : 0),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (context, index) {
-                if (index == _displayedBooks.length) {
-                  return const Center(
-                    child: SizedBox(
-                      width: 40,
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                final book = _displayedBooks[index];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: BookCard(
-                    book: book,
-                    isCompact: true,
+            child: _books.isEmpty && _isLoading
+                ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                : _books.isEmpty
+                ? const SizedBox.shrink()
+                : ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    // +1 para o loader no final quando ainda há mais páginas
+                    itemCount: _books.length + (_hasMore ? 1 : 0),
+                    cacheExtent: _itemWidth * 4,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      // Último slot: loader de paginação
+                      if (index == _books.length) {
+                        return SizedBox(
+                          width: _itemWidth,
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final book = _books[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: BookCard(
+                          key: ValueKey(book.id),
+                          book: book,
+                          isCompact: true,
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ),
       ],
