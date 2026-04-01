@@ -1,15 +1,70 @@
 import 'package:flutter/material.dart';
-
+import 'package:lumilivre/screens/category_books.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/genre_card.dart';
-import 'package:lumilivre/screens/category_books.dart';
 
 class CategoryItem {
   final String title;
   final String imagePath;
 
-  CategoryItem({required this.title, required this.imagePath});
+  const CategoryItem({required this.title, required this.imagePath});
 }
+
+const _allCategories = [
+  CategoryItem(title: 'TCCs', imagePath: 'assets/images/categories/TCCs.png'),
+  CategoryItem(
+    title: 'Aventura',
+    imagePath: 'assets/images/categories/Aventura.png',
+  ),
+  CategoryItem(
+    title: 'Romance',
+    imagePath: 'assets/images/categories/Romance.png',
+  ),
+  CategoryItem(
+    title: 'Educativo',
+    imagePath: 'assets/images/categories/Educativo.png',
+  ),
+  CategoryItem(
+    title: 'Suspense',
+    imagePath: 'assets/images/categories/Suspense.png',
+  ),
+  CategoryItem(
+    title: 'Biografia',
+    imagePath: 'assets/images/categories/Biografia.png',
+  ),
+  CategoryItem(
+    title: 'Ficção',
+    imagePath: 'assets/images/categories/Ficcao.png',
+  ),
+  CategoryItem(
+    title: 'História',
+    imagePath: 'assets/images/categories/História.png',
+  ),
+  CategoryItem(
+    title: 'Autoajuda',
+    imagePath: 'assets/images/categories/Autoajuda.png',
+  ),
+  CategoryItem(
+    title: 'Fantasia',
+    imagePath: 'assets/images/categories/Fantasia.png',
+  ),
+  CategoryItem(
+    title: 'Terror',
+    imagePath: 'assets/images/categories/Terror.png',
+  ),
+  CategoryItem(
+    title: 'Poesia',
+    imagePath: 'assets/images/categories/Poesia.png',
+  ),
+  CategoryItem(
+    title: 'Ciência e Tecnologia',
+    imagePath: 'assets/images/categories/Ciencia.png',
+  ),
+  CategoryItem(
+    title: 'Infantojuvenil',
+    imagePath: 'assets/images/categories/Infantojuvenil.jpg',
+  ),
+];
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -38,65 +93,6 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<CategoryItem> categories = [
-      CategoryItem(
-        title: 'TCCs',
-        imagePath: 'assets/images/categories/TCCs.png',
-      ),
-      CategoryItem(
-        title: 'Aventura',
-        imagePath: 'assets/images/categories/Aventura.png',
-      ),
-      CategoryItem(
-        title: 'Romance',
-        imagePath: 'assets/images/categories/Romance.png',
-      ),
-      CategoryItem(
-        title: 'Educativo',
-        imagePath: 'assets/images/categories/Educativo.png',
-      ),
-      CategoryItem(
-        title: 'Suspense',
-        imagePath: 'assets/images/categories/Suspense.png',
-      ),
-      CategoryItem(
-        title: 'Biografia',
-        imagePath: 'assets/images/categories/Biografia.png',
-      ),
-      CategoryItem(
-        title: 'Ficção',
-        imagePath: 'assets/images/categories/Ficcao.png',
-      ),
-      CategoryItem(
-        title: 'História',
-        imagePath: 'assets/images/categories/História.png',
-      ),
-      CategoryItem(
-        title: 'Autoajuda',
-        imagePath: 'assets/images/categories/Autoajuda.png',
-      ),
-      CategoryItem(
-        title: 'Fantasia',
-        imagePath: 'assets/images/categories/Fantasia.png',
-      ),
-      CategoryItem(
-        title: 'Terror',
-        imagePath: 'assets/images/categories/Terror.png',
-      ),
-      CategoryItem(
-        title: 'Poesia',
-        imagePath: 'assets/images/categories/Poesia.png',
-      ),
-      CategoryItem(
-        title: 'Ciência e Tecnologia',
-        imagePath: 'assets/images/categories/Ciencia.png',
-      ),
-      CategoryItem(
-        title: 'Infantojuvenil',
-        imagePath: 'assets/images/categories/Infantojuvenil.jpg',
-      ),
-    ];
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -121,19 +117,17 @@ class SearchScreen extends StatelessWidget {
                 childAspectRatio: 1.6,
               ),
               delegate: SliverChildBuilderDelegate((context, index) {
-                final category = categories[index];
+                final category = _allCategories[index];
 
-                return GestureDetector(
+                return GenreCard(
+                  title: category.title,
+                  color:
+                      LumiLivreTheme.genreCardColors[index %
+                          LumiLivreTheme.genreCardColors.length],
+                  imagePath: category.imagePath,
                   onTap: () => _navigateToCategory(context, category.title),
-                  child: GenreCard(
-                    title: category.title,
-                    color:
-                        LumiLivreTheme.genreCardColors[index %
-                            LumiLivreTheme.genreCardColors.length],
-                    imagePath: category.imagePath,
-                  ),
                 );
-              }, childCount: categories.length),
+              }, childCount: _allCategories.length),
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),

@@ -32,7 +32,12 @@ class Book {
     return Book(
       id: safeParseInt(map['id']),
       title:
-          map['title'] ?? map['titulo'] ?? map['nome'] ?? 'Título Desconhecido',
+          (map['title'] ??
+                  map['titulo'] ??
+                  map['nome'] ??
+                  'Título Desconhecido')
+              .toString()
+              .toCapitalized(),
       author: map['author'] ?? map['autor'] ?? 'Autor Desconhecido',
       imageUrl: map['imageUrl'] ?? map['imagem'] ?? '',
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),

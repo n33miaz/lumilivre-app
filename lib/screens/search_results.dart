@@ -75,7 +75,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 0.55,
+                childAspectRatio: 0.5,
               ),
               itemCount: _books.length,
               itemBuilder: (context, index) {

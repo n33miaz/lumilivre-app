@@ -307,9 +307,11 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   Widget _buildInfoRow(BuildContext context, BookDetails details) {
     final tipoCapaFormatado = details.tipoCapa
-      .toCapitalized()
-      .replaceAll('_', ' ')
-      .replaceFirst('Capa ', '');
+        .replaceAll('_', ' ')
+        .toUpperCase()
+        .replaceFirst('CAPA ', '')
+        .trim()
+        .toCapitalized();
 
     final normalizedClassificacao = details.classificacaoEtaria
         .toLowerCase()

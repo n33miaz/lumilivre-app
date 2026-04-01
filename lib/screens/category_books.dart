@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 
 class CategoryBooksScreen extends StatefulWidget {
@@ -48,16 +49,17 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         page: _currentPage,
       );
 
-      if (newBooks.isEmpty) {
-        setState(() {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+        if (newBooks.isEmpty) {
           _hasMore = false;
-        });
-      } else {
-        setState(() {
+        } else {
           _books.addAll(newBooks);
           _currentPage++;
-        });
-      }
+        }
+      });
     } catch (e) {
       debugPrint('Erro ao buscar livros: $e');
       if (mounted) {
@@ -66,7 +68,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
           _hasMore = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Erro ao carregar livros. Verifique a conexão.'),
           ),
         );
@@ -89,20 +91,87 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 1,
       ),
-      body: _buildBookGrid(),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    // Initial loading
+    if (_books.isEmpty && _isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Empty state
+    if (_books.isEmpty && !_hasMore) {
+      return _buildEmptyState();
+    }
+
+    return _buildBookGrid();
+  }
+
+  Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: LumiLivreTheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.auto_stories_outlined,
+                size: 48,
+                color: LumiLivreTheme.primary.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Nenhum livro encontrado',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.grey.shade800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Ainda não há livros cadastrados em "${widget.categoryName}".\nVolte em breve para novas adições!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              label: const Text('EXPLORAR OUTROS'),
+              style: FilledButton.styleFrom(
+                backgroundColor: LumiLivreTheme.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildBookGrid() {
-    if (_books.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_books.isEmpty && !_hasMore) {
-      return const Center(
-        child: Text('Nenhum livro encontrado nesta categoria.'),
-      );
-    }
-
     return GridView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),

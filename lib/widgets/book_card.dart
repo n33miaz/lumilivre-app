@@ -38,22 +38,22 @@ class BookCard extends StatelessWidget {
                 BookDetailsScreen(book: book),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 0.1);
-              const end = Offset.zero;
-              const curve = Curves.easeOutCubic;
-              final tween = Tween(
-                begin: begin,
-                end: end,
-              ).chain(CurveTween(curve: curve));
+                  const begin = Offset(0.0, 0.1);
+                  const end = Offset.zero;
+                  const curve = Curves.easeOutCubic;
+                  final tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
 
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                ),
-              );
-            },
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    ),
+                  );
+                },
           ),
         );
       },
@@ -87,12 +87,17 @@ class BookCard extends StatelessWidget {
                               imageUrl: book.imageUrl,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Container(
-                                color: colorScheme.surfaceVariant.withOpacity(0.3),
+                                color: colorScheme.surfaceVariant.withOpacity(
+                                  0.3,
+                                ),
                                 child: const Center(
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               ),
-                              errorWidget: (context, url, error) => _buildPlaceholder(),
+                              errorWidget: (context, url, error) =>
+                                  _buildPlaceholder(),
                               memCacheWidth: 420,
                             )
                           : _buildPlaceholder(),
@@ -139,13 +144,17 @@ class BookCard extends StatelessWidget {
                 Padding(
                   padding: infoPadding,
                   child: SizedBox(
-                    height: isCompact ? 50 : 60, // Altura fixa para alinhar o autor embaixo
+                    height: isCompact
+                        ? 50
+                        : 60, // Altura fixa para alinhar o autor embaixo
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          book.title,
+                          book.title.trim().isNotEmpty
+                              ? '${book.title.trim()[0].toUpperCase()}${book.title.trim().substring(1)}'
+                              : '',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -159,7 +168,9 @@ class BookCard extends StatelessWidget {
                             Icon(
                               Icons.person_outline_rounded,
                               size: authorSize + 2,
-                              color: Theme.of(context).hintColor.withOpacity(0.7),
+                              color: Theme.of(
+                                context,
+                              ).hintColor.withOpacity(0.7),
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -191,10 +202,7 @@ class BookCard extends StatelessWidget {
   Widget _buildPlaceholder() {
     return Container(
       color: Colors.grey[200],
-      child: Image.asset(
-        'assets/images/capa-padrao.png',
-        fit: BoxFit.cover,
-      ),
+      child: Image.asset('assets/images/capa-padrao.png', fit: BoxFit.cover),
     );
   }
 }
