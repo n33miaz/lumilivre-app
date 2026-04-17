@@ -41,6 +41,19 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final auth = Provider.of<AuthProvider>(context);
+    if (auth.isGuest) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     _userController.dispose();

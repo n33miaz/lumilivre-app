@@ -5,9 +5,11 @@ import 'package:local_auth/local_auth.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/constants.dart';
-import 'package:lumilivre/widgets/change_password_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/change_password_dialog.dart';
+import 'auth/login.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -28,9 +30,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadBiometricsPreference() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isBiometricsEnabled = prefs.getBool('biometricsEnabled') ?? false;
-    });
+    if (!mounted) return;
+    setState(() => _isBiometricsEnabled = prefs.getBool('biometricsEnabled') ?? false);
   }
 
   Future<void> _saveBiometricsPreference(bool value) async {
@@ -41,149 +42,110 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _toggleBiometrics(bool value) async {
     if (value) {
       try {
-        final bool canAuthenticate =
-            await _localAuth.canCheckBiometrics ||
-            await _localAuth.isDeviceSupported();
+        final bool canAuthenticate = await _localAuth.canCheckBiometrics || await _localAuth.isDeviceSupported();
         if (canAuthenticate) {
-          setState(() {
-            _isBiometricsEnabled = true;
-          });
+          setState(() => _isBiometricsEnabled = true);
           await _saveBiometricsPreference(true);
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Biometria não disponível neste dispositivo.'),
-              ),
-            );
-          }
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Biometria não disponível neste dispositivo.')),
+          );
         }
       } catch (e) {
         debugPrint('$e');
       }
     } else {
-      setState(() {
-        _isBiometricsEnabled = false;
-      });
+      setState(() => _isBiometricsEnabled = false);
       await _saveBiometricsPreference(false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final roundedShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    );
+    final auth = Provider.of<AuthProvider>(context);
+    final isGuest = auth.isGuest;
+    final roundedShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurações'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Configurações'),
+        centerTitle: true,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            'Aparência',
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
+          _SectionTitle('Aparência'),
           _buildThemeSelector(context),
           const SizedBox(height: 24),
-          Text(
-            'Segurança',
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          if (!kIsWeb) ...[
-            Card(
-              shape: roundedShape,
-              clipBehavior: Clip.antiAlias,
-              child: SwitchListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                title: const Text('Acesso com Biometria'),
-                subtitle: const Text('Entrar com digital ou rosto.'),
-                value: _isBiometricsEnabled,
-                onChanged: _toggleBiometrics,
-                secondary: SizedBox(
-                  width: 40,
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/icons/biometric.svg',
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
-                        BlendMode.srcIn,
-                      ),
-                    ),
+
+          if (!isGuest) ..._buildAccountOptions(roundedShape),
+          if (isGuest) _buildGuestLoginPrompt(context, roundedShape),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildAccountOptions(RoundedRectangleBorder roundedShape) {
+    return [
+      _SectionTitle('Segurança'),
+      if (!kIsWeb) ...[
+        Card(
+          shape: roundedShape,
+          clipBehavior: Clip.antiAlias,
+          child: SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            title: const Text('Acesso com Biometria'),
+            subtitle: const Text('Entrar com digital ou rosto.'),
+            value: _isBiometricsEnabled,
+            onChanged: _toggleBiometrics,
+            secondary: SizedBox(
+              width: 40,
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/biometric.svg',
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-          ],
-          Text(
-            'Conta',
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
           ),
-          const SizedBox(height: 8),
-          Card(
-            shape: roundedShape,
-            clipBehavior: Clip.antiAlias,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              shape: roundedShape,
-              leading: const Icon(Icons.lock_outline),
-              title: const Text('Mudar Senha'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 20),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const ChangePasswordDialog();
-                  },
-                );
-              },
-            ),
+        ),
+        const SizedBox(height: 24),
+      ],
+      _SectionTitle('Conta'),
+      Card(
+        shape: roundedShape,
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: roundedShape,
+          leading: const Icon(Icons.lock_outline),
+          title: const Text('Mudar Senha'),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 20),
+          onTap: () => showDialog(
+            context: context,
+            builder: (_) => const ChangePasswordDialog(),
           ),
-          Card(
-            shape: roundedShape,
-            clipBehavior: Clip.antiAlias,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              shape: roundedShape,
-              leading: Icon(Icons.logout, color: Colors.red.shade400),
-              title: Text(
-                'Sair da Conta',
-                style: TextStyle(color: Colors.red.shade400),
-              ),
-              onTap: () {
-                Navigator.of(context).pop();
-                Provider.of<AuthProvider>(context, listen: false).logout();
-              },
-            ),
-          ),
-        ],
+        ),
       ),
-    );
+      Card(
+        shape: roundedShape,
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: roundedShape,
+          leading: Icon(Icons.logout, color: Colors.red.shade400),
+          title: Text('Sair da Conta', style: TextStyle(color: Colors.red.shade400)),
+          onTap: () {
+            Navigator.of(context).pop();
+            Provider.of<AuthProvider>(context, listen: false).logout();
+          },
+        ),
+      ),
+    ];
   }
 
   Widget _buildThemeSelector(BuildContext context) {
@@ -230,6 +192,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  Widget _buildGuestLoginPrompt(BuildContext context, RoundedRectangleBorder roundedShape) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle('Conta'),
+        Card(
+          shape: roundedShape,
+          clipBehavior: Clip.antiAlias,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Icon(Icons.person_outline, size: 48, color: Colors.grey.shade400),
+                const SizedBox(height: 12),
+                Text(
+                  'Faça login para acessar todas as configurações',
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.login, size: 18),
+                    label: const Text('Entrar'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: Theme.of(context).primaryColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+    );
+  }
 }
 
 class _ThemeOptionButton extends StatelessWidget {
@@ -259,9 +282,7 @@ class _ThemeOptionButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color: isSelected ? LumiLivreTheme.primary.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? LumiLivreTheme.primary : Colors.transparent,

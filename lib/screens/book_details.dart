@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:lumilivre/services/api.dart';
-import 'package:lumilivre/services/loan_status_calculator.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/favorites.dart';
+import 'package:lumilivre/screens/auth/login.dart';
+import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/services/loan_status_calculator.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/utils/parsers.dart';
 
@@ -40,14 +42,40 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   BookDetails? _details;
   LoanStatus _status = LoanStatus.loading;
   DateTime? _dueDate;
+  bool _isGuest = false;
   bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAllData();
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      if (!auth.isAuthenticated) {
+        _loadGuestOnly();
+      } else {
+        _loadAllData();
+      }
     });
+  }
+
+  Future<void> _loadGuestOnly() async {
+    if (!mounted) return;
+    try {
+      final details = await _apiService.getBookDetails(widget.book.id);
+      if (!mounted) return;
+      setState(() {
+        _details = details;
+        _isGuest = true;
+        _hasError = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isGuest = true;
+        });
+      }
+    }
   }
 
   Future<void> _loadAllData() async {
@@ -162,11 +190,32 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              const Text('Não foi possível carregar os dados.'),
-              ElevatedButton(
-                onPressed: _loadAllData,
-                child: const Text('Tentar Novamente'),
+              const Text(
+                'Não foi possível carregar os detalhes do livro.',
+                style: TextStyle(color: Colors.red),
               ),
+              if (_isGuest) ...[
+                const SizedBox(height: 16),
+                const Text(
+                  'Faça login para acessar mais informações.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.login, size: 18),
+                  label: const Text('Entrar'),
+                ),
+              ] else ...[
+                ElevatedButton(
+                  onPressed: _loadAllData,
+                  child: const Text('Tentar Novamente'),
+                ),
+              ],
             ],
           ),
         ),
@@ -293,9 +342,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Lançado em ${details.dataLancamento.day}/${details.dataLancamento.month}/${details.dataLancamento.year}',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -327,9 +376,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InfoItem(top: '★ ${details.rating}', bottom: 'Avaliações'),
-
           _InfoItem(top: tipoCapaFormatado, bottom: 'Tipo da Capa'),
-
           Column(
             children: [
               SizedBox(
@@ -360,18 +407,30 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   Widget _buildActionButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 8.0,
+      ),
       child: Row(
         children: [
-          _LikeButton(book: widget.book),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _BorrowButton(
-              status: _status,
-              dueDate: _dueDate,
-              onPressed: _handleLoanRequest,
+          if (!_isGuest) _LikeButton(book: widget.book),
+          if (_isGuest) ...[
+            Expanded(
+              child: _BorrowButton(
+                status: LoanStatus.guest,
+                onPressed: null,
+              ),
             ),
-          ),
+          ] else ...[
+            const SizedBox(width: 16),
+            Expanded(
+              child: _BorrowButton(
+                status: _status,
+                dueDate: _dueDate,
+                onPressed: _handleLoanRequest,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -403,16 +462,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const Divider(height: 32),
           Text(
             'Sinopse',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             details.sinopse,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -434,7 +493,10 @@ class _InfoItem extends StatelessWidget {
           child: Center(
             child: Text(
               top,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
         ),
@@ -464,9 +526,7 @@ class _LikeButton extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          favoritesProvider.toggleFavorite(book);
-        },
+        onTap: () => favoritesProvider.toggleFavorite(book),
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: Icon(
@@ -485,7 +545,11 @@ class _BorrowButton extends StatelessWidget {
   final DateTime? dueDate;
   final VoidCallback? onPressed;
 
-  const _BorrowButton({required this.status, this.dueDate, this.onPressed});
+  const _BorrowButton({
+    required this.status,
+    this.dueDate,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -505,6 +569,7 @@ class _BorrowButton extends StatelessWidget {
       case LoanStatus.guest:
         backgroundColor = Colors.grey;
         text = 'FAÇA LOGIN PARA SOLICITAR';
+        iconPath = '';
         break;
 
       case LoanStatus.noCopies:
@@ -560,22 +625,29 @@ class _BorrowButton extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: isClickable ? onPressed : null,
+      onTap: status == LoanStatus.guest
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            }
+          : (isClickable ? onPressed : null),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         height: 56,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: isClickable
-              ? [
-                  BoxShadow(
-                    color: backgroundColor.withValues(alpha: 0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
+          boxShadow:
+              isClickable
+                  ? [
+                    BoxShadow(
+                      color: backgroundColor.withValues(alpha: 0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                  : [],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
