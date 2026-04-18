@@ -25,7 +25,13 @@ void main() {
       runApp(
         MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => AuthProvider()),
+            ChangeNotifierProvider(
+              create: (context) {
+                final authProvider = AuthProvider();
+                unawaited(authProvider.tryAutoLogin());
+                return authProvider;
+              },
+            ),
             ChangeNotifierProvider(create: (context) => ThemeProvider()),
             ChangeNotifierProvider(create: (context) => FavoritesProvider()),
           ],
@@ -53,7 +59,9 @@ class LumiLivreApp extends StatelessWidget {
         darkTheme: LumiLivreTheme.darkTheme,
         themeMode: themeProvider.currentTheme,
 
-        home: auth.isAuthenticated || auth.isGuest
+        home: !auth.authAttempted
+            ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+            : auth.isAuthenticated || auth.isGuest
             ? const MainNavigator()
             : const LoginScreen(),
       ),
