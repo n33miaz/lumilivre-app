@@ -7,26 +7,29 @@ import 'package:lumilivre/services/loan_api.dart';
 
 void main() {
   group('LoanApi', () {
-    test('requestLoan deve chamar endpoint por tombo com bearer token', () async {
-      late http.Request capturedRequest;
-      final api = LoanApi(
-        client: MockClient((request) async {
-          capturedRequest = request;
-          return http.Response('', 200);
-        }),
-      );
+    test(
+      'requestLoan deve chamar endpoint por tombo com bearer token',
+      () async {
+        late http.Request capturedRequest;
+        final api = LoanApi(
+          client: MockClient((request) async {
+            capturedRequest = request;
+            return http.Response('', 200);
+          }),
+        );
 
-      final success = await api.requestLoan('12345', 'T001', 'jwt-token');
+        final success = await api.requestLoan('12345', 'T001', 'jwt-token');
 
-      expect(success, isTrue);
-      expect(capturedRequest.method, 'POST');
-      expect(capturedRequest.url.path, endsWith('/solicitacoes/solicitar'));
-      expect(capturedRequest.url.queryParameters, {
-        'matriculaAluno': '12345',
-        'tomboExemplar': 'T001',
-      });
-      expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
-    });
+        expect(success, isTrue);
+        expect(capturedRequest.method, 'POST');
+        expect(capturedRequest.url.path, endsWith('/solicitacoes/solicitar'));
+        expect(capturedRequest.url.queryParameters, {
+          'matriculaAluno': '12345',
+          'tomboExemplar': 'T001',
+        });
+        expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
+      },
+    );
 
     test('requestLoanByBookId deve aceitar status 201', () async {
       final api = LoanApi(

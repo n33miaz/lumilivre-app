@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -51,7 +51,7 @@ jobs:
         run: flutter build apk --flavor dev --debug --dart-define=API_BASE_URL=http://127.0.0.1:8080
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: lumilivre-app-dev-debug
           path: build/app/outputs/flutter-apk/app-dev-debug.apk

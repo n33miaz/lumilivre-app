@@ -8,11 +8,14 @@ void main() {
       SharedPreferences.setMockInitialValues({});
     });
 
-    test('getCatalogLocal deve retornar null quando cache nao existe', () async {
-      final catalog = await CatalogApi().getCatalogLocal();
+    test(
+      'getCatalogLocal deve retornar null quando cache nao existe',
+      () async {
+        final catalog = await CatalogApi().getCatalogLocal();
 
-      expect(catalog, isNull);
-    });
+        expect(catalog, isNull);
+      },
+    );
 
     test('getCatalogLocal deve parsear cache valido', () async {
       SharedPreferences.setMockInitialValues({
@@ -39,7 +42,10 @@ void main() {
       expect(catalog, isNotNull);
       expect(catalog!.keys, contains('Ficcao'));
       expect(catalog['Ficcao']!.single.title, 'Duna');
-      expect(catalog['Ficcao']!.single.imageUrl, 'https://example.com/duna.jpg');
+      expect(
+        catalog['Ficcao']!.single.imageUrl,
+        'https://example.com/duna.jpg',
+      );
     });
 
     test('getCatalogLocal deve retornar null para cache invalido', () async {

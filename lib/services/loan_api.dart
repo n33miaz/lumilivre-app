@@ -22,7 +22,9 @@ class LoanApi {
       if (response.statusCode == 200) {
         return loanFromJson(utf8.decode(response.bodyBytes));
       } else {
-        throw Exception('Falha ao carregar empréstimos: ${response.statusCode}');
+        throw Exception(
+          'Falha ao carregar empréstimos: ${response.statusCode}',
+        );
       }
     } catch (e) {
       debugPrint('Erro em getMyLoans: $e');
