@@ -27,6 +27,14 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+coverage/
+
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+lumilivre-key.pem
+*.pem
 
 # Symbolication related
 app.*.symbols
