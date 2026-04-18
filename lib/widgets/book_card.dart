@@ -63,7 +63,7 @@ class BookCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -87,9 +87,8 @@ class BookCard extends StatelessWidget {
                               imageUrl: book.imageUrl,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Container(
-                                color: colorScheme.surfaceVariant.withOpacity(
-                                  0.3,
-                                ),
+                                color: colorScheme.surfaceContainerHighest
+                                    .withValues(alpha: 0.3),
                                 child: const Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
@@ -114,7 +113,7 @@ class BookCard extends StatelessWidget {
                             horizontal: 6,
                             vertical: 4,
                           ),
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -170,7 +169,7 @@ class BookCard extends StatelessWidget {
                               size: authorSize + 2,
                               color: Theme.of(
                                 context,
-                              ).hintColor.withOpacity(0.7),
+                              ).hintColor.withValues(alpha: 0.7),
                             ),
                             const SizedBox(width: 4),
                             Expanded(

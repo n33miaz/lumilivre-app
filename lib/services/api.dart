@@ -1,408 +1,109 @@
-﻿import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/book.dart';
 import '../models/book_details.dart';
 import '../models/loan.dart';
 import '../models/ranking.dart';
 import '../models/user.dart';
-import '../utils/constants.dart';
 
+import 'auth_api.dart';
+import 'book_api.dart';
+import 'catalog_api.dart';
+import 'loan_api.dart';
+import 'ranking_api.dart';
+import 'student_api.dart';
+import 'upload_api.dart';
+
+export 'auth_api.dart';
+export 'book_api.dart';
+export 'catalog_api.dart';
+export 'loan_api.dart';
+export 'ranking_api.dart';
+export 'student_api.dart';
+export 'upload_api.dart';
+
+/// Facade that preserves the original ApiService public interface.
+/// All methods delegate to domain-specific API classes.
 class ApiService {
   static final ApiService _instance = ApiService._internal();
 
-  factory ApiService() {
-    return _instance;
-  }
+  factory ApiService() => _instance;
 
   ApiService._internal();
 
-  static const String _catalogCacheKey = 'catalog_cache_v1';
+  final AuthApi _auth = AuthApi();
+  final CatalogApi _catalog = CatalogApi();
+  final BookApi _book = BookApi();
+  final LoanApi _loan = LoanApi();
+  final StudentApi _student = StudentApi();
+  final RankingApi _ranking = RankingApi();
+  final UploadApi _upload = UploadApi();
 
-  // --- MÉTODOS DE CACHE E CATÁLOGO ---
+  // --- Auth ---
 
-  Future<Map<String, List<Book>>?> getCatalogLocal() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? jsonString = prefs.getString(_catalogCacheKey);
-
-      if (jsonString != null && jsonString.isNotEmpty) {
-        final List<dynamic> data = json.decode(jsonString);
-        return _parseCatalogJson(data);
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao ler cache local: $e');
-    }
-    return null;
-  }
-
-  Future<Map<String, List<Book>>> fetchAndSaveCatalog() async {
-    final url = Uri.parse('$apiBaseUrl/livros/catalogo-mobile');
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-
-    try {
-      final response = await http
-          .get(
-            url,
-            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-          )
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final String body = utf8.decode(response.bodyBytes);
-
-        if (body.isNotEmpty) {
-          await prefs.setString(_catalogCacheKey, body);
-
-          final List<dynamic> data = json.decode(body);
-          return _parseCatalogJson(data);
-        }
-        return {};
-      } else if (response.statusCode == 204) {
-        return {};
-      } else {
-        throw Exception('Falha ao carregar o catálogo: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro na requisição do catálogo: $e');
-      rethrow;
-    }
-  }
-
-  Map<String, List<Book>> _parseCatalogJson(List<dynamic> data) {
-    Map<String, List<Book>> catalog = {};
-
-    for (var genreData in data) {
-      if (genreData['nome'] == null || genreData['livros'] == null) continue;
-
-      String genreName = genreData['nome'];
-
-      List<Book> books = (genreData['livros'] as List).map((bookData) {
-        String rawImage = bookData['imagem']?.toString() ?? '';
-        String finalImage = '';
-        if (rawImage.isNotEmpty) {
-          finalImage = rawImage.startsWith('http://')
-              ? rawImage.replaceFirst('http://', 'https://')
-              : rawImage;
-        }
-
-        return Book(
-          id: (bookData['id'] as num?)?.toInt() ?? 0,
-          title: bookData['titulo']?.toString() ?? 'Título Desconhecido',
-          author: bookData['autor']?.toString() ?? 'Autor Desconhecido',
-          imageUrl: finalImage,
-          rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
-        );
-      }).toList();
-
-      if (books.isNotEmpty) {
-        catalog[genreName] = books;
-      }
-    }
-    return catalog;
-  }
-
-  // --- MÉTODOS DE AUTENTICAÇÃO ---
-
-  Future<LoginResponse> login(String user, String password) async {
-    final url = Uri.parse('$apiBaseUrl/auth/login');
-
-    try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json; charset=UTF-8'},
-            body: jsonEncode({'user': user, 'senha': password}),
-          )
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        return loginResponseFromJson(response.body);
-      } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception(
-          errorData['mensagem'] ?? errorData['message'] ?? 'Falha no login',
-        );
-      }
-    } catch (e) {
-      debugPrint('Erro na chamada de login: $e');
-      throw Exception(
-        'Não foi possível conectar ao servidor. Tente novamente.',
-      );
-    }
-  }
+  Future<LoginResponse> login(String user, String password) =>
+      _auth.login(user, password);
 
   Future<bool> changePassword(
     String matricula,
     String currentPassword,
     String newPassword,
     String token,
-  ) async {
-    final url = Uri.parse('$apiBaseUrl/usuarios/alterar-senha');
+  ) =>
+      _auth.changePassword(matricula, currentPassword, newPassword, token);
 
-    try {
-      final response = await http
-          .put(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode({
-              'matricula': matricula,
-              'senhaAtual': currentPassword,
-              'novaSenha': newPassword,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
+  // --- Catalog ---
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        final errorData = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(errorData['message'] ?? 'Erro ao alterar senha');
-      }
-    } catch (e) {
-      debugPrint('Erro changePassword: $e');
-      rethrow;
-    }
-  }
+  Future<Map<String, List<Book>>?> getCatalogLocal() =>
+      _catalog.getCatalogLocal();
 
-  // --- MÉTODOS DE LIVROS E BUSCA ---
+  Future<Map<String, List<Book>>> fetchAndSaveCatalog() =>
+      _catalog.fetchAndSaveCatalog();
 
-  Future<List<Book>> searchBooks(String query, {int page = 0}) async {
-    final url = Uri.parse(
-      '$apiBaseUrl/livros/mobile/buscar?texto=${Uri.encodeComponent(query)}&page=$page&size=20',
-    );
+  Future<List<Book>> searchBooks(String query, {int page = 0}) =>
+      _catalog.searchBooks(query, page: page);
 
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
+  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) =>
+      _catalog.getBooksByGenre(genre, page: page);
 
-    try {
-      final response = await http
-          .get(
-            url,
-            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-          )
-          .timeout(const Duration(seconds: 10));
+  // --- Books ---
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> pageData = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> bookList = pageData['content'];
+  Future<BookDetails> getBookDetails(int bookId) =>
+      _book.getBookDetails(bookId);
 
-        return bookList.map((bookData) {
-          return Book(
-            id: (bookData['id'] as num?)?.toInt() ?? 0,
-            title: bookData['titulo'] ?? bookData['nome'] ?? 'Sem Título',
-            author: bookData['autor'] ?? 'Autor desconhecido',
-            imageUrl: bookData['imagem'] ?? '',
-            rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 0.0,
-          );
-        }).toList();
-      } else if (response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception('Erro na busca: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro em searchBooks: $e');
-      throw Exception('Não foi possível conectar ao servidor.');
-    }
-  }
+  // --- Loans ---
 
-  Future<BookDetails> getBookDetails(int bookId) async {
-    final url = Uri.parse('$apiBaseUrl/livros/$bookId');
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-    try {
-      final response = await http
-          .get(
-            url,
-            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-          )
-          .timeout(const Duration(seconds: 10));
+  Future<List<Loan>> getMyLoans(String matricula, String token) =>
+      _loan.getMyLoans(matricula, token);
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(utf8.decode(response.bodyBytes));
-        return BookDetails.fromJson(jsonData);
-      } else {
-        throw Exception('Falha ao carregar detalhes do livro.');
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro em getBookDetails: $e');
-      throw Exception('Falha ao carregar detalhes do livro.');
-    }
-  }
+  Future<List<Loan>> getMyRequests(String matricula, String token) =>
+      _loan.getMyRequests(matricula, token);
 
-  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
-    final url = Uri.parse(
-      '$apiBaseUrl/livros/genero/${Uri.encodeComponent(genre)}?page=$page&size=10',
-    );
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('authToken');
-    try {
-      final response = await http
-          .get(
-            url,
-            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-          )
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> pageData = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> bookList = pageData['content'];
-        return bookList.map((bookData) {
-          return Book(
-            id: (bookData['id'] as num?)?.toInt() ?? 0,
-            title: bookData['titulo'] ?? bookData['nome'] ?? 'Sem Título',
-            author: bookData['autor'] ?? 'Autor desconhecido',
-            imageUrl:
-                bookData['imagem'] ??
-                'https://via.placeholder.com/140x210.png?text=Lumi',
-            rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
-          );
-        }).toList();
-      } else if (response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception('Falha ao carregar livros do gênero: $genre');
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro em getBooksByGenre: $e');
-      throw Exception('Não foi possível conectar ao servidor.');
-    }
-  }
-
-  // --- MÉTODOS DE EMPRÉSTIMOS E SOLICITAÇÕES ---
-
-  Future<List<Loan>> getMyLoans(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula');
-
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        return loanFromJson(utf8.decode(response.bodyBytes));
-      } else {
-        throw Exception(
-          'Falha ao carregar empréstimos: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      debugPrint('Erro em getMyLoans: $e');
-      return [];
-    }
-  }
-
-  Future<List<Loan>> getMyRequests(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/solicitacoes/aluno/$matricula');
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((item) => Loan.fromRequestJson(item)).toList();
-      } else {
-        return [];
-      }
-    } catch (e) {
-      debugPrint('Erro ao buscar solicitações: $e');
-      return [];
-    }
-  }
-
-  Future<bool> requestLoan(String matricula, String tombo, String token) async {
-    final url = Uri.parse(
-      '$apiBaseUrl/solicitacoes/solicitar?matriculaAluno=$matricula&tomboExemplar=$tombo',
-    );
-
-    try {
-      final response = await http
-          .post(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Erro ao solicitar: $e');
-      return false;
-    }
-  }
+  Future<bool> requestLoan(String matricula, String tombo, String token) =>
+      _loan.requestLoan(matricula, tombo, token);
 
   Future<bool> requestLoanByBookId(
     String matricula,
     int livroId,
     String token,
-  ) async {
-    final url = Uri.parse(
-      '$apiBaseUrl/solicitacoes/solicitar-mobile?matriculaAluno=$matricula&livroId=$livroId',
-    );
+  ) =>
+      _loan.requestLoanByBookId(matricula, livroId, token);
 
-    try {
-      final response = await http
-          .post(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
+  Future<List<Loan>> getMyLoansHistory(String matricula, String token) =>
+      _loan.getMyLoansHistory(matricula, token);
 
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      debugPrint('Erro ao solicitar: $e');
-      return false;
-    }
-  }
+  // --- Students ---
 
-  Future<List<Loan>> getMyLoansHistory(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/emprestimos/aluno/$matricula/historico');
+  Future<String?> getStudentName(String matricula, String token) =>
+      _student.getStudentName(matricula, token);
 
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
+  Future<Map<String, dynamic>?> getStudentData(
+    String matricula,
+    String token,
+  ) =>
+      _student.getStudentData(matricula, token);
 
-      if (response.statusCode == 200) {
-        return loanFromJson(utf8.decode(response.bodyBytes));
-      } else {
-        throw Exception('Falha ao carregar histórico: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Erro em getMyLoansHistory: $e');
-      return [];
-    }
-  }
-
-  // --- MÉTODOS DE ALUNO E RANKING ---
-
-  Future<String?> getStudentName(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/alunos/$matricula');
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
-          return jsonResponse['data']['nomeCompleto'];
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao buscar nome do aluno: $e');
-    }
-    return null;
-  }
+  // --- Ranking ---
 
   Future<List<RankingItem>> getRanking({
     int top = 50,
@@ -410,141 +111,33 @@ class ApiService {
     int? moduloId,
     int? turnoId,
     required String token,
-  }) async {
-    String query = '?top=$top';
-    if (cursoId != null) query += '&cursoId=$cursoId';
-    if (moduloId != null) query += '&moduloId=$moduloId';
-    if (turnoId != null) query += '&turnoId=$turnoId';
+  }) =>
+      _ranking.getRanking(
+        top: top,
+        cursoId: cursoId,
+        moduloId: moduloId,
+        turnoId: turnoId,
+        token: token,
+      );
 
-    final url = Uri.parse('$apiBaseUrl/emprestimos/ranking$query');
+  Future<List<FilterItem>> getSimpleList(String endpoint, String token) =>
+      _ranking.getSimpleList(endpoint, token);
 
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
+  Future<List<FilterItem>> getCursos(String token) =>
+      _ranking.getCursos(token);
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((e) => RankingItem.fromJson(e)).toList();
-      } else if (response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception('Erro ao buscar ranking');
-      }
-    } catch (e) {
-      debugPrint('Erro getRanking: $e');
-      return [];
-    }
-  }
-
-  Future<List<FilterItem>> getSimpleList(String endpoint, String token) async {
-    final url = Uri.parse('$apiBaseUrl/$endpoint');
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((e) => FilterItem.fromJson(e)).toList();
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Erro ao buscar $endpoint: $e');
-      return [];
-    }
-  }
-
-  Future<List<FilterItem>> getCursos(String token) async {
-    final url = Uri.parse('$apiBaseUrl/cursos/home?size=100');
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> content = data['content'];
-        return content.map((e) => FilterItem.fromJson(e)).toList();
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Erro ao buscar cursos: $e');
-      return [];
-    }
-  }
-
-  Future<Map<String, dynamic>?> getStudentData(
-    String matricula,
-    String token,
-  ) async {
-    final url = Uri.parse('$apiBaseUrl/alunos/$matricula');
-    try {
-      final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
-          return jsonResponse['data'];
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao buscar dados do aluno: $e');
-    }
-    return null;
-  }
+  // --- Upload ---
 
   Future<bool> uploadProfilePicture(
     String matricula,
     String token,
     String filePath, {
     Uint8List? webBytes,
-  }) async {
-    final url = Uri.parse('$apiBaseUrl/alunos/$matricula/foto');
-    final request = http.MultipartRequest('POST', url);
-
-    request.headers['Authorization'] = 'Bearer $token';
-
-    if (kIsWeb && webBytes != null) {
-      // Web
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'file',
-          webBytes,
-          filename: 'profile.jpg',
-          contentType: MediaType('image', 'jpeg'),
-        ),
+  }) =>
+      _upload.uploadProfilePicture(
+        matricula,
+        token,
+        filePath,
+        webBytes: webBytes,
       );
-    } else {
-      // Mobile
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          filePath,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-    }
-
-    try {
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
-      final response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        debugPrint('Erro upload: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      debugPrint('Erro ao enviar foto: $e');
-      return false;
-    }
-  }
 }
