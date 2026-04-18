@@ -74,16 +74,15 @@ O padrao e proximo de MVVM/Provider, com `ChangeNotifier` como view model simple
 
 ## Autenticacao e Comunicacao
 
-- `ApiService` e singleton.
+- `ApiService` e singleton e opera como facade para `AuthApi`, `BookApi`, `CatalogApi`, `LoanApi`, `RankingApi`, `StudentApi`, `UploadApi`.
 - `AuthProvider.login` chama `ApiService.login`.
-- Token JWT fica em `SharedPreferences` com chave `authToken`.
-- Dados do usuario ficam em `SharedPreferences` com chave `userData`.
+- Token JWT e `userData` residem em `flutter_secure_storage` (`AuthStorage`).
 - Chamadas sensiveis enviam `Authorization: Bearer <token>`.
 - `LoginResponse` espera `id`, `email`, `role`, `matriculaAluno`, `token` e `isInitialPassword`.
 - `isInitialPassword=true` bloqueia o navegador principal ate o usuario trocar senha.
 - Troca de senha usa `PUT /usuarios/alterar-senha`.
 - Modo convidado nao autentica token e deve bloquear a solicitacao de emprestimo.
-- O app possui `tryAutoLogin`, mas o bootstrap atual nao o chama em `main.dart`. Se a sessao deve sobreviver a reinicializacao, esse fluxo precisa ser invocado antes de decidir a `home`.
+- `main.dart` invoca `tryAutoLogin` no bootstrap e exibe splash enquanto valida; `app_bootstrap_test.dart` cobre os cenarios com/sem sessao.
 
 ## Regras de Negocio no App
 
@@ -170,20 +169,26 @@ flutter build ios
 
 ## Configuracao de API
 
-A URL da API esta hardcoded em `lib/utils/constants.dart`:
+A URL da API e obtida em tempo de build via `--dart-define=API_BASE_URL=...` em `lib/utils/constants.dart` (fallback para localhost no desenvolvimento). Os tres flavors (dev/staging/prod) encapsulam o alvo em `android/app/build.gradle.kts`.
 
-```dart
-const String apiBaseUrl = 'http://127.0.0.1:8080';
+```powershell
+flutter run --flavor dev --dart-define=API_BASE_URL=http://10.0.2.2:8080
+flutter build apk --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre.com.br
 ```
-
-Para producao, trocar para a URL publica da API antes do build ou evoluir para configuracao por flavor/env.
 
 ## Qualidade, Escalabilidade e Pontos de Atencao
 
 - A extracao de `LoanStatusCalculator` e um bom exemplo de regra pura testavel.
 - O app possui testes relevantes para modelos, providers, parsers, status de emprestimo e cache.
-- `ApiService` concentra muitas responsabilidades. Em crescimento, dividir por dominio (`AuthApi`, `CatalogApi`, `LoanApi`, `StudentApi`) reduzira acoplamento.
-- Sessao local precisa chamar `tryAutoLogin` no startup se persistencia entre aberturas for requisito.
-- Biometria hoje parece uma preferencia local, nao um fluxo de autenticacao completo.
-- A URL de API hardcoded dificulta builds por ambiente.
-- Para seguranca mobile, considerar armazenamento seguro para token em vez de `SharedPreferences`, especialmente fora de prototipo/TCC.
+- Token e `userData` agora residem em `flutter_secure_storage` (`auth_storage.dart`); `SharedPreferences` fica restrito a tema e favoritos.
+- `tryAutoLogin` e invocado no bootstrap (`main.dart`) e testado em `app_bootstrap_test.dart`.
+- Biometria segue como preferencia local; fluxo completo ainda nao implementado.
+
+## Evolucao Arquitetural Recente
+
+- **Secure storage**: `AuthStorage` encapsula `FlutterSecureStorage` e migra dados legados do `SharedPreferences` de forma transparente.
+- **Split de ApiService**: `ApiService` tornou-se facade delegando a `AuthApi`, `BookApi`, `CatalogApi`, `LoanApi`, `RankingApi`, `StudentApi`, `UploadApi` — cada arquivo abaixo de 200 linhas.
+- **Flavors**: `android/app/build.gradle.kts` define dev/staging/prod com `applicationIdSuffix`, `versionNameSuffix` e `manifestPlaceholders`.
+- **Bootstrap**: `main.dart` aguarda `tryAutoLogin` antes de decidir a `home`, exibindo splash enquanto valida a sessao.
+- **Codegen OpenAPI**: `scripts/generate_api.sh|.bat` + `lib/api/gen/` preparam clients gerados via `openapi-generator-cli` (consome `/v3/api-docs` do backend).
+- **CI**: `.github/workflows/ci.yml` roda `flutter analyze`, `flutter test --coverage` e `flutter build apk --flavor dev`.
