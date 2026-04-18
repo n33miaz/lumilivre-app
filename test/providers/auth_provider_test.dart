@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/services/auth_storage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +12,7 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
+      FlutterSecureStorage.setMockInitialValues({});
       authProvider = AuthProvider();
     });
 
@@ -69,6 +72,12 @@ void main() {
 
     group('logout', () {
       test('deve limpar estado ao fazer logout', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey:
+              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
+        });
+        authProvider = AuthProvider();
         authProvider.loginAsGuest();
         expect(authProvider.isGuest, isTrue);
         await authProvider.logout();
@@ -76,6 +85,9 @@ void main() {
         expect(authProvider.isAuthenticated, isFalse);
         expect(authProvider.isInitialPassword, isFalse);
         expect(authProvider.user, isNull);
+        final storage = AuthStorage();
+        expect(await storage.getToken(), isNull);
+        expect(await storage.getUserData(), isNull);
       });
 
       test('deve notificar listeners ao fazer logout', () async {
@@ -95,9 +107,9 @@ void main() {
       });
 
       test('deve restaurar usuário de dados salvos', () async {
-        SharedPreferences.setMockInitialValues({
-          'authToken': 'jwt-token-mock-123',
-          'userData':
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey:
               '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
         });
         final provider = AuthProvider();

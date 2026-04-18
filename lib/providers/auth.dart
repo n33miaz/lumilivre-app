@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/auth_storage.dart';
 import '../services/api.dart';
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final AuthStorage _authStorage = AuthStorage();
 
   LoginResponse? _user;
   bool _isGuest = false;
@@ -25,9 +26,10 @@ class AuthProvider with ChangeNotifier {
     _isGuest = false;
     _isInitialPassword = response.isInitialPassword;
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('authToken', response.token);
-    await prefs.setString('userData', jsonEncode(response));
+    await _authStorage.saveSession(
+      token: response.token,
+      userData: jsonEncode(response),
+    );
 
     notifyListeners();
   }
@@ -46,18 +48,18 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> tryAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('authToken') || !prefs.containsKey('userData')) {
+    final token = await _authStorage.getToken();
+    final userDataString = await _authStorage.getUserData();
+
+    if (token == null || userDataString == null) {
       _authAttempted = true;
       notifyListeners();
       return;
     }
-    final userDataString = prefs.getString('userData');
-    if (userDataString != null) {
-      final userData = jsonDecode(userDataString);
-      _user = LoginResponse.fromJson(userData);
-      _isInitialPassword = _user?.isInitialPassword ?? false;
-    }
+
+    final userData = jsonDecode(userDataString);
+    _user = LoginResponse.fromJson(userData);
+    _isInitialPassword = _user?.isInitialPassword ?? false;
 
     _authAttempted = true;
     notifyListeners();
@@ -67,9 +69,7 @@ class AuthProvider with ChangeNotifier {
     _user = null;
     _isGuest = false;
     _isInitialPassword = false;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('authToken');
-    await prefs.remove('userData');
+    await _authStorage.clearSession();
 
     notifyListeners();
   }
