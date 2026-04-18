@@ -42,24 +42,46 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void completeInitialPasswordChange() {
+  Future<void> completeInitialPasswordChange() async {
     _isInitialPassword = false;
+    if (_user != null) {
+      _user = LoginResponse(
+        id: _user!.id,
+        email: _user!.email,
+        role: _user!.role,
+        matriculaAluno: _user!.matriculaAluno,
+        token: _user!.token,
+        isInitialPassword: false,
+      );
+      await _authStorage.saveSession(
+        token: _user!.token,
+        userData: jsonEncode(_user),
+      );
+    }
     notifyListeners();
   }
 
   Future<void> tryAutoLogin() async {
-    final token = await _authStorage.getToken();
-    final userDataString = await _authStorage.getUserData();
+    await _authStorage.migrateLegacySession();
 
-    if (token == null || userDataString == null) {
-      _authAttempted = true;
-      notifyListeners();
-      return;
+    try {
+      final token = await _authStorage.getToken();
+      final userDataString = await _authStorage.getUserData();
+
+      if (token == null || userDataString == null) {
+        _authAttempted = true;
+        notifyListeners();
+        return;
+      }
+
+      final userData = jsonDecode(userDataString) as Map<String, dynamic>;
+      _user = LoginResponse.fromJson({...userData, 'token': token});
+      _isInitialPassword = _user?.isInitialPassword ?? false;
+    } catch (_) {
+      await _authStorage.clearSession();
+      _user = null;
+      _isInitialPassword = false;
     }
-
-    final userData = jsonDecode(userDataString);
-    _user = LoginResponse.fromJson(userData);
-    _isInitialPassword = _user?.isInitialPassword ?? false;
 
     _authAttempted = true;
     notifyListeners();
