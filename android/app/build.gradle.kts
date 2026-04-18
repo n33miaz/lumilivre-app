@@ -72,6 +72,7 @@ android {
             versionNameSuffix = "-dev"
             resValue("string", "app_name", "LumiLivre Dev")
             manifestPlaceholders["appTitle"] = "LumiLivre Dev"
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
 
         create("staging") {
@@ -80,12 +81,14 @@ android {
             versionNameSuffix = "-staging"
             resValue("string", "app_name", "LumiLivre Staging")
             manifestPlaceholders["appTitle"] = "LumiLivre Staging"
+            manifestPlaceholders["usesCleartextTraffic"] = "false"
         }
 
         create("prod") {
             dimension = "environment"
             resValue("string", "app_name", "LumiLivre")
             manifestPlaceholders["appTitle"] = "LumiLivre"
+            manifestPlaceholders["usesCleartextTraffic"] = "false"
         }
     }
 }
