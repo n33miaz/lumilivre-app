@@ -31,8 +31,14 @@ void main() {
 
       expect(capturedRequest.method, 'POST');
       expect(capturedRequest.url.path, endsWith('/auth/login'));
-      expect(capturedRequest.headers['Content-Type'], contains('application/json'));
-      expect(jsonDecode(capturedRequest.body), {'user': '12345', 'senha': '12345'});
+      expect(
+        capturedRequest.headers['Content-Type'],
+        contains('application/json'),
+      );
+      expect(jsonDecode(capturedRequest.body), {
+        'user': '12345',
+        'senha': '12345',
+      });
       expect(response.email, 'aluno@lumilivre.test');
       expect(response.role, 'ALUNO');
       expect(response.matriculaAluno, '12345');
@@ -40,24 +46,30 @@ void main() {
       expect(response.isInitialPassword, isTrue);
     });
 
-    test('login deve expor mensagem generica quando API retorna erro', () async {
-      final api = AuthApi(
-        client: MockClient((request) async {
-          return http.Response(jsonEncode({'message': 'Senha incorreta'}), 401);
-        }),
-      );
+    test(
+      'login deve expor mensagem generica quando API retorna erro',
+      () async {
+        final api = AuthApi(
+          client: MockClient((request) async {
+            return http.Response(
+              jsonEncode({'message': 'Senha incorreta'}),
+              401,
+            );
+          }),
+        );
 
-      expect(
-        () => api.login('12345', 'errada'),
-        throwsA(
-          isA<Exception>().having(
-            (error) => error.toString(),
-            'message',
-            contains('conectar'),
+        expect(
+          () => api.login('12345', 'errada'),
+          throwsA(
+            isA<Exception>().having(
+              (error) => error.toString(),
+              'message',
+              contains('conectar'),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('changePassword deve enviar token e corpo esperado', () async {
       late http.Request capturedRequest;
@@ -68,7 +80,12 @@ void main() {
         }),
       );
 
-      final changed = await api.changePassword('12345', 'atual', 'nova', 'jwt-token');
+      final changed = await api.changePassword(
+        '12345',
+        'atual',
+        'nova',
+        'jwt-token',
+      );
 
       expect(changed, isTrue);
       expect(capturedRequest.method, 'PUT');

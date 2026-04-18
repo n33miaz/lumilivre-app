@@ -18,7 +18,8 @@ class BookCarousel extends StatefulWidget {
 
 class _BookCarouselState extends State<BookCarousel> {
   static const double _itemWidth = 150.0 + 16.0; // card + gap
-  static const double _prefetchThreshold = _itemWidth * 3; // busca 3 cards antes do fim
+  static const double _prefetchThreshold =
+      _itemWidth * 3; // busca 3 cards antes do fim
 
   final ApiService _apiService = ApiService();
   final ScrollController _scrollController = ScrollController();

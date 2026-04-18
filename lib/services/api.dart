@@ -49,8 +49,7 @@ class ApiService {
     String currentPassword,
     String newPassword,
     String token,
-  ) =>
-      _auth.changePassword(matricula, currentPassword, newPassword, token);
+  ) => _auth.changePassword(matricula, currentPassword, newPassword, token);
 
   // --- Catalog ---
 
@@ -86,8 +85,7 @@ class ApiService {
     String matricula,
     int livroId,
     String token,
-  ) =>
-      _loan.requestLoanByBookId(matricula, livroId, token);
+  ) => _loan.requestLoanByBookId(matricula, livroId, token);
 
   Future<List<Loan>> getMyLoansHistory(String matricula, String token) =>
       _loan.getMyLoansHistory(matricula, token);
@@ -100,8 +98,7 @@ class ApiService {
   Future<Map<String, dynamic>?> getStudentData(
     String matricula,
     String token,
-  ) =>
-      _student.getStudentData(matricula, token);
+  ) => _student.getStudentData(matricula, token);
 
   // --- Ranking ---
 
@@ -111,20 +108,18 @@ class ApiService {
     int? moduloId,
     int? turnoId,
     required String token,
-  }) =>
-      _ranking.getRanking(
-        top: top,
-        cursoId: cursoId,
-        moduloId: moduloId,
-        turnoId: turnoId,
-        token: token,
-      );
+  }) => _ranking.getRanking(
+    top: top,
+    cursoId: cursoId,
+    moduloId: moduloId,
+    turnoId: turnoId,
+    token: token,
+  );
 
   Future<List<FilterItem>> getSimpleList(String endpoint, String token) =>
       _ranking.getSimpleList(endpoint, token);
 
-  Future<List<FilterItem>> getCursos(String token) =>
-      _ranking.getCursos(token);
+  Future<List<FilterItem>> getCursos(String token) => _ranking.getCursos(token);
 
   // --- Upload ---
 
@@ -133,11 +128,10 @@ class ApiService {
     String token,
     String filePath, {
     Uint8List? webBytes,
-  }) =>
-      _upload.uploadProfilePicture(
-        matricula,
-        token,
-        filePath,
-        webBytes: webBytes,
-      );
+  }) => _upload.uploadProfilePicture(
+    matricula,
+    token,
+    filePath,
+    webBytes: webBytes,
+  );
 }

@@ -31,7 +31,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadBiometricsPreference() async {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() => _isBiometricsEnabled = prefs.getBool('biometricsEnabled') ?? false);
+    setState(
+      () => _isBiometricsEnabled = prefs.getBool('biometricsEnabled') ?? false,
+    );
   }
 
   Future<void> _saveBiometricsPreference(bool value) async {
@@ -42,13 +44,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _toggleBiometrics(bool value) async {
     if (value) {
       try {
-        final bool canAuthenticate = await _localAuth.canCheckBiometrics || await _localAuth.isDeviceSupported();
+        final bool canAuthenticate =
+            await _localAuth.canCheckBiometrics ||
+            await _localAuth.isDeviceSupported();
         if (canAuthenticate) {
           setState(() => _isBiometricsEnabled = true);
           await _saveBiometricsPreference(true);
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Biometria não disponível neste dispositivo.')),
+            const SnackBar(
+              content: Text('Biometria não disponível neste dispositivo.'),
+            ),
           );
         }
       } catch (e) {
@@ -64,13 +70,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
     final isGuest = auth.isGuest;
-    final roundedShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
+    final roundedShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configurações'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Configurações'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -93,7 +98,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           shape: roundedShape,
           clipBehavior: Clip.antiAlias,
           child: SwitchListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
             title: const Text('Acesso com Biometria'),
             subtitle: const Text('Entrar com digital ou rosto.'),
             value: _isBiometricsEnabled,
@@ -120,7 +128,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: roundedShape,
         clipBehavior: Clip.antiAlias,
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
           shape: roundedShape,
           leading: const Icon(Icons.lock_outline),
           title: const Text('Mudar Senha'),
@@ -135,10 +146,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: roundedShape,
         clipBehavior: Clip.antiAlias,
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
           shape: roundedShape,
           leading: Icon(Icons.logout, color: Colors.red.shade400),
-          title: Text('Sair da Conta', style: TextStyle(color: Colors.red.shade400)),
+          title: Text(
+            'Sair da Conta',
+            style: TextStyle(color: Colors.red.shade400),
+          ),
           onTap: () {
             Navigator.of(context).pop();
             Provider.of<AuthProvider>(context, listen: false).logout();
@@ -193,7 +210,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildGuestLoginPrompt(BuildContext context, RoundedRectangleBorder roundedShape) {
+  Widget _buildGuestLoginPrompt(
+    BuildContext context,
+    RoundedRectangleBorder roundedShape,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -205,7 +225,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Icon(Icons.person_outline, size: 48, color: Colors.grey.shade400),
+                Icon(
+                  Icons.person_outline,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Faça login para acessar todas as configurações',
@@ -225,7 +249,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: const Text('Entrar'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -282,7 +308,9 @@ class _ThemeOptionButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? LumiLivreTheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected
+              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? LumiLivreTheme.primary : Colors.transparent,

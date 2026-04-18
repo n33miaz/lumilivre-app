@@ -420,9 +420,9 @@ class _ProfileScreenState extends State<ProfileScreen>
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
               },
               child: const Padding(
                 padding: EdgeInsets.all(10),
@@ -483,9 +483,9 @@ class _GuestEmptyState extends StatelessWidget {
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
               },
               icon: const Icon(Icons.login, size: 18),
               label: const Text('Entrar'),

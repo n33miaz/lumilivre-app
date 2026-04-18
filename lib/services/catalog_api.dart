@@ -123,7 +123,9 @@ class CatalogApi {
             id: (bookData['id'] as num?)?.toInt() ?? 0,
             title: bookData['titulo'] ?? bookData['nome'] ?? 'Sem Título',
             author: bookData['autor'] ?? 'Autor desconhecido',
-            imageUrl: bookData['imagem'] ?? 'https://via.placeholder.com/140x210.png?text=Lumi',
+            imageUrl:
+                bookData['imagem'] ??
+                'https://via.placeholder.com/140x210.png?text=Lumi',
             rating: (bookData['avaliacao'] as num?)?.toDouble() ?? 4.6,
           );
         }).toList();

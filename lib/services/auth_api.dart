@@ -33,7 +33,9 @@ class AuthApi {
       }
     } catch (e) {
       debugPrint('Erro na chamada de login: $e');
-      throw Exception('Não foi possível conectar ao servidor. Tente novamente.');
+      throw Exception(
+        'Não foi possível conectar ao servidor. Tente novamente.',
+      );
     }
   }
 
