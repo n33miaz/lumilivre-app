@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,16 +59,33 @@ void main() {
     });
 
     group('completeInitialPasswordChange', () {
-      test('deve desativar flag de senha inicial', () {
-        authProvider.completeInitialPasswordChange();
+      test('deve desativar flag de senha inicial', () async {
+        await authProvider.completeInitialPasswordChange();
         expect(authProvider.isInitialPassword, isFalse);
       });
 
-      test('deve notificar listeners', () {
+      test('deve notificar listeners', () async {
         int notifyCount = 0;
         authProvider.addListener(() => notifyCount++);
-        authProvider.completeInitialPasswordChange();
+        await authProvider.completeInitialPasswordChange();
         expect(notifyCount, 1);
+      });
+
+      test('deve persistir flag de senha inicial como false', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey:
+              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":true}',
+        });
+        final provider = AuthProvider();
+        await provider.tryAutoLogin();
+
+        await provider.completeInitialPasswordChange();
+
+        final storage = AuthStorage();
+        final savedUserData = jsonDecode(await storage.getUserData() ?? '{}');
+        expect(provider.isInitialPassword, isFalse);
+        expect(savedUserData['isInitialPassword'], isFalse);
       });
     });
 
@@ -118,6 +137,44 @@ void main() {
         expect(provider.user?.email, 'aluno@escola.com');
         expect(provider.authAttempted, isTrue);
       });
+
+      test('deve migrar sessao legada antes de restaurar usuario', () async {
+        SharedPreferences.setMockInitialValues({
+          AuthStorage.authTokenKey: 'legacy-token',
+          AuthStorage.userDataKey:
+              '{"id":1,"email":"legado@escola.com","role":"ALUNO","matriculaAluno":"2025001","isInitialPassword":false}',
+        });
+        final provider = AuthProvider();
+
+        await provider.tryAutoLogin();
+
+        expect(provider.isAuthenticated, isTrue);
+        expect(provider.user?.email, 'legado@escola.com');
+        expect(provider.user?.token, 'legacy-token');
+
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString(AuthStorage.authTokenKey), isNull);
+        expect(prefs.getString(AuthStorage.userDataKey), isNull);
+      });
+
+      test(
+        'deve limpar sessao segura quando dados salvos estao corrompidos',
+        () async {
+          FlutterSecureStorage.setMockInitialValues({
+            AuthStorage.authTokenKey: 'jwt-token-mock-123',
+            AuthStorage.userDataKey: '{json invalido',
+          });
+          final provider = AuthProvider();
+
+          await provider.tryAutoLogin();
+
+          expect(provider.authAttempted, isTrue);
+          expect(provider.isAuthenticated, isFalse);
+          final storage = AuthStorage();
+          expect(await storage.getToken(), isNull);
+          expect(await storage.getUserData(), isNull);
+        },
+      );
     });
 
     group('transições de estado', () {

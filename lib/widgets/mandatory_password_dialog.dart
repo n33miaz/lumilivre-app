@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lumilivre/providers/auth.dart';
@@ -53,11 +53,9 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
           ),
         );
 
-        Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        ).completeInitialPasswordChange();
+        await auth.completeInitialPasswordChange();
 
+        if (!mounted) return;
         Navigator.of(context).pop();
       }
     } catch (e) {

@@ -1,12 +1,14 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lumilivre/services/auth_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AuthStorage', () {
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       FlutterSecureStorage.setMockInitialValues({});
     });
 
@@ -34,5 +36,25 @@ void main() {
       expect(await storage.getToken(), isNull);
       expect(await storage.getUserData(), isNull);
     });
+
+    test(
+      'deve migrar sessao legada do SharedPreferences para storage seguro',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          AuthStorage.authTokenKey: 'legacy-token',
+          AuthStorage.userDataKey: '{"email":"legado@escola.com"}',
+        });
+        final storage = AuthStorage();
+
+        await storage.migrateLegacySession();
+
+        expect(await storage.getToken(), 'legacy-token');
+        expect(await storage.getUserData(), '{"email":"legado@escola.com"}');
+
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString(AuthStorage.authTokenKey), isNull);
+        expect(prefs.getString(AuthStorage.userDataKey), isNull);
+      },
+    );
   });
 }
