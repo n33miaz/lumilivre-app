@@ -36,8 +36,7 @@ class Book {
                   map['titulo'] ??
                   map['nome'] ??
                   'Título Desconhecido')
-              .toString()
-              .toCapitalized(),
+              .toString(),
       author: map['author'] ?? map['autor'] ?? 'Autor Desconhecido',
       imageUrl: map['imageUrl'] ?? map['imagem'] ?? '',
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),

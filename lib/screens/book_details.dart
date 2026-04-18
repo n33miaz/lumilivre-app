@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -342,9 +341,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Lançado em ${details.dataLancamento.day}/${details.dataLancamento.month}/${details.dataLancamento.year}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -407,19 +406,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   Widget _buildActionButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 8.0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: Row(
         children: [
           if (!_isGuest) _LikeButton(book: widget.book),
           if (_isGuest) ...[
             Expanded(
-              child: _BorrowButton(
-                status: LoanStatus.guest,
-                onPressed: null,
-              ),
+              child: _BorrowButton(status: LoanStatus.guest, onPressed: null),
             ),
           ] else ...[
             const SizedBox(width: 16),
@@ -462,16 +455,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const Divider(height: 32),
           Text(
             'Sinopse',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             details.sinopse,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
           ),
         ],
       ),
@@ -493,10 +486,7 @@ class _InfoItem extends StatelessWidget {
           child: Center(
             child: Text(
               top,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
         ),
@@ -545,11 +535,7 @@ class _BorrowButton extends StatelessWidget {
   final DateTime? dueDate;
   final VoidCallback? onPressed;
 
-  const _BorrowButton({
-    required this.status,
-    this.dueDate,
-    this.onPressed,
-  });
+  const _BorrowButton({required this.status, this.dueDate, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -627,9 +613,9 @@ class _BorrowButton extends StatelessWidget {
     return GestureDetector(
       onTap: status == LoanStatus.guest
           ? () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
             }
           : (isClickable ? onPressed : null),
       child: AnimatedContainer(
@@ -638,16 +624,15 @@ class _BorrowButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow:
-              isClickable
-                  ? [
-                    BoxShadow(
-                      color: backgroundColor.withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                  : [],
+          boxShadow: isClickable
+              ? [
+                  BoxShadow(
+                    color: backgroundColor.withValues(alpha: 0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
