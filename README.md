@@ -11,6 +11,19 @@
 <br/>
 
 <div align="center">
+
+![License](https://img.shields.io/badge/license-MIT-purple?style=flat-square)
+![Flutter](https://img.shields.io/badge/Flutter-3-02569B?style=flat-square&logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?style=flat-square&logo=dart)
+![Android](https://img.shields.io/badge/Android-ready-3DDC84?style=flat-square&logo=android)
+![iOS](https://img.shields.io/badge/iOS-ready-000000?style=flat-square&logo=apple)
+![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue?style=flat-square&logo=githubactions)
+
+</div>
+
+<br/>
+
+<div align="center">
   <h1>Sobre o Projeto</h1>
 </div>
 
@@ -32,35 +45,59 @@ Diferente de sistemas tradicionais, o app foca na experiência do usuário (UX),
 <br/>
 
 <div align="center">
+  <h1>Stack Técnica</h1>
+</div>
+
+| Camada | Tecnologia |
+|--------|------------|
+| Linguagem / SDK | Dart 3.9 + Flutter |
+| Estado | Provider 6.1 (`ChangeNotifier`) |
+| HTTP | `http` 1.5 (+ `dio` para clients gerados) |
+| Persistência segura | **flutter_secure_storage** (token + user) |
+| Persistência leve | `shared_preferences` (tema, favoritos) |
+| UI | Material 3, `flutter_svg`, `cached_network_image`, Lottie |
+| Segurança local | `local_auth` |
+| Upload | `image_picker`, `http_parser` |
+| Conectividade | `connectivity_plus`, `internet_connection_checker` |
+| Contratos | **openapi-generator-cli** (scripts/generate_api) |
+| Testes | `flutter_test`, `flutter_lints` |
+| Build por ambiente | **Flavors Android (dev/staging/prod)** + `--dart-define=API_BASE_URL` |
+
+<br/>
+
+<div align="center">
   <h1>Funcionalidades Principais</h1>
 </div>
 
 ### 📚 Catálogo & Busca
-- **Vitrine Virtual:** Carrosséis de livros organizados por categorias (Aventura, Romance, TCCs, etc.).
-- **Busca Inteligente:** Pesquisa por título, autor ou ISBN.
-- **Detalhes do Livro:** Sinopse, classificação etária, número de páginas e **disponibilidade em tempo real** (integração com estoque físico).
+- **Vitrine Virtual:** carrosséis por categoria com **infinite scroll**.
+- **Busca Inteligente:** por título, autor ou ISBN.
+- **Detalhes do Livro:** sinopse, classificação, disponibilidade em tempo real (estoque físico).
+- **Modo Offline:** cache local via `SharedPreferences` (`catalog_cache_v1`) com stale-while-revalidate.
 
 ### 🔄 Empréstimos & Solicitações
-- **Solicitação Digital:** O aluno solicita um livro pelo app e aguarda a aprovação do bibliotecário.
-- **Status em Tempo Real:** Acompanhamento de solicitações (Pendente, Aprovado, Recusado).
-- **Histórico:** Visualização de todos os empréstimos já realizados e devolvidos.
+- **Solicitação Digital:** aluno solicita pelo app, bibliotecário aprova no web.
+- **Status em Tempo Real** (PENDENTE/ACEITA/REJEITADA).
+- **Histórico** de empréstimos e solicitações.
 
 ### 👤 Perfil & Gamificação
-- **Ranking de Leitores:** Sistema de gamificação que exibe os alunos que mais leem na instituição.
-- **Carteirinha Virtual:** Dados do aluno e foto de perfil integrados.
-- **Favoritos:** Lista de desejos para leituras futuras.
+- **Ranking** de leitores com filtros por curso/módulo/turno.
+- **Foto de perfil** com upload para Supabase.
+- **Favoritos** locais por ID.
 
 ### ⚙️ Recursos Técnicos Avançados
-- **Modo Offline (Cache):** O catálogo é salvo localmente (`SharedPreferences`), permitindo consulta mesmo sem internet.
-- **Biometria:** Login rápido utilizando impressão digital ou reconhecimento facial (`local_auth`).
-- **Temas:** Suporte completo a **Modo Claro** e **Modo Escuro**.
+- **Secure Storage:** token JWT em `flutter_secure_storage` (Keystore/Keychain).
+- **Restore de sessão** no boot (`tryAutoLogin` em `main.dart` + splash durante validação).
+- **Biometria:** suporte via `local_auth`.
+- **Temas:** claro / escuro / sistema.
+- **ApiService** dividido em facade (`AuthApi`, `BookApi`, `CatalogApi`, `LoanApi`, `RankingApi`, `StudentApi`, `UploadApi`) — cada domínio abaixo de 200 linhas.
 
 ### Ambientes
 
-O app usa flavors Android e `--dart-define=API_BASE_URL` para selecionar a API:
+O app usa **flavors Android** e `--dart-define=API_BASE_URL` para selecionar a API:
 
 ```bash
-flutter run --flavor dev --dart-define=API_BASE_URL=http://127.0.0.1:8080
+flutter run --flavor dev     --dart-define=API_BASE_URL=http://127.0.0.1:8080
 flutter run --flavor staging --dart-define=API_BASE_URL=https://staging.lumilivre.example
 flutter run --flavor prod
 ```
@@ -104,23 +141,68 @@ flowchart TD
     API -.->|Consulta Metadados| External
 ```
 
+### Estrutura interna
+
+```
+lib/
+  main.dart                 (bootstrap + tryAutoLogin + splash)
+  providers/                (AuthProvider, ThemeProvider, FavoritesProvider)
+  services/                 (ApiService facade + AuthApi/BookApi/CatalogApi/LoanApi/RankingApi/StudentApi/UploadApi)
+  services/auth_storage.dart (flutter_secure_storage)
+  api/gen/                  (clients gerados pelo openapi-generator-cli)
+  models/ · screens/ · widgets/ · utils/
+assets/ (images, icons, animations)
+android/ · ios/ · web/
+test/    (providers, services, models, utils, bootstrap)
+scripts/ (generate_api.sh | .bat)
+```
+
 <br/>
 
 <div align="center">
   <h1>Segurança</h1>
 </div>
 
-- **Autenticação JWT:** Todas as requisições sensíveis utilizam tokens JWT validados pelo backend.
-- **Secure Storage:** O token é armazenado de forma segura no dispositivo.
-- **Validação de Senha Inicial:** O app força a troca de senha no primeiro acesso para garantir a segurança da conta do aluno.
+- **Autenticação JWT** em todas as requisições sensíveis.
+- **Secure Storage** (Keystore/Keychain) para token e dados de usuário.
+- **Validação de Senha Inicial** no primeiro acesso (bloqueia navegação principal até a troca).
+- **Convidado** navega sem token, mas não consegue solicitar empréstimo nem acessar dados pessoais.
+
+<br/>
+
+<div align="center">
+  <h1>Como rodar localmente</h1>
+</div>
+
+```powershell
+# 1. Dependências
+flutter pub get
+
+# 2. Gerar clients OpenAPI (opcional; requer API com /v3/api-docs)
+.\scripts\generate_api.bat
+
+# 3. Executar
+flutter run --flavor dev --dart-define=API_BASE_URL=http://10.0.2.2:8080
+
+# 4. Testes
+flutter analyze
+flutter test
+
+# 5. Build de produção
+flutter build apk --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre.com.br
+flutter build ios --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre.com.br
+```
+
+<br/>
+
+<div align="center">
+  <h1>Licença</h1>
+</div>
+
+Distribuído sob a licença **MIT**. Veja `LICENSE` para mais detalhes.
 
 <br/>
 
 <div align="center">
   <sub>LumiLivre © 2026 - Todos os direitos reservados.</sub>
 </div>
-
-
-
-
-
