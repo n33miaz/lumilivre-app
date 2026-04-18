@@ -55,6 +55,18 @@ Diferente de sistemas tradicionais, o app foca na experiência do usuário (UX),
 - **Biometria:** Login rápido utilizando impressão digital ou reconhecimento facial (`local_auth`).
 - **Temas:** Suporte completo a **Modo Claro** e **Modo Escuro**.
 
+### Ambientes
+
+O app usa flavors Android e `--dart-define=API_BASE_URL` para selecionar a API:
+
+```bash
+flutter run --flavor dev --dart-define=API_BASE_URL=http://127.0.0.1:8080
+flutter run --flavor staging --dart-define=API_BASE_URL=https://staging.lumilivre.example
+flutter run --flavor prod
+```
+
+Sem `API_BASE_URL`, o app usa `https://lumilivre-api.onrender.com`.
+
 <br/>
 
 <div align="center">
