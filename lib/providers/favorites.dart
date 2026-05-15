@@ -31,7 +31,7 @@ class FavoritesProvider with ChangeNotifier {
     await prefs.setStringList('favoriteBooks', favoritesJson);
   }
 
-  bool isFavorite(int bookId) {
+  bool isFavorite(String bookId) {
     return _favoriteBooks.any((book) => book.id == bookId);
   }
 

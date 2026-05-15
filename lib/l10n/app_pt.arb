@@ -1,0 +1,22 @@
+{
+  "@@locale": "pt",
+  "appTitle": "LumiLivre",
+  "settingsTitle": "Configurações",
+  "appearanceSection": "Aparência",
+  "languageSection": "Idioma",
+  "securitySection": "Segurança",
+  "accountSection": "Conta",
+  "themeLabel": "Tema",
+  "themeLight": "Claro",
+  "themeSystem": "Sistema",
+  "themeDark": "Escuro",
+  "languagePortuguese": "Português (Brasil)",
+  "languageEnglish": "English (US)",
+  "biometricAccess": "Acesso com biometria",
+  "biometricSubtitle": "Entrar com digital ou rosto.",
+  "biometricUnavailable": "Biometria não disponível neste dispositivo.",
+  "changePassword": "Mudar senha",
+  "logout": "Sair da conta",
+  "guestSettingsPrompt": "Faça login para acessar todas as configurações",
+  "loginAction": "Entrar"
+}

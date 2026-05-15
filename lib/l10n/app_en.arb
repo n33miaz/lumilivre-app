@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+  "appTitle": "LumiLivre",
+  "settingsTitle": "Settings",
+  "appearanceSection": "Appearance",
+  "languageSection": "Language",
+  "securitySection": "Security",
+  "accountSection": "Account",
+  "themeLabel": "Theme",
+  "themeLight": "Light",
+  "themeSystem": "System",
+  "themeDark": "Dark",
+  "languagePortuguese": "Portuguese (Brazil)",
+  "languageEnglish": "English (US)",
+  "biometricAccess": "Biometric access",
+  "biometricSubtitle": "Sign in with fingerprint or face.",
+  "biometricUnavailable": "Biometrics are not available on this device.",
+  "changePassword": "Change password",
+  "logout": "Sign out",
+  "guestSettingsPrompt": "Sign in to access all settings",
+  "loginAction": "Sign in"
+}

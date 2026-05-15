@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import '../utils/constants.dart';
+import 'request_context.dart';
 
 class UploadApi {
   Future<bool> uploadProfilePicture(
@@ -11,9 +12,9 @@ class UploadApi {
     String filePath, {
     Uint8List? webBytes,
   }) async {
-    final url = Uri.parse('$apiBaseUrl/alunos/$matricula/foto');
+    final url = Uri.parse('$apiBaseUrl/api/v2/students/$matricula/avatar');
     final request = http.MultipartRequest('POST', url);
-    request.headers['Authorization'] = 'Bearer $token';
+    request.headers.addAll(await RequestContext.headers(token: token));
 
     if (kIsWeb && webBytes != null) {
       request.files.add(
@@ -40,12 +41,11 @@ class UploadApi {
       );
       final response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 204) {
         return true;
-      } else {
-        debugPrint('Erro upload: ${response.body}');
-        return false;
       }
+      debugPrint('Erro upload: ${response.body}');
+      return false;
     } catch (e) {
       debugPrint('Erro ao enviar foto: $e');
       return false;

@@ -67,7 +67,7 @@ class ApiService {
 
   // --- Books ---
 
-  Future<BookDetails> getBookDetails(int bookId) =>
+  Future<BookDetails> getBookDetails(String bookId) =>
       _book.getBookDetails(bookId);
 
   // --- Loans ---
@@ -83,7 +83,7 @@ class ApiService {
 
   Future<bool> requestLoanByBookId(
     String matricula,
-    int livroId,
+    String livroId,
     String token,
   ) => _loan.requestLoanByBookId(matricula, livroId, token);
 

@@ -29,7 +29,7 @@ class LoanStatusCalculator {
     required BookDetails details,
     required List<Loan> loans,
     required List<dynamic> requests,
-    required int targetBookId,
+    required String targetBookId,
     Map<String, dynamic>? studentData,
   }) {
     // Verifica empréstimo ativo para este livro
@@ -69,7 +69,7 @@ class LoanStatusCalculator {
     return const LoanStatusResult(status: LoanStatus.available);
   }
 
-  static Loan? _findActiveLoan(List<Loan> loans, int targetBookId) {
+  static Loan? _findActiveLoan(List<Loan> loans, String targetBookId) {
     for (final loan in loans) {
       if (loan.livroId == targetBookId) {
         return loan;
@@ -78,13 +78,17 @@ class LoanStatusCalculator {
     return null;
   }
 
-  static bool _hasPendingRequest(List<dynamic> requests, int targetBookId) {
+  static bool _hasPendingRequest(List<dynamic> requests, String targetBookId) {
     return requests.any((r) {
       if (r == null || r is! Map) {
         return false;
       }
-      final reqLivroId = (r['livroId'] as num?)?.toInt() ?? -1;
-      final reqStatus = r['status']?.toString() ?? '';
+      final reqLivroId =
+          r['livroId']?.toString() ?? r['bookId']?.toString() ?? '';
+      final rawStatus = r['status'];
+      final reqStatus = rawStatus is Map
+          ? rawStatus['code']?.toString() ?? ''
+          : rawStatus?.toString() ?? '';
       return reqLivroId == targetBookId && reqStatus == 'PENDENTE';
     });
   }

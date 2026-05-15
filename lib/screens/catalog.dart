@@ -47,7 +47,7 @@ class _CatalogScreenState extends State<CatalogScreen>
       _persistedCategoryOrder!.addAll(newKeys);
     }
 
-    final Set<int> prominentlyDisplayedBookIds = {};
+    final Set<String> prominentlyDisplayedBookIds = {};
     final List<MapEntry<String, List<Book>>> processedCategories = [];
 
     // Monta a lista mantendo a ordem estática e balanceando a exibição dos livros

@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/providers/favorites.dart';
+import 'package:lumilivre/providers/locale.dart';
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
@@ -34,6 +37,7 @@ void main() {
             ),
             ChangeNotifierProvider(create: (context) => ThemeProvider()),
             ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+            ChangeNotifierProvider(create: (context) => LocaleProvider()),
           ],
           child: const LumiLivreApp(),
         ),
@@ -50,10 +54,18 @@ class LumiLivreApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AuthProvider, ThemeProvider>(
-      builder: (context, auth, themeProvider, _) => MaterialApp(
-        title: 'LumiLivre',
+    return Consumer3<AuthProvider, ThemeProvider, LocaleProvider>(
+      builder: (context, auth, themeProvider, localeProvider, _) => MaterialApp(
+        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         debugShowCheckedModeBanner: false,
+        locale: localeProvider.locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
 
         theme: LumiLivreTheme.lightTheme,
         darkTheme: LumiLivreTheme.darkTheme,

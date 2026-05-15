@@ -2,11 +2,14 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:lumilivre/providers/auth.dart';
-import 'package:lumilivre/providers/theme.dart';
-import 'package:lumilivre/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:lumilivre/l10n/app_localizations.dart';
+import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/locale.dart';
+import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 import '../widgets/change_password_dialog.dart';
 import 'auth/login.dart';
@@ -42,20 +45,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _toggleBiometrics(bool value) async {
+    final l10n = AppLocalizations.of(context)!;
     if (value) {
       try {
-        final bool canAuthenticate =
+        final canAuthenticate =
             await _localAuth.canCheckBiometrics ||
             await _localAuth.isDeviceSupported();
         if (canAuthenticate) {
           setState(() => _isBiometricsEnabled = true);
           await _saveBiometricsPreference(true);
         } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Biometria não disponível neste dispositivo.'),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.biometricUnavailable)));
         }
       } catch (e) {
         debugPrint('$e');
@@ -68,31 +70,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final auth = Provider.of<AuthProvider>(context);
+    final localeProvider = Provider.of<LocaleProvider>(context);
+    final localeTag = localeProvider.locale.toLanguageTag();
     final isGuest = auth.isGuest;
     final roundedShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurações'), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.settingsTitle), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionTitle('Aparência'),
-          _buildThemeSelector(context),
+          _SectionTitle(l10n.appearanceSection),
+          _buildThemeSelector(context, l10n),
           const SizedBox(height: 24),
-
-          if (!isGuest) ..._buildAccountOptions(roundedShape),
-          if (isGuest) _buildGuestLoginPrompt(context, roundedShape),
+          _SectionTitle(l10n.languageSection),
+          Card(
+            shape: roundedShape,
+            clipBehavior: Clip.antiAlias,
+            child: RadioGroup<String>(
+              groupValue: localeTag,
+              onChanged: (value) {
+                if (value == 'pt-BR') {
+                  localeProvider.setLocale(const Locale('pt', 'BR'));
+                } else if (value == 'en-US') {
+                  localeProvider.setLocale(const Locale('en', 'US'));
+                }
+              },
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    value: 'pt-BR',
+                    title: Text(l10n.languagePortuguese),
+                    selected: localeTag == 'pt-BR',
+                  ),
+                  RadioListTile<String>(
+                    value: 'en-US',
+                    title: Text(l10n.languageEnglish),
+                    selected: localeTag == 'en-US',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          if (!isGuest) ..._buildAccountOptions(roundedShape, l10n),
+          if (isGuest) _buildGuestLoginPrompt(context, roundedShape, l10n),
         ],
       ),
     );
   }
 
-  List<Widget> _buildAccountOptions(RoundedRectangleBorder roundedShape) {
+  List<Widget> _buildAccountOptions(
+    RoundedRectangleBorder roundedShape,
+    AppLocalizations l10n,
+  ) {
     return [
-      _SectionTitle('Segurança'),
+      _SectionTitle(l10n.securitySection),
       if (!kIsWeb) ...[
         Card(
           shape: roundedShape,
@@ -102,8 +139,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               horizontal: 16,
               vertical: 8,
             ),
-            title: const Text('Acesso com Biometria'),
-            subtitle: const Text('Entrar com digital ou rosto.'),
+            title: Text(l10n.biometricAccess),
+            subtitle: Text(l10n.biometricSubtitle),
             value: _isBiometricsEnabled,
             onChanged: _toggleBiometrics,
             secondary: SizedBox(
@@ -123,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 24),
       ],
-      _SectionTitle('Conta'),
+      _SectionTitle(l10n.accountSection),
       Card(
         shape: roundedShape,
         clipBehavior: Clip.antiAlias,
@@ -134,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           shape: roundedShape,
           leading: const Icon(Icons.lock_outline),
-          title: const Text('Mudar Senha'),
+          title: Text(l10n.changePassword),
           trailing: const Icon(Icons.arrow_forward_ios, size: 20),
           onTap: () => showDialog(
             context: context,
@@ -153,7 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           shape: roundedShape,
           leading: Icon(Icons.logout, color: Colors.red.shade400),
           title: Text(
-            'Sair da Conta',
+            l10n.logout,
             style: TextStyle(color: Colors.red.shade400),
           ),
           onTap: () {
@@ -165,23 +202,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
   }
 
-  Widget _buildThemeSelector(BuildContext context) {
+  Widget _buildThemeSelector(BuildContext context, AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Tema',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            Text(
+              l10n.themeLabel,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: _ThemeOptionButton(
-                    label: 'Claro',
+                    label: l10n.themeLight,
                     iconPath: 'assets/icons/sun.svg',
                     option: ThemeOption.light,
                   ),
@@ -189,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _ThemeOptionButton(
-                    label: 'Sistema',
+                    label: l10n.themeSystem,
                     materialIcon: Icons.brightness_auto_outlined,
                     option: ThemeOption.system,
                   ),
@@ -197,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _ThemeOptionButton(
-                    label: 'Escuro',
+                    label: l10n.themeDark,
                     iconPath: 'assets/icons/moon.svg',
                     option: ThemeOption.dark,
                   ),
@@ -213,11 +250,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildGuestLoginPrompt(
     BuildContext context,
     RoundedRectangleBorder roundedShape,
+    AppLocalizations l10n,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle('Conta'),
+        _SectionTitle(l10n.accountSection),
         Card(
           shape: roundedShape,
           clipBehavior: Clip.antiAlias,
@@ -232,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Faça login para acessar todas as configurações',
+                  l10n.guestSettingsPrompt,
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
@@ -246,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       );
                     },
                     icon: const Icon(Icons.login, size: 18),
-                    label: const Text('Entrar'),
+                    label: Text(l10n.loginAction),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -297,7 +335,7 @@ class _ThemeOptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final bool isSelected = themeProvider.themeOption == option;
+    final isSelected = themeProvider.themeOption == option;
     final color = isSelected
         ? LumiLivreTheme.primary
         : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);

@@ -4,30 +4,27 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/book_details.dart';
-import '../services/auth_storage.dart';
 import '../utils/constants.dart';
+import 'auth_storage.dart';
+import 'request_context.dart';
 
 class BookApi {
   final AuthStorage _authStorage = AuthStorage();
 
-  Future<BookDetails> getBookDetails(int bookId) async {
-    final url = Uri.parse('$apiBaseUrl/livros/$bookId');
+  Future<BookDetails> getBookDetails(String bookId) async {
+    final url = Uri.parse('$apiBaseUrl/api/v2/books/$bookId');
     final token = await _authStorage.getToken();
 
     try {
       final response = await http
-          .get(
-            url,
-            headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-          )
+          .get(url, headers: await RequestContext.headers(token: token))
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(utf8.decode(response.bodyBytes));
         return BookDetails.fromJson(jsonData);
-      } else {
-        throw Exception('Falha ao carregar detalhes do livro.');
       }
+      throw Exception('Falha ao carregar detalhes do livro.');
     } catch (e) {
       if (kDebugMode) debugPrint('Erro em getBookDetails: $e');
       throw Exception('Falha ao carregar detalhes do livro.');

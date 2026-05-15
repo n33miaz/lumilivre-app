@@ -4,7 +4,7 @@ LoginResponse loginResponseFromJson(String str) =>
     LoginResponse.fromJson(json.decode(str));
 
 class LoginResponse {
-  final int id;
+  final String id;
   final String email;
   final String role;
   final String? matriculaAluno;
@@ -22,12 +22,14 @@ class LoginResponse {
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      id: json["id"],
+      id: json["id"]?.toString() ?? '',
       email: json["email"],
       role: json["role"],
-      matriculaAluno: json["matriculaAluno"],
+      matriculaAluno:
+          json["matriculaAluno"] ?? json["studentRegistrationNumber"],
       token: json["token"],
-      isInitialPassword: json["isInitialPassword"] ?? false,
+      isInitialPassword:
+          json["isInitialPassword"] ?? json["initialPasswordChange"] ?? false,
     );
   }
 

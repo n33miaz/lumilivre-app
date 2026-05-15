@@ -1,24 +1,22 @@
 import 'dart:convert';
+
 import 'package:lumilivre/utils/parsers.dart';
 
 List<Loan> loanFromJson(String str) {
   final decoded = json.decode(str);
-  if (decoded == null) {
-    return [];
-  }
-  if (decoded is! List) {
+  if (decoded == null || decoded is! List) {
     return [];
   }
   return List<Loan>.from(decoded.map((x) => Loan.fromJson(x)));
 }
 
 class Loan {
-  final int id;
+  final String id;
   final DateTime dataEmprestimo;
   final DateTime dataDevolucao;
   final String status;
   final String? penalidade;
-  final int livroId;
+  final String livroId;
   final String livroTitulo;
   final String? imagemUrl;
   final bool isRequest;
@@ -37,31 +35,54 @@ class Loan {
 
   factory Loan.fromJson(Map<String, dynamic> json) {
     return Loan(
-      id: safeParseInt(json["id"]),
-      dataEmprestimo: parseDate(json["dataEmprestimo"], fallback: DateTime.now),
-      dataDevolucao: parseDate(json["dataDevolucao"], fallback: DateTime.now),
-      status: json["status"]?.toString() ?? "DESCONHECIDO",
-      penalidade: json["penalidade"]?.toString(),
-      livroId: safeParseInt(json["livroId"]),
-      livroTitulo: json["livroTitulo"]?.toString() ?? "Livro sem título",
-      imagemUrl: json["imagemUrl"]?.toString(),
+      id: json['id']?.toString() ?? '',
+      dataEmprestimo: parseDate(
+        json['dataEmprestimo'] ?? json['borrowedAt'],
+        fallback: DateTime.now,
+      ),
+      dataDevolucao: parseDate(
+        json['dataDevolucao'] ?? json['dueAt'],
+        fallback: DateTime.now,
+      ),
+      status: _codeOrString(json['status']) ?? 'DESCONHECIDO',
+      penalidade:
+          json['penalidade']?.toString() ?? _codeOrString(json['penaltyCode']),
+      livroId: json['livroId']?.toString() ?? json['bookId']?.toString() ?? '',
+      livroTitulo:
+          json['livroTitulo']?.toString() ??
+          json['bookTitle']?.toString() ??
+          'Livro sem título',
+      imagemUrl: json['imagemUrl']?.toString() ?? json['coverUrl']?.toString(),
       isRequest: false,
     );
   }
 
   factory Loan.fromRequestJson(Map<String, dynamic> json) {
     return Loan(
-      id: json["id"] ?? 0,
+      id: json['id']?.toString() ?? '',
       dataEmprestimo: parseDate(
-        json["dataSolicitacao"],
+        json['dataSolicitacao'] ?? json['requestedAt'],
         fallback: DateTime.now,
       ),
       dataDevolucao: DateTime(2100),
-      status: json["status"] ?? "PENDENTE",
-      livroId: json["livroId"] ?? 0,
-      livroTitulo: json["livroNome"] ?? "Solicitação",
+      status: _codeOrString(json['status']) ?? 'PENDENTE',
+      livroId: json['livroId']?.toString() ?? json['bookId']?.toString() ?? '',
+      livroTitulo:
+          json['livroNome']?.toString() ??
+          json['bookTitle']?.toString() ??
+          'Solicitação',
       imagemUrl: null,
       isRequest: true,
     );
+  }
+
+  static String? _codeOrString(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is Map) {
+      return value['code']?.toString();
+    }
+    return value.toString();
   }
 }

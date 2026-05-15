@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/ranking.dart';
 import '../utils/constants.dart';
+import 'request_context.dart';
 
 class RankingApi {
   Future<List<RankingItem>> getRanking({
@@ -14,26 +15,28 @@ class RankingApi {
     int? turnoId,
     required String token,
   }) async {
-    String query = '?top=$top';
-    if (cursoId != null) query += '&cursoId=$cursoId';
-    if (moduloId != null) query += '&moduloId=$moduloId';
-    if (turnoId != null) query += '&turnoId=$turnoId';
+    var query = '?top=$top';
+    if (cursoId != null) query += '&courseId=$cursoId';
+    if (moduloId != null) query += '&academicModuleId=$moduloId';
+    if (turnoId != null) query += '&studyShiftId=$turnoId';
 
-    final url = Uri.parse('$apiBaseUrl/emprestimos/ranking$query');
+    final url = Uri.parse('$apiBaseUrl/api/v2/students/ranking$query');
 
     try {
       final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
+          .get(url, headers: await RequestContext.headers(token: token))
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((e) => RankingItem.fromJson(e)).toList();
-      } else if (response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception('Erro ao buscar ranking');
+        final data = json.decode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+        return data
+            .map((e) => RankingItem.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
+      if (response.statusCode == 204) {
+        return [];
+      }
+      throw Exception('Erro ao buscar ranking');
     } catch (e) {
       debugPrint('Erro getRanking: $e');
       return [];
@@ -41,16 +44,26 @@ class RankingApi {
   }
 
   Future<List<FilterItem>> getSimpleList(String endpoint, String token) async {
-    final url = Uri.parse('$apiBaseUrl/$endpoint');
+    final endpointMap = {
+      'modulos': 'academic-modules',
+      'turnos': 'study-shifts',
+      'generos': 'genres',
+    };
+    final target = endpointMap[endpoint] ?? endpoint;
+    final url = Uri.parse('$apiBaseUrl/api/v2/$target?size=100');
 
     try {
       final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
+          .get(url, headers: await RequestContext.headers(token: token))
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((e) => FilterItem.fromJson(e)).toList();
+        final page = json.decode(utf8.decode(response.bodyBytes))
+            as Map<String, dynamic>;
+        final data = (page['content'] ?? []) as List<dynamic>;
+        return data
+            .map((e) => FilterItem.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
       return [];
     } catch (e) {
@@ -60,19 +73,20 @@ class RankingApi {
   }
 
   Future<List<FilterItem>> getCursos(String token) async {
-    final url = Uri.parse('$apiBaseUrl/cursos/home?size=100');
+    final url = Uri.parse('$apiBaseUrl/api/v2/courses?size=100');
 
     try {
       final response = await http
-          .get(url, headers: {'Authorization': 'Bearer $token'})
+          .get(url, headers: await RequestContext.headers(token: token))
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> content = data['content'];
-        return content.map((e) => FilterItem.fromJson(e)).toList();
+        final data = json.decode(utf8.decode(response.bodyBytes))
+            as Map<String, dynamic>;
+        final content = (data['content'] ?? []) as List<dynamic>;
+        return content
+            .map((e) => FilterItem.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
       return [];
     } catch (e) {

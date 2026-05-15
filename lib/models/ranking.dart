@@ -11,8 +11,8 @@ class RankingItem {
 
   factory RankingItem.fromJson(Map<String, dynamic> json) {
     return RankingItem(
-      matricula: json['matricula'] ?? '',
-      nome: json['nome'] ?? 'Aluno',
+      matricula: json['matricula'] ?? json['registrationNumber'] ?? '',
+      nome: json['nome'] ?? json['fullName'] ?? 'Aluno',
       emprestimosCount: json['emprestimosCount'] ?? 0,
     );
   }
@@ -29,7 +29,7 @@ class FilterItem {
       id: json['id'] is int
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 0,
-      nome: json['nome'] ?? '',
+      nome: json['nome'] ?? json['name'] ?? '',
     );
   }
 }

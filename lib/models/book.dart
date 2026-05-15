@@ -1,8 +1,9 @@
 import 'dart:convert';
+
 import 'package:lumilivre/utils/parsers.dart';
 
 class Book {
-  final int id;
+  final String id;
   final String title;
   final String author;
   final String imageUrl;
@@ -29,16 +30,20 @@ class Book {
   String toJson() => json.encode(toMap());
 
   factory Book.fromMap(Map<String, dynamic> map) {
+    final rawImage = (map['imageUrl'] ?? map['coverUrl'] ?? map['imagem'] ?? '')
+        .toString();
+
     return Book(
-      id: safeParseInt(map['id']),
+      id: _idToString(map['id']),
       title:
           (map['title'] ??
                   map['titulo'] ??
                   map['nome'] ??
                   'Título Desconhecido')
               .toString(),
-      author: map['author'] ?? map['autor'] ?? 'Autor Desconhecido',
-      imageUrl: map['imageUrl'] ?? map['imagem'] ?? '',
+      author: (map['author'] ?? map['autor'] ?? 'Autor Desconhecido')
+          .toString(),
+      imageUrl: _normalizeImageUrl(rawImage),
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),
     );
   }
@@ -67,7 +72,7 @@ class Book {
       rating.hashCode;
 
   Book copyWith({
-    int? id,
+    String? id,
     String? title,
     String? author,
     String? imageUrl,
@@ -80,5 +85,21 @@ class Book {
       imageUrl: imageUrl ?? this.imageUrl,
       rating: rating ?? this.rating,
     );
+  }
+
+  static String _normalizeImageUrl(String rawImage) {
+    return rawImage.startsWith('http://')
+        ? rawImage.replaceFirst('http://', 'https://')
+        : rawImage;
+  }
+
+  static String _idToString(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+    if (value is String || value is num) {
+      return value.toString();
+    }
+    return '';
   }
 }
