@@ -8,7 +8,7 @@ void main() {
     group('fromJson', () {
       test('deve parsear resposta de login completa', () {
         final user = LoginResponse.fromJson(UserFixtures.validLoginResponse);
-        expect(user.id, 1);
+        expect(user.id, '1');
         expect(user.email, 'aluno@escola.com');
         expect(user.role, 'ALUNO');
         expect(user.matriculaAluno, '2025001');
@@ -41,7 +41,7 @@ void main() {
       test('deve serializar todos os campos', () {
         final user = LoginResponse.fromJson(UserFixtures.validLoginResponse);
         final json = user.toJson();
-        expect(json['id'], 1);
+        expect(json['id'], '1');
         expect(json['email'], 'aluno@escola.com');
         expect(json['token'], 'jwt-token-mock-123');
         expect(json['isInitialPassword'], isFalse);
@@ -75,7 +75,7 @@ void main() {
       test('deve parsear JSON string de login', () {
         final jsonStr = jsonEncode(UserFixtures.validLoginResponse);
         final user = loginResponseFromJson(jsonStr);
-        expect(user.id, 1);
+        expect(user.id, '1');
         expect(user.email, 'aluno@escola.com');
       });
     });

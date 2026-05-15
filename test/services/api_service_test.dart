@@ -30,7 +30,7 @@ void main() {
                   : rawImage;
             }
             return Book(
-              id: (bookData['id'] as num?)?.toInt() ?? 0,
+              id: bookData['id']?.toString() ?? '',
               title: bookData['titulo']?.toString() ?? 'Título Desconhecido',
               author: bookData['autor']?.toString() ?? 'Autor Desconhecido',
               imageUrl: finalImage,
@@ -109,7 +109,7 @@ void main() {
           },
         ]);
         final book = catalog['Teste']![0];
-        expect(book.id, 0);
+        expect(book.id, '');
         expect(book.title, 'Título Desconhecido');
         expect(book.author, 'Autor Desconhecido');
         expect(book.imageUrl, '');

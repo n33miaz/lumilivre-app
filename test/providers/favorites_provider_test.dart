@@ -10,21 +10,21 @@ void main() {
     late FavoritesProvider provider;
 
     const bookA = Book(
-      id: 1,
+      id: '1',
       title: 'Livro A',
       author: 'Autor A',
       imageUrl: '',
       rating: 4.0,
     );
     const bookB = Book(
-      id: 2,
+      id: '2',
       title: 'Livro B',
       author: 'Autor B',
       imageUrl: '',
       rating: 3.5,
     );
     const bookADuplicate = Book(
-      id: 1,
+      id: '1',
       title: 'Livro A',
       author: 'Autor A',
       imageUrl: '',
@@ -42,8 +42,8 @@ void main() {
       });
 
       test('isFavorite deve retornar false para qualquer id', () {
-        expect(provider.isFavorite(1), isFalse);
-        expect(provider.isFavorite(999), isFalse);
+        expect(provider.isFavorite('1'), isFalse);
+        expect(provider.isFavorite('999'), isFalse);
       });
     });
 
@@ -79,7 +79,7 @@ void main() {
       test('deve remover por id mesmo com instância diferente', () {
         provider.toggleFavorite(bookA);
         provider.toggleFavorite(bookADuplicate);
-        expect(provider.isFavorite(1), isFalse);
+        expect(provider.isFavorite('1'), isFalse);
       });
 
       test('deve manter outros livros ao remover um', () {

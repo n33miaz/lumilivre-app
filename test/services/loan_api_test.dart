@@ -4,9 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:lumilivre/services/loan_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('LoanApi', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
+
     test(
       'requestLoan deve chamar endpoint por tombo com bearer token',
       () async {
@@ -22,10 +29,10 @@ void main() {
 
         expect(success, isTrue);
         expect(capturedRequest.method, 'POST');
-        expect(capturedRequest.url.path, endsWith('/solicitacoes/solicitar'));
+        expect(capturedRequest.url.path, endsWith('/api/v2/loan-requests'));
         expect(capturedRequest.url.queryParameters, {
-          'matriculaAluno': '12345',
-          'tomboExemplar': 'T001',
+          'studentRegistrationNumber': '12345',
+          'copyCode': 'T001',
         });
         expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
       },
@@ -36,7 +43,7 @@ void main() {
         client: MockClient((request) async => http.Response('', 201)),
       );
 
-      final success = await api.requestLoanByBookId('12345', 10, 'jwt-token');
+      final success = await api.requestLoanByBookId('12345', '10', 'jwt-token');
 
       expect(success, isTrue);
     });
@@ -49,14 +56,14 @@ void main() {
               jsonEncode([
                 {
                   'id': 7,
-                  'alunoNome': 'Aluno Teste',
-                  'alunoMatricula': '12345',
-                  'tomboExemplar': 'T001',
-                  'livroId': 10,
-                  'livroNome': 'Livro Teste',
-                  'dataSolicitacao': '2026-04-17T10:00:00',
-                  'status': 'PENDENTE',
-                  'observacao': 'Solicitado via Mobile',
+                  'studentName': 'Aluno Teste',
+                  'studentRegistrationNumber': '12345',
+                  'copyCode': 'T001',
+                  'bookId': 10,
+                  'bookTitle': 'Livro Teste',
+                  'requestedAt': '2026-04-17T10:00:00',
+                  'status': 'PENDING',
+                  'notes': 'Solicitado via Mobile',
                 },
               ]),
             ),
@@ -69,7 +76,7 @@ void main() {
 
       expect(requests, hasLength(1));
       expect(requests.single.livroTitulo, 'Livro Teste');
-      expect(requests.single.status, 'PENDENTE');
+      expect(requests.single.status, 'PENDING');
     });
 
     test('getMyLoans deve retornar lista vazia quando API falha', () async {

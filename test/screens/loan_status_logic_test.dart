@@ -35,7 +35,7 @@ void main() {
       List<Loan>? loans,
       List<dynamic>? requests,
       Map<String, dynamic>? studentData,
-      int targetBookId = 1,
+      String targetBookId = '1',
     }) {
       return LoanStatusCalculator.calculate(
         details: details,
@@ -57,11 +57,11 @@ void main() {
 
     test('deve retornar ACTIVE quando aluno tem empréstimo ativo do livro', () {
       final loan = Loan(
-        id: 1,
+        id: '1',
         dataEmprestimo: DateTime.now().subtract(const Duration(days: 5)),
         dataDevolucao: DateTime.now().add(const Duration(days: 10)),
         status: 'ATIVO',
-        livroId: 1,
+        livroId: '1',
         livroTitulo: 'Duna',
       );
       final result = calc(details: availableBook, loans: [loan]);
@@ -71,11 +71,11 @@ void main() {
 
     test('deve retornar OVERDUE quando devolução já passou', () {
       final loan = Loan(
-        id: 1,
+        id: '1',
         dataEmprestimo: DateTime.now().subtract(const Duration(days: 30)),
         dataDevolucao: DateTime.now().subtract(const Duration(days: 1)),
         status: 'ATIVO',
-        livroId: 1,
+        livroId: '1',
         livroTitulo: 'Duna',
       );
       final result = calc(details: availableBook, loans: [loan]);
@@ -86,7 +86,7 @@ void main() {
       final result = calc(
         details: availableBook,
         requests: [
-          {'livroId': 1, 'status': 'PENDENTE'},
+          {'livroId': '1', 'status': 'PENDENTE'},
         ],
       );
       expect(result.status, LoanStatus.pending);
@@ -96,7 +96,7 @@ void main() {
       final result = calc(
         details: availableBook,
         requests: [
-          {'livroId': 99, 'status': 'PENDENTE'},
+          {'livroId': '99', 'status': 'PENDENTE'},
         ],
       );
       expect(result.status, LoanStatus.available);
@@ -106,7 +106,7 @@ void main() {
       final result = calc(
         details: availableBook,
         requests: [
-          {'livroId': 1, 'status': 'REJEITADA'},
+          {'livroId': '1', 'status': 'REJEITADA'},
         ],
       );
       expect(result.status, LoanStatus.available);
@@ -137,11 +137,11 @@ void main() {
       final loans = List.generate(
         3,
         (i) => Loan(
-          id: i,
+          id: '$i',
           dataEmprestimo: DateTime.now(),
           dataDevolucao: DateTime.now().add(const Duration(days: 14)),
           status: 'ATIVO',
-          livroId: 100 + i,
+          livroId: '${100 + i}',
           livroTitulo: 'Livro $i',
         ),
       );
@@ -153,11 +153,11 @@ void main() {
       final loans = List.generate(
         2,
         (i) => Loan(
-          id: i,
+          id: '$i',
           dataEmprestimo: DateTime.now(),
           dataDevolucao: DateTime.now().add(const Duration(days: 14)),
           status: 'ATIVO',
-          livroId: 100 + i,
+          livroId: '${100 + i}',
           livroTitulo: 'Livro $i',
         ),
       );
@@ -173,11 +173,11 @@ void main() {
     group('prioridade das regras', () {
       test('empréstimo ativo deve ter prioridade sobre penalidade', () {
         final loan = Loan(
-          id: 1,
+          id: '1',
           dataEmprestimo: DateTime.now(),
           dataDevolucao: DateTime.now().add(const Duration(days: 10)),
           status: 'ATIVO',
-          livroId: 1,
+          livroId: '1',
           livroTitulo: 'Duna',
         );
         final result = calc(
@@ -192,7 +192,7 @@ void main() {
         final result = calc(
           details: noCopiesBook,
           requests: [
-            {'livroId': 1, 'status': 'PENDENTE'},
+            {'livroId': '1', 'status': 'PENDENTE'},
           ],
         );
         expect(result.status, LoanStatus.pending);
@@ -210,11 +210,11 @@ void main() {
         final loans = List.generate(
           3,
           (i) => Loan(
-            id: i,
+            id: '$i',
             dataEmprestimo: DateTime.now(),
             dataDevolucao: DateTime.now().add(const Duration(days: 14)),
             status: 'ATIVO',
-            livroId: 100 + i,
+            livroId: '${100 + i}',
             livroTitulo: 'Livro $i',
           ),
         );
@@ -233,7 +233,7 @@ void main() {
           details: availableBook,
           loans: [],
           requests: [],
-          targetBookId: 1,
+          targetBookId: '1',
           studentData: null,
         );
         expect(result.status, LoanStatus.available);
@@ -252,11 +252,11 @@ void main() {
       test('dueDate deve ser preenchido em empréstimo ativo', () {
         final dueDate = DateTime.now().add(const Duration(days: 7));
         final loan = Loan(
-          id: 1,
+          id: '1',
           dataEmprestimo: DateTime.now(),
           dataDevolucao: dueDate,
           status: 'ATIVO',
-          livroId: 1,
+          livroId: '1',
           livroTitulo: 'Duna',
         );
         final result = calc(details: availableBook, loans: [loan]);

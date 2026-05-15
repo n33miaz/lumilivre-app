@@ -11,6 +11,7 @@ import 'package:lumilivre/main.dart';
 import 'package:lumilivre/models/user.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/favorites.dart';
+import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
@@ -28,6 +29,7 @@ Widget buildBootstrappedApp() {
       ),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+      ChangeNotifierProvider(create: (context) => LocaleProvider()),
     ],
     child: const LumiLivreApp(),
   );
@@ -57,7 +59,7 @@ void main() {
     tester,
   ) async {
     final user = LoginResponse(
-      id: 7,
+      id: '7',
       token: 'jwt-token',
       email: 'aluno@lumilivre.test',
       role: 'ALUNO',

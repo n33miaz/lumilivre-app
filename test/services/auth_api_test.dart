@@ -4,8 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:lumilivre/services/auth_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   group('AuthApi', () {
     test('login deve enviar credenciais e parsear resposta', () async {
       late http.Request capturedRequest;
@@ -36,8 +43,8 @@ void main() {
         contains('application/json'),
       );
       expect(jsonDecode(capturedRequest.body), {
-        'user': '12345',
-        'senha': '12345',
+        'username': '12345',
+        'password': '12345',
       });
       expect(response.email, 'aluno@lumilivre.test');
       expect(response.role, 'ALUNO');
@@ -76,7 +83,7 @@ void main() {
       final api = AuthApi(
         client: MockClient((request) async {
           capturedRequest = request;
-          return http.Response('', 200);
+          return http.Response('', 204);
         }),
       );
 
@@ -89,12 +96,12 @@ void main() {
 
       expect(changed, isTrue);
       expect(capturedRequest.method, 'PUT');
-      expect(capturedRequest.url.path, endsWith('/usuarios/alterar-senha'));
+      expect(capturedRequest.url.path, endsWith('/api/v2/auth/change-password'));
       expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
       expect(jsonDecode(capturedRequest.body), {
-        'matricula': '12345',
-        'senhaAtual': 'atual',
-        'novaSenha': 'nova',
+        'registrationNumber': '12345',
+        'currentPassword': 'atual',
+        'newPassword': 'nova',
       });
     });
   });

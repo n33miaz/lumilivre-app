@@ -19,7 +19,7 @@ void main() {
 
     test('getCatalogLocal deve parsear cache valido', () async {
       SharedPreferences.setMockInitialValues({
-        'catalog_cache_v1': '''
+        'catalog_cache_v2_pt-BR': '''
           [
             {
               "nome": "Ficcao",
@@ -50,7 +50,7 @@ void main() {
 
     test('getCatalogLocal deve retornar null para cache invalido', () async {
       SharedPreferences.setMockInitialValues({
-        'catalog_cache_v1': '{json invalido',
+        'catalog_cache_v2_pt-BR': '{json invalido',
       });
 
       final catalog = await CatalogApi().getCatalogLocal();

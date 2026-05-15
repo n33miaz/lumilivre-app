@@ -8,12 +8,12 @@ void main() {
     group('fromJson (empréstimo)', () {
       test('deve criar Loan ativo com dados completos', () {
         final loan = Loan.fromJson(LoanFixtures.activeLoan);
-        expect(loan.id, 1);
+        expect(loan.id, '1');
         expect(loan.dataEmprestimo, DateTime(2025, 3, 1));
         expect(loan.dataDevolucao, DateTime(2025, 3, 15));
         expect(loan.status, 'ATIVO');
         expect(loan.penalidade, isNull);
-        expect(loan.livroId, 10);
+        expect(loan.livroId, '10');
         expect(loan.livroTitulo, 'Duna');
         expect(loan.imagemUrl, 'https://example.com/duna.jpg');
         expect(loan.isRequest, isFalse);
@@ -21,7 +21,7 @@ void main() {
 
       test('deve criar Loan atrasado com penalidade', () {
         final loan = Loan.fromJson(LoanFixtures.overdueLoan);
-        expect(loan.id, 2);
+        expect(loan.id, '2');
         expect(loan.status, 'ATRASADO');
         expect(loan.penalidade, contains('Multa'));
         expect(loan.imagemUrl, isNull);
@@ -36,9 +36,9 @@ void main() {
           'livroId': null,
           'livroTitulo': null,
         });
-        expect(loan.id, 0);
+        expect(loan.id, '');
         expect(loan.status, 'DESCONHECIDO');
-        expect(loan.livroId, 0);
+        expect(loan.livroId, '');
         expect(loan.livroTitulo, 'Livro sem título');
         expect(loan.isRequest, isFalse);
       });
@@ -49,22 +49,22 @@ void main() {
           'id': '99',
           'livroId': '42',
         });
-        expect(loan.id, 99);
-        expect(loan.livroId, 42);
+        expect(loan.id, '99');
+        expect(loan.livroId, '42');
       });
 
       test('deve converter id do tipo double', () {
         final loan = Loan.fromJson({...LoanFixtures.activeLoan, 'id': 7.9});
-        expect(loan.id, 7);
+        expect(loan.id, '7.9');
       });
     });
 
     group('fromRequestJson (solicitação)', () {
       test('deve criar Loan de solicitação pendente', () {
         final loan = Loan.fromRequestJson(LoanFixtures.pendingRequest);
-        expect(loan.id, 3);
+        expect(loan.id, '3');
         expect(loan.status, 'PENDENTE');
-        expect(loan.livroId, 30);
+        expect(loan.livroId, '30');
         expect(loan.livroTitulo, 'Livro Solicitado');
         expect(loan.isRequest, isTrue);
         expect(loan.imagemUrl, isNull);
@@ -73,7 +73,7 @@ void main() {
 
       test('deve criar Loan de solicitação rejeitada', () {
         final loan = Loan.fromRequestJson(LoanFixtures.rejectedRequest);
-        expect(loan.id, 4);
+        expect(loan.id, '4');
         expect(loan.status, 'REJEITADA');
         expect(loan.livroTitulo, 'Livro Rejeitado');
         expect(loan.isRequest, isTrue);
@@ -87,9 +87,9 @@ void main() {
           'livroId': null,
           'livroNome': null,
         });
-        expect(loan.id, 0);
+        expect(loan.id, '');
         expect(loan.status, 'PENDENTE');
-        expect(loan.livroId, 0);
+        expect(loan.livroId, '');
         expect(loan.livroTitulo, 'Solicitação');
         expect(loan.isRequest, isTrue);
       });
