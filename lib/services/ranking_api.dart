@@ -20,7 +20,7 @@ class RankingApi {
     if (moduloId != null) query += '&academicModuleId=$moduloId';
     if (turnoId != null) query += '&studyShiftId=$turnoId';
 
-    final url = Uri.parse('$apiBaseUrl/api/v2/students/ranking$query');
+    final url = Uri.parse('$apiBaseUrl/api/students/ranking$query');
 
     try {
       final response = await http
@@ -50,7 +50,7 @@ class RankingApi {
       'generos': 'genres',
     };
     final target = endpointMap[endpoint] ?? endpoint;
-    final url = Uri.parse('$apiBaseUrl/api/v2/$target?size=100');
+    final url = Uri.parse('$apiBaseUrl/api/$target?size=100');
 
     try {
       final response = await http
@@ -73,7 +73,7 @@ class RankingApi {
   }
 
   Future<List<FilterItem>> getCursos(String token) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/courses?size=100');
+    final url = Uri.parse('$apiBaseUrl/api/courses?size=100');
 
     try {
       final response = await http

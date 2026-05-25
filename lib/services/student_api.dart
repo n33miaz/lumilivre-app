@@ -8,7 +8,7 @@ import 'request_context.dart';
 
 class StudentApi {
   Future<String?> getStudentName(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/students/$matricula');
+    final url = Uri.parse('$apiBaseUrl/api/students/$matricula');
 
     try {
       final response = await http
@@ -30,7 +30,7 @@ class StudentApi {
     String matricula,
     String token,
   ) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/students/$matricula');
+    final url = Uri.parse('$apiBaseUrl/api/students/$matricula');
 
     try {
       final response = await http

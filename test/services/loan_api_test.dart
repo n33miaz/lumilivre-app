@@ -29,7 +29,7 @@ void main() {
 
         expect(success, isTrue);
         expect(capturedRequest.method, 'POST');
-        expect(capturedRequest.url.path, endsWith('/api/v2/loan-requests'));
+        expect(capturedRequest.url.path, endsWith('/api/loan-requests'));
         expect(capturedRequest.url.queryParameters, {
           'studentRegistrationNumber': '12345',
           'copyCode': 'T001',

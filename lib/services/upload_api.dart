@@ -12,7 +12,7 @@ class UploadApi {
     String filePath, {
     Uint8List? webBytes,
   }) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/students/$matricula/avatar');
+    final url = Uri.parse('$apiBaseUrl/api/students/$matricula/avatar');
     final request = http.MultipartRequest('POST', url);
     request.headers.addAll(await RequestContext.headers(token: token));
 

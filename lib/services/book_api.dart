@@ -12,7 +12,7 @@ class BookApi {
   final AuthStorage _authStorage = AuthStorage();
 
   Future<BookDetails> getBookDetails(String bookId) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/books/$bookId');
+    final url = Uri.parse('$apiBaseUrl/api/books/$bookId');
     final token = await _authStorage.getToken();
 
     try {

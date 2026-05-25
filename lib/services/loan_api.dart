@@ -13,7 +13,7 @@ class LoanApi {
   final http.Client _client;
 
   Future<List<Loan>> getMyLoans(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/loans/student/$matricula');
+    final url = Uri.parse('$apiBaseUrl/api/loans/student/$matricula');
 
     try {
       final response = await _client
@@ -32,7 +32,7 @@ class LoanApi {
 
   Future<List<Loan>> getMyRequests(String matricula, String token) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/loan-requests/student/$matricula',
+      '$apiBaseUrl/api/loan-requests/student/$matricula',
     );
 
     try {
@@ -55,7 +55,7 @@ class LoanApi {
 
   Future<bool> requestLoan(String matricula, String tombo, String token) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/loan-requests?studentRegistrationNumber=$matricula&copyCode=$tombo',
+      '$apiBaseUrl/api/loan-requests?studentRegistrationNumber=$matricula&copyCode=$tombo',
     );
 
     try {
@@ -75,7 +75,7 @@ class LoanApi {
     String token,
   ) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/loan-requests/by-book?studentRegistrationNumber=$matricula&bookId=$livroId',
+      '$apiBaseUrl/api/loan-requests/by-book?studentRegistrationNumber=$matricula&bookId=$livroId',
     );
 
     try {
@@ -91,7 +91,7 @@ class LoanApi {
 
   Future<List<Loan>> getMyLoansHistory(String matricula, String token) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/loans/student/$matricula/history',
+      '$apiBaseUrl/api/loans/student/$matricula/history',
     );
 
     try {

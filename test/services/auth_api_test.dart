@@ -96,7 +96,7 @@ void main() {
 
       expect(changed, isTrue);
       expect(capturedRequest.method, 'PUT');
-      expect(capturedRequest.url.path, endsWith('/api/v2/auth/change-password'));
+      expect(capturedRequest.url.path, endsWith('/api/auth/change-password'));
       expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
       expect(jsonDecode(capturedRequest.body), {
         'registrationNumber': '12345',

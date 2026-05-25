@@ -30,7 +30,7 @@ class CatalogApi {
   }
 
   Future<Map<String, List<Book>>> fetchAndSaveCatalog() async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/books/catalog');
+    final url = Uri.parse('$apiBaseUrl/api/books/catalog');
     final prefs = await SharedPreferences.getInstance();
     final token = await _authStorage.getToken();
     final locale = await RequestContext.currentLocaleTag();
@@ -61,7 +61,7 @@ class CatalogApi {
 
   Future<List<Book>> searchBooks(String query, {int page = 0}) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/books/public/search?q=${Uri.encodeComponent(query)}&page=$page&size=20',
+      '$apiBaseUrl/api/books/public/search?q=${Uri.encodeComponent(query)}&page=$page&size=20',
     );
     final token = await _authStorage.getToken();
 
@@ -90,7 +90,7 @@ class CatalogApi {
 
   Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/v2/books/genres/${Uri.encodeComponent(genre)}?page=$page&size=10',
+      '$apiBaseUrl/api/books/genres/${Uri.encodeComponent(genre)}?page=$page&size=10',
     );
     final token = await _authStorage.getToken();
 

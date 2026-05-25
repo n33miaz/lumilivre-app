@@ -13,7 +13,7 @@ class AuthApi {
   final http.Client _client;
 
   Future<LoginResponse> login(String user, String password) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/auth/login');
+    final url = Uri.parse('$apiBaseUrl/api/auth/login');
 
     try {
       final response = await _client
@@ -46,7 +46,7 @@ class AuthApi {
     String newPassword,
     String token,
   ) async {
-    final url = Uri.parse('$apiBaseUrl/api/v2/auth/change-password');
+    final url = Uri.parse('$apiBaseUrl/api/auth/change-password');
 
     try {
       final response = await _client
