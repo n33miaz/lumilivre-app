@@ -12,7 +12,7 @@
 
 <div align="center">
 
-![License](https://img.shields.io/badge/license-MIT-purple?style=flat-square)
+![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-762075?style=flat-square)
 ![Flutter](https://img.shields.io/badge/Flutter-3-02569B?style=flat-square&logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?style=flat-square&logo=dart)
 ![Android](https://img.shields.io/badge/Android-ready-3DDC84?style=flat-square&logo=android)
@@ -199,7 +199,7 @@ flutter build ios --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre
   <h1>Licença</h1>
 </div>
 
-Distribuído sob a licença **MIT**. Veja `LICENSE` para mais detalhes.
+**Proprietário — Todos os direitos reservados.** O código-fonte é público apenas para leitura, estudo e avaliação. Qualquer uso, cópia, modificação ou execução em produção requer licença comercial mediante negociação. Veja [`LICENSE`](LICENSE). Interessados: **ncormino@gmail.com**.
 
 <br/>
 
