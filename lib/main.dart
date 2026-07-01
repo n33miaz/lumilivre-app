@@ -8,6 +8,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/providers/locale.dart';
+import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/screens/auth/login.dart';
@@ -34,6 +35,11 @@ void main() {
                 unawaited(authProvider.tryAutoLogin());
                 return authProvider;
               },
+            ),
+            ChangeNotifierProxyProvider<AuthProvider, SettingsProvider>(
+              create: (context) => SettingsProvider(),
+              update: (context, authProvider, settingsProvider) =>
+                  settingsProvider!..syncWithAuth(authProvider),
             ),
             ChangeNotifierProvider(create: (context) => ThemeProvider()),
             ChangeNotifierProvider(create: (context) => FavoritesProvider()),
