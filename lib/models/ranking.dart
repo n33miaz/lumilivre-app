@@ -1,19 +1,19 @@
 class RankingItem {
-  final String matricula;
-  final String nome;
-  final int emprestimosCount;
+  final String registrationNumber;
+  final String fullName;
+  final int loanCount;
 
   RankingItem({
-    required this.matricula,
-    required this.nome,
-    required this.emprestimosCount,
+    required this.registrationNumber,
+    required this.fullName,
+    required this.loanCount,
   });
 
   factory RankingItem.fromJson(Map<String, dynamic> json) {
     return RankingItem(
-      matricula: json['matricula'] ?? json['registrationNumber'] ?? '',
-      nome: json['nome'] ?? json['fullName'] ?? 'Aluno',
-      emprestimosCount: json['emprestimosCount'] ?? 0,
+      registrationNumber: json['registrationNumber'] ?? json['matricula'] ?? '',
+      fullName: json['fullName'] ?? json['nome'] ?? 'Leitor',
+      loanCount: json['loanCount'] ?? json['emprestimosCount'] ?? 0,
     );
   }
 }

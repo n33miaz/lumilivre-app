@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:lumilivre/models/ranking.dart';
@@ -73,7 +73,7 @@ class _PodiumBar extends StatelessWidget {
         const SizedBox(height: 8),
 
         Text(
-          item.nome.split(' ').first,
+          item.fullName.split(' ').first,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           textAlign: TextAlign.center,
           maxLines: 1,
@@ -89,7 +89,7 @@ class _PodiumBar extends StatelessWidget {
             border: Border.all(color: Colors.grey.shade300),
           ),
           child: Text(
-            '${item.emprestimosCount}',
+            '${item.loanCount}',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,

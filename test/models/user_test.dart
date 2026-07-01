@@ -9,9 +9,9 @@ void main() {
       test('deve parsear resposta de login completa', () {
         final user = LoginResponse.fromJson(UserFixtures.validLoginResponse);
         expect(user.id, '1');
-        expect(user.email, 'aluno@escola.com');
-        expect(user.role, 'ALUNO');
-        expect(user.matriculaAluno, '2025001');
+        expect(user.email, 'leitor@escola.com');
+        expect(user.role, 'READER');
+        expect(user.readerRegistrationNumber, '2025001');
         expect(user.token, 'jwt-token-mock-123');
         expect(user.isInitialPassword, isFalse);
       });
@@ -19,7 +19,12 @@ void main() {
       test('deve parsear usuário com senha inicial obrigatória', () {
         final user = LoginResponse.fromJson(UserFixtures.initialPasswordUser);
         expect(user.isInitialPassword, isTrue);
-        expect(user.matriculaAluno, '2025002');
+        expect(user.readerRegistrationNumber, '2025002');
+      });
+
+      test('deve aceitar a chave legada matriculaAluno', () {
+        final user = LoginResponse.fromJson(UserFixtures.legacyLoginResponse);
+        expect(user.readerRegistrationNumber, '2025003');
       });
 
       test('deve usar false como default para isInitialPassword', () {
@@ -29,11 +34,11 @@ void main() {
         expect(user.isInitialPassword, isFalse);
       });
 
-      test('deve aceitar matriculaAluno como null', () {
+      test('deve aceitar readerRegistrationNumber como null', () {
         final json = Map<String, dynamic>.from(UserFixtures.validLoginResponse)
-          ..['matriculaAluno'] = null;
+          ..['readerRegistrationNumber'] = null;
         final user = LoginResponse.fromJson(json);
-        expect(user.matriculaAluno, isNull);
+        expect(user.readerRegistrationNumber, isNull);
       });
     });
 
@@ -42,9 +47,9 @@ void main() {
         final user = LoginResponse.fromJson(UserFixtures.validLoginResponse);
         final json = user.toJson();
         expect(json['id'], '1');
-        expect(json['email'], 'aluno@escola.com');
+        expect(json['email'], 'leitor@escola.com');
         expect(json['token'], 'jwt-token-mock-123');
-        expect(json['isInitialPassword'], isFalse);
+        expect(json['initialPasswordChange'], isFalse);
       });
     });
 
@@ -76,7 +81,7 @@ void main() {
         final jsonStr = jsonEncode(UserFixtures.validLoginResponse);
         final user = loginResponseFromJson(jsonStr);
         expect(user.id, '1');
-        expect(user.email, 'aluno@escola.com');
+        expect(user.email, 'leitor@escola.com');
       });
     });
   });

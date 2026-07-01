@@ -31,7 +31,7 @@ void main() {
         expect(capturedRequest.method, 'POST');
         expect(capturedRequest.url.path, endsWith('/api/loan-requests'));
         expect(capturedRequest.url.queryParameters, {
-          'studentRegistrationNumber': '12345',
+          'readerRegistrationNumber': '12345',
           'copyCode': 'T001',
         });
         expect(capturedRequest.headers['Authorization'], 'Bearer jwt-token');
@@ -56,8 +56,8 @@ void main() {
               jsonEncode([
                 {
                   'id': 7,
-                  'studentName': 'Aluno Teste',
-                  'studentRegistrationNumber': '12345',
+                  'readerName': 'Leitor Teste',
+                  'readerRegistrationNumber': '12345',
                   'copyCode': 'T001',
                   'bookId': 10,
                   'bookTitle': 'Livro Teste',

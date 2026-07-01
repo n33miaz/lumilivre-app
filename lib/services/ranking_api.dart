@@ -20,7 +20,7 @@ class RankingApi {
     if (moduloId != null) query += '&academicModuleId=$moduloId';
     if (turnoId != null) query += '&studyShiftId=$turnoId';
 
-    final url = Uri.parse('$apiBaseUrl/api/students/ranking$query');
+    final url = Uri.parse('$apiBaseUrl/api/readers/ranking$query');
 
     try {
       final response = await http
@@ -28,7 +28,8 @@ class RankingApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+        final data =
+            json.decode(utf8.decode(response.bodyBytes)) as List<dynamic>;
         return data
             .map((e) => RankingItem.fromJson(e as Map<String, dynamic>))
             .toList();
@@ -58,8 +59,9 @@ class RankingApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final page = json.decode(utf8.decode(response.bodyBytes))
-            as Map<String, dynamic>;
+        final page =
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         final data = (page['content'] ?? []) as List<dynamic>;
         return data
             .map((e) => FilterItem.fromJson(e as Map<String, dynamic>))
@@ -81,8 +83,9 @@ class RankingApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes))
-            as Map<String, dynamic>;
+        final data =
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         final content = (data['content'] ?? []) as List<dynamic>;
         return content
             .map((e) => FilterItem.fromJson(e as Map<String, dynamic>))

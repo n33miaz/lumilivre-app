@@ -22,9 +22,9 @@ void main() {
           return http.Response(
             jsonEncode({
               'id': 1,
-              'email': 'aluno@lumilivre.test',
-              'role': 'ALUNO',
-              'matriculaAluno': '12345',
+              'email': 'leitor@lumilivre.test',
+              'role': 'READER',
+              'readerRegistrationNumber': '12345',
               'token': 'jwt-token',
               'isInitialPassword': true,
             }),
@@ -46,9 +46,9 @@ void main() {
         'username': '12345',
         'password': '12345',
       });
-      expect(response.email, 'aluno@lumilivre.test');
-      expect(response.role, 'ALUNO');
-      expect(response.matriculaAluno, '12345');
+      expect(response.email, 'leitor@lumilivre.test');
+      expect(response.role, 'READER');
+      expect(response.readerRegistrationNumber, '12345');
       expect(response.token, 'jwt-token');
       expect(response.isInitialPassword, isTrue);
     });

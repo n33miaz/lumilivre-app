@@ -34,7 +34,7 @@ void main() {
       required BookDetails details,
       List<Loan>? loans,
       List<dynamic>? requests,
-      Map<String, dynamic>? studentData,
+      Map<String, dynamic>? readerData,
       String targetBookId = '1',
     }) {
       return LoanStatusCalculator.calculate(
@@ -42,12 +42,12 @@ void main() {
         loans: loans ?? [],
         requests: requests ?? [],
         targetBookId: targetBookId,
-        studentData: studentData ?? {'penalidade': null},
+        readerData: readerData ?? {'penalidade': null},
       );
     }
 
     test(
-      'deve retornar AVAILABLE quando livro tem exemplares e aluno pode emprestar',
+      'deve retornar AVAILABLE quando livro tem exemplares e leitor pode emprestar',
       () {
         final result = calc(details: availableBook);
         expect(result.status, LoanStatus.available);
@@ -55,19 +55,22 @@ void main() {
       },
     );
 
-    test('deve retornar ACTIVE quando aluno tem empréstimo ativo do livro', () {
-      final loan = Loan(
-        id: '1',
-        dataEmprestimo: DateTime.now().subtract(const Duration(days: 5)),
-        dataDevolucao: DateTime.now().add(const Duration(days: 10)),
-        status: 'ATIVO',
-        livroId: '1',
-        livroTitulo: 'Duna',
-      );
-      final result = calc(details: availableBook, loans: [loan]);
-      expect(result.status, LoanStatus.active);
-      expect(result.dueDate, isNotNull);
-    });
+    test(
+      'deve retornar ACTIVE quando leitor tem empréstimo ativo do livro',
+      () {
+        final loan = Loan(
+          id: '1',
+          dataEmprestimo: DateTime.now().subtract(const Duration(days: 5)),
+          dataDevolucao: DateTime.now().add(const Duration(days: 10)),
+          status: 'ATIVO',
+          livroId: '1',
+          livroTitulo: 'Duna',
+        );
+        final result = calc(details: availableBook, loans: [loan]);
+        expect(result.status, LoanStatus.active);
+        expect(result.dueDate, isNotNull);
+      },
+    );
 
     test('deve retornar OVERDUE quando devolução já passou', () {
       final loan = Loan(
@@ -117,10 +120,10 @@ void main() {
       expect(result.status, LoanStatus.noCopies);
     });
 
-    test('deve retornar BLOCKED_PENALTY quando aluno tem penalidade', () {
+    test('deve retornar BLOCKED_PENALTY quando leitor tem penalidade', () {
       final result = calc(
         details: availableBook,
-        studentData: {'penalidade': 'Multa R\$5,00'},
+        readerData: {'penalidade': 'Multa R\$5,00'},
       );
       expect(result.status, LoanStatus.blockedPenalty);
     });
@@ -128,12 +131,12 @@ void main() {
     test('não deve considerar penalidade "null" (string)', () {
       final result = calc(
         details: availableBook,
-        studentData: {'penalidade': 'null'},
+        readerData: {'penalidade': 'null'},
       );
       expect(result.status, LoanStatus.available);
     });
 
-    test('deve retornar LIMIT_REACHED quando aluno tem 3+ empréstimos', () {
+    test('deve retornar LIMIT_REACHED quando leitor tem 3+ empréstimos', () {
       final loans = List.generate(
         3,
         (i) => Loan(
@@ -183,7 +186,7 @@ void main() {
         final result = calc(
           details: availableBook,
           loans: [loan],
-          studentData: {'penalidade': 'Multa'},
+          readerData: {'penalidade': 'Multa'},
         );
         expect(result.status, LoanStatus.active);
       });
@@ -201,7 +204,7 @@ void main() {
       test('noCopies deve ter prioridade sobre penalidade', () {
         final result = calc(
           details: noCopiesBook,
-          studentData: {'penalidade': 'Multa'},
+          readerData: {'penalidade': 'Multa'},
         );
         expect(result.status, LoanStatus.noCopies);
       });
@@ -221,20 +224,20 @@ void main() {
         final result = calc(
           details: availableBook,
           loans: loans,
-          studentData: {'penalidade': 'Multa'},
+          readerData: {'penalidade': 'Multa'},
         );
         expect(result.status, LoanStatus.blockedPenalty);
       });
     });
 
     group('edge cases', () {
-      test('studentData null não deve crashar', () {
+      test('readerData null não deve crashar', () {
         final result = LoanStatusCalculator.calculate(
           details: availableBook,
           loans: [],
           requests: [],
           targetBookId: '1',
-          studentData: null,
+          readerData: null,
         );
         expect(result.status, LoanStatus.available);
       });

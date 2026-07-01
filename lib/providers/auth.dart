@@ -49,7 +49,7 @@ class AuthProvider with ChangeNotifier {
         id: _user!.id,
         email: _user!.email,
         role: _user!.role,
-        matriculaAluno: _user!.matriculaAluno,
+        readerRegistrationNumber: _user!.readerRegistrationNumber,
         token: _user!.token,
         isInitialPassword: false,
       );

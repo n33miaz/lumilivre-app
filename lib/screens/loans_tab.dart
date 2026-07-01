@@ -43,8 +43,8 @@ class _LoansTabState extends State<LoansTab> {
   void _loadAllLoans() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (authProvider.isAuthenticated &&
-        authProvider.user?.matriculaAluno != null) {
-      final matricula = authProvider.user!.matriculaAluno!;
+        authProvider.user?.readerRegistrationNumber != null) {
+      final matricula = authProvider.user!.readerRegistrationNumber!;
       final token = authProvider.user!.token;
 
       setState(() => _isLoading = true);

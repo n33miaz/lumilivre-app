@@ -61,10 +61,10 @@ void main() {
     final user = LoginResponse(
       id: '7',
       token: 'jwt-token',
-      email: 'aluno@lumilivre.test',
-      role: 'ALUNO',
+      email: 'leitor@lumilivre.test',
+      role: 'READER',
       isInitialPassword: false,
-      matriculaAluno: '2024001',
+      readerRegistrationNumber: '2024001',
     );
 
     FlutterSecureStorage.setMockInitialValues({

@@ -38,7 +38,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
     try {
       await _apiService.changePassword(
-        auth.user!.matriculaAluno ?? '',
+        auth.user!.readerRegistrationNumber ?? '',
         _currentPasswordController.text,
         _newPasswordController.text,
         auth.user!.token,

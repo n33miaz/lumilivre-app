@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/book.dart';
 import '../models/book_details.dart';
+import '../models/library_settings.dart';
 import '../models/loan.dart';
 import '../models/ranking.dart';
 import '../models/user.dart';
@@ -10,16 +11,18 @@ import 'auth_api.dart';
 import 'book_api.dart';
 import 'catalog_api.dart';
 import 'loan_api.dart';
+import 'reader_api.dart';
 import 'ranking_api.dart';
-import 'student_api.dart';
+import 'settings_api.dart';
 import 'upload_api.dart';
 
 export 'auth_api.dart';
 export 'book_api.dart';
 export 'catalog_api.dart';
 export 'loan_api.dart';
+export 'reader_api.dart';
 export 'ranking_api.dart';
-export 'student_api.dart';
+export 'settings_api.dart';
 export 'upload_api.dart';
 
 /// Facade that preserves the original ApiService public interface.
@@ -35,8 +38,9 @@ class ApiService {
   final CatalogApi _catalog = CatalogApi();
   final BookApi _book = BookApi();
   final LoanApi _loan = LoanApi();
-  final StudentApi _student = StudentApi();
+  final ReaderApi _reader = ReaderApi();
   final RankingApi _ranking = RankingApi();
+  final SettingsApi _settings = SettingsApi();
   final UploadApi _upload = UploadApi();
 
   // --- Auth ---
@@ -72,33 +76,42 @@ class ApiService {
 
   // --- Loans ---
 
-  Future<List<Loan>> getMyLoans(String matricula, String token) =>
-      _loan.getMyLoans(matricula, token);
+  Future<List<Loan>> getMyLoans(
+    String readerRegistrationNumber,
+    String token,
+  ) => _loan.getMyLoans(readerRegistrationNumber, token);
 
-  Future<List<Loan>> getMyRequests(String matricula, String token) =>
-      _loan.getMyRequests(matricula, token);
+  Future<List<Loan>> getMyRequests(
+    String readerRegistrationNumber,
+    String token,
+  ) => _loan.getMyRequests(readerRegistrationNumber, token);
 
-  Future<bool> requestLoan(String matricula, String tombo, String token) =>
-      _loan.requestLoan(matricula, tombo, token);
+  Future<bool> requestLoan(
+    String readerRegistrationNumber,
+    String tombo,
+    String token,
+  ) => _loan.requestLoan(readerRegistrationNumber, tombo, token);
 
   Future<bool> requestLoanByBookId(
-    String matricula,
+    String readerRegistrationNumber,
     String livroId,
     String token,
-  ) => _loan.requestLoanByBookId(matricula, livroId, token);
+  ) => _loan.requestLoanByBookId(readerRegistrationNumber, livroId, token);
 
-  Future<List<Loan>> getMyLoansHistory(String matricula, String token) =>
-      _loan.getMyLoansHistory(matricula, token);
-
-  // --- Students ---
-
-  Future<String?> getStudentName(String matricula, String token) =>
-      _student.getStudentName(matricula, token);
-
-  Future<Map<String, dynamic>?> getStudentData(
-    String matricula,
+  Future<List<Loan>> getMyLoansHistory(
+    String readerRegistrationNumber,
     String token,
-  ) => _student.getStudentData(matricula, token);
+  ) => _loan.getMyLoansHistory(readerRegistrationNumber, token);
+
+  // --- Readers ---
+
+  Future<String?> getReaderName(String registrationNumber, String token) =>
+      _reader.getReaderName(registrationNumber, token);
+
+  Future<Map<String, dynamic>?> getReaderData(
+    String registrationNumber,
+    String token,
+  ) => _reader.getReaderData(registrationNumber, token);
 
   // --- Ranking ---
 
@@ -121,15 +134,20 @@ class ApiService {
 
   Future<List<FilterItem>> getCursos(String token) => _ranking.getCursos(token);
 
+  // --- Settings ---
+
+  Future<LibrarySettings> getSettings(String token) =>
+      _settings.getSettings(token);
+
   // --- Upload ---
 
   Future<bool> uploadProfilePicture(
-    String matricula,
+    String readerRegistrationNumber,
     String token,
     String filePath, {
     Uint8List? webBytes,
   }) => _upload.uploadProfilePicture(
-    matricula,
+    readerRegistrationNumber,
     token,
     filePath,
     webBytes: webBytes,

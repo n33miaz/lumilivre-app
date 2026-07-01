@@ -39,7 +39,7 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
 
     try {
       await _apiService.changePassword(
-        auth.user!.matriculaAluno!,
+        auth.user!.readerRegistrationNumber!,
         _currentPasswordController.text,
         _newPasswordController.text,
         auth.user!.token,

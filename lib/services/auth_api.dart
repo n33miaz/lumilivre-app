@@ -29,9 +29,7 @@ class AuthApi {
       }
 
       final errorData = jsonDecode(response.body);
-      throw Exception(
-        errorData['message']?.toString() ?? 'Falha no login',
-      );
+      throw Exception(errorData['message']?.toString() ?? 'Falha no login');
     } catch (e) {
       debugPrint('Erro na chamada de login: $e');
       throw Exception(

@@ -43,7 +43,7 @@ void main() {
         expect(LoanStatus.guest, isNotNull);
       });
 
-      test('blockedPenalty deve existir para alunos com penalidade', () {
+      test('blockedPenalty deve existir para leitores com penalidade', () {
         expect(LoanStatus.blockedPenalty, isNotNull);
       });
 

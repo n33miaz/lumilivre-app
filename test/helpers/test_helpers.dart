@@ -119,33 +119,46 @@ class UserFixtures {
   UserFixtures._();
   static const Map<String, dynamic> validLoginResponse = {
     'id': 1,
-    'email': 'aluno@escola.com',
-    'role': 'ALUNO',
-    'matriculaAluno': '2025001',
+    'email': 'leitor@escola.com',
+    'role': 'READER',
+    'readerRegistrationNumber': '2025001',
     'token': 'jwt-token-mock-123',
     'isInitialPassword': false,
   };
   static const Map<String, dynamic> initialPasswordUser = {
     'id': 2,
     'email': 'novo@escola.com',
-    'role': 'ALUNO',
-    'matriculaAluno': '2025002',
+    'role': 'READER',
+    'readerRegistrationNumber': '2025002',
     'token': 'jwt-token-mock-456',
     'isInitialPassword': true,
+  };
+  static const Map<String, dynamic> legacyLoginResponse = {
+    'id': 3,
+    'email': 'legado@escola.com',
+    'role': 'READER',
+    'matriculaAluno': '2025003',
+    'token': 'jwt-token-mock-789',
+    'isInitialPassword': false,
   };
 }
 
 class RankingFixtures {
   RankingFixtures._();
   static const Map<String, dynamic> validItem = {
+    'registrationNumber': '2025001',
+    'fullName': 'João Silva',
+    'loanCount': 15,
+  };
+  static const Map<String, dynamic> minimalItem = {
+    'registrationNumber': null,
+    'fullName': null,
+    'loanCount': null,
+  };
+  static const Map<String, dynamic> legacyItem = {
     'matricula': '2025001',
     'nome': 'João Silva',
     'emprestimosCount': 15,
-  };
-  static const Map<String, dynamic> minimalItem = {
-    'matricula': null,
-    'nome': null,
-    'emprestimosCount': null,
   };
 }
 

@@ -75,7 +75,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues({
           AuthStorage.authTokenKey: 'jwt-token-mock-123',
           AuthStorage.userDataKey:
-              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":true}',
+              '{"id":1,"email":"leitor@escola.com","role":"READER","readerRegistrationNumber":"2025001","token":"jwt-token-mock-123","isInitialPassword":true}',
         });
         final provider = AuthProvider();
         await provider.tryAutoLogin();
@@ -85,7 +85,7 @@ void main() {
         final storage = AuthStorage();
         final savedUserData = jsonDecode(await storage.getUserData() ?? '{}');
         expect(provider.isInitialPassword, isFalse);
-        expect(savedUserData['isInitialPassword'], isFalse);
+        expect(savedUserData['initialPasswordChange'], isFalse);
       });
     });
 
@@ -94,7 +94,7 @@ void main() {
         FlutterSecureStorage.setMockInitialValues({
           AuthStorage.authTokenKey: 'jwt-token-mock-123',
           AuthStorage.userDataKey:
-              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
+              '{"id":1,"email":"leitor@escola.com","role":"READER","readerRegistrationNumber":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
         });
         authProvider = AuthProvider();
         authProvider.loginAsGuest();
@@ -129,12 +129,12 @@ void main() {
         FlutterSecureStorage.setMockInitialValues({
           AuthStorage.authTokenKey: 'jwt-token-mock-123',
           AuthStorage.userDataKey:
-              '{"id":1,"email":"aluno@escola.com","role":"ALUNO","matriculaAluno":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
+              '{"id":1,"email":"leitor@escola.com","role":"READER","readerRegistrationNumber":"2025001","token":"jwt-token-mock-123","isInitialPassword":false}',
         });
         final provider = AuthProvider();
         await provider.tryAutoLogin();
         expect(provider.isAuthenticated, isTrue);
-        expect(provider.user?.email, 'aluno@escola.com');
+        expect(provider.user?.email, 'leitor@escola.com');
         expect(provider.authAttempted, isTrue);
       });
 

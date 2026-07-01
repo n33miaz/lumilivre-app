@@ -97,21 +97,21 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       }
 
       final user = authProvider.user!;
-      final matricula = user.matriculaAluno!;
+      final registrationNumber = user.readerRegistrationNumber!;
       final token = user.token;
 
       final results = await Future.wait([
-        _apiService.getMyLoans(matricula, token),
-        _apiService.getMyRequests(matricula, token),
-        _apiService.getStudentData(matricula, token),
+        _apiService.getMyLoans(registrationNumber, token),
+        _apiService.getMyRequests(registrationNumber, token),
+        _apiService.getReaderData(registrationNumber, token),
       ]);
 
       final loans = results[0] as List<Loan>;
       final requests = results[1] as List<dynamic>;
-      final studentData = results[2] as Map<String, dynamic>?;
+      final readerData = results[2] as Map<String, dynamic>?;
 
       if (mounted) {
-        _calculateStatus(details, loans, requests, studentData);
+        _calculateStatus(details, loans, requests, readerData);
         setState(() => _hasError = false);
       }
     } catch (e) {
@@ -128,14 +128,14 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     BookDetails details,
     List<Loan> loans,
     List<dynamic> requests,
-    Map<String, dynamic>? studentData,
+    Map<String, dynamic>? readerData,
   ) {
     final result = LoanStatusCalculator.calculate(
       details: details,
       loans: loans,
       requests: requests,
       targetBookId: widget.book.id,
-      studentData: studentData,
+      readerData: readerData,
     );
 
     setState(() {
@@ -150,7 +150,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     setState(() => _status = LoanStatus.loading);
 
     bool success = await _apiService.requestLoanByBookId(
-      auth.user!.matriculaAluno!,
+      auth.user!.readerRegistrationNumber!,
       widget.book.id,
       auth.user!.token,
     );

@@ -10,7 +10,7 @@ class LoanStatusResult {
   const LoanStatusResult({required this.status, this.dueDate});
 }
 
-/// Calcula o status de empréstimo de um livro para um aluno.
+/// Calcula o status de empréstimo de um livro para um leitor.
 ///
 /// Lógica de negócio pura, sem dependência de Flutter/widgets.
 /// Prioridade das regras:
@@ -30,7 +30,7 @@ class LoanStatusCalculator {
     required List<Loan> loans,
     required List<dynamic> requests,
     required String targetBookId,
-    Map<String, dynamic>? studentData,
+    Map<String, dynamic>? readerData,
   }) {
     // Verifica empréstimo ativo para este livro
     final activeLoan = _findActiveLoan(loans, targetBookId);
@@ -52,7 +52,7 @@ class LoanStatusCalculator {
       return const LoanStatusResult(status: LoanStatus.noCopies);
     }
 
-    final penalidade = studentData?['penalidade'];
+    final penalidade = readerData?['penalidade'];
     final hasPenalty = penalidade != null && penalidade != 'null';
     if (hasPenalty) {
       return const LoanStatusResult(status: LoanStatus.blockedPenalty);

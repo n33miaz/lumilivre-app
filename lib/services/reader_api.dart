@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 import 'request_context.dart';
 
-class StudentApi {
-  Future<String?> getStudentName(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/api/students/$matricula');
+class ReaderApi {
+  Future<String?> getReaderName(String registrationNumber, String token) async {
+    final url = Uri.parse('$apiBaseUrl/api/readers/$registrationNumber');
 
     try {
       final response = await http
@@ -17,20 +17,21 @@ class StudentApi {
 
       if (response.statusCode == 200) {
         final jsonResponse =
-            json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         return jsonResponse['fullName']?.toString();
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao buscar nome do aluno: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar nome do leitor: $e');
     }
     return null;
   }
 
-  Future<Map<String, dynamic>?> getStudentData(
-    String matricula,
+  Future<Map<String, dynamic>?> getReaderData(
+    String registrationNumber,
     String token,
   ) async {
-    final url = Uri.parse('$apiBaseUrl/api/students/$matricula');
+    final url = Uri.parse('$apiBaseUrl/api/readers/$registrationNumber');
 
     try {
       final response = await http
@@ -39,7 +40,8 @@ class StudentApi {
 
       if (response.statusCode == 200) {
         final jsonResponse =
-            json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         return {
           ...jsonResponse,
           'nomeCompleto': jsonResponse['fullName'],
@@ -48,7 +50,7 @@ class StudentApi {
         };
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao buscar dados do aluno: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar dados do leitor: $e');
     }
     return null;
   }

@@ -12,8 +12,13 @@ class LoanApi {
 
   final http.Client _client;
 
-  Future<List<Loan>> getMyLoans(String matricula, String token) async {
-    final url = Uri.parse('$apiBaseUrl/api/loans/student/$matricula');
+  Future<List<Loan>> getMyLoans(
+    String readerRegistrationNumber,
+    String token,
+  ) async {
+    final url = Uri.parse(
+      '$apiBaseUrl/api/loans/reader/$readerRegistrationNumber',
+    );
 
     try {
       final response = await _client
@@ -30,9 +35,12 @@ class LoanApi {
     }
   }
 
-  Future<List<Loan>> getMyRequests(String matricula, String token) async {
+  Future<List<Loan>> getMyRequests(
+    String readerRegistrationNumber,
+    String token,
+  ) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/loan-requests/student/$matricula',
+      '$apiBaseUrl/api/loan-requests/reader/$readerRegistrationNumber',
     );
 
     try {
@@ -41,7 +49,8 @@ class LoanApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+        final data =
+            json.decode(utf8.decode(response.bodyBytes)) as List<dynamic>;
         return data
             .map((item) => Loan.fromRequestJson(item as Map<String, dynamic>))
             .toList();
@@ -53,9 +62,13 @@ class LoanApi {
     }
   }
 
-  Future<bool> requestLoan(String matricula, String tombo, String token) async {
+  Future<bool> requestLoan(
+    String readerRegistrationNumber,
+    String tombo,
+    String token,
+  ) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/loan-requests?studentRegistrationNumber=$matricula&copyCode=$tombo',
+      '$apiBaseUrl/api/loan-requests?readerRegistrationNumber=$readerRegistrationNumber&copyCode=$tombo',
     );
 
     try {
@@ -70,12 +83,12 @@ class LoanApi {
   }
 
   Future<bool> requestLoanByBookId(
-    String matricula,
+    String readerRegistrationNumber,
     String livroId,
     String token,
   ) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/loan-requests/by-book?studentRegistrationNumber=$matricula&bookId=$livroId',
+      '$apiBaseUrl/api/loan-requests/by-book?readerRegistrationNumber=$readerRegistrationNumber&bookId=$livroId',
     );
 
     try {
@@ -89,9 +102,12 @@ class LoanApi {
     }
   }
 
-  Future<List<Loan>> getMyLoansHistory(String matricula, String token) async {
+  Future<List<Loan>> getMyLoansHistory(
+    String readerRegistrationNumber,
+    String token,
+  ) async {
     final url = Uri.parse(
-      '$apiBaseUrl/api/loans/student/$matricula/history',
+      '$apiBaseUrl/api/loans/reader/$readerRegistrationNumber/history',
     );
 
     try {

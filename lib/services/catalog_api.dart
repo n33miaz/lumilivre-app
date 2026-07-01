@@ -71,8 +71,9 @@ class CatalogApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final pageData = json.decode(utf8.decode(response.bodyBytes))
-            as Map<String, dynamic>;
+        final pageData =
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         final bookList = pageData['content'] as List<dynamic>;
         return bookList
             .map((bookData) => Book.fromMap(bookData as Map<String, dynamic>))
@@ -100,8 +101,9 @@ class CatalogApi {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final pageData = json.decode(utf8.decode(response.bodyBytes))
-            as Map<String, dynamic>;
+        final pageData =
+            json.decode(utf8.decode(response.bodyBytes))
+                as Map<String, dynamic>;
         final bookList = pageData['content'] as List<dynamic>;
         return bookList
             .map((bookData) => Book.fromMap(bookData as Map<String, dynamic>))

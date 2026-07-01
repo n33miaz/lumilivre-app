@@ -7,12 +7,14 @@ import 'request_context.dart';
 
 class UploadApi {
   Future<bool> uploadProfilePicture(
-    String matricula,
+    String readerRegistrationNumber,
     String token,
     String filePath, {
     Uint8List? webBytes,
   }) async {
-    final url = Uri.parse('$apiBaseUrl/api/students/$matricula/avatar');
+    final url = Uri.parse(
+      '$apiBaseUrl/api/readers/$readerRegistrationNumber/avatar',
+    );
     final request = http.MultipartRequest('POST', url);
     request.headers.addAll(await RequestContext.headers(token: token));
 
