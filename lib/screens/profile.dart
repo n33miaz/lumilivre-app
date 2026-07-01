@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/likes_tab.dart';
 import 'package:lumilivre/screens/loans_tab.dart';
@@ -26,9 +28,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   late TabController _tabController;
   final ApiService _apiService = ApiService();
 
-  String? _studentName;
+  String? _readerName;
   String? _profileImageUrl;
   int _currentIndex = 0;
+  bool _rankingEnabled = true;
 
   int? _myRankPosition;
 
@@ -38,43 +41,94 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-
-    _tabController.addListener(() {
-      if (mounted) {
-        setState(() => _currentIndex = _tabController.index);
-      }
-    });
-
+    _initTabController(length: 3);
     _loadHeaderData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final rankingEnabled = Provider.of<SettingsProvider>(context).showRanking;
+
+    if (_rankingEnabled == rankingEnabled) {
+      return;
+    }
+
+    final newLength = rankingEnabled ? 3 : 2;
+    final newIndex = _currentIndex >= newLength ? newLength - 1 : _currentIndex;
+
+    _tabController.removeListener(_handleTabChange);
+    _tabController.dispose();
+    _rankingEnabled = rankingEnabled;
+    _currentIndex = newIndex;
+    _initTabController(length: newLength, initialIndex: newIndex);
+
+    if (!rankingEnabled) {
+      _myRankPosition = null;
+    } else {
+      _loadRankFromAuth();
+    }
+  }
+
+  void _initTabController({required int length, int initialIndex = 0}) {
+    _tabController = TabController(
+      length: length,
+      vsync: this,
+      initialIndex: initialIndex,
+    );
+    _tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (mounted) {
+      setState(() => _currentIndex = _tabController.index);
+    }
   }
 
   void _loadHeaderData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!authProvider.isAuthenticated ||
-        authProvider.user?.matriculaAluno == null) {
+        authProvider.user?.readerRegistrationNumber == null) {
       return;
     }
 
-    final matricula = authProvider.user!.matriculaAluno!;
+    final registrationNumber = authProvider.user!.readerRegistrationNumber!;
     final token = authProvider.user!.token;
 
-    final data = await _apiService.getStudentData(matricula, token);
+    final data = await _apiService.getReaderData(registrationNumber, token);
 
     if (mounted && data != null) {
       setState(() {
-        _studentName = data['nomeCompleto'];
+        _readerName = data['nomeCompleto'];
         _profileImageUrl = data['foto'];
       });
     }
 
-    _fetchMyRank(matricula, token);
+    if (!mounted) return;
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    if (settings.showRanking) {
+      _fetchMyRank(registrationNumber, token);
+    }
   }
 
-  Future<void> _fetchMyRank(String matricula, String token) async {
+  void _loadRankFromAuth() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final registrationNumber = authProvider.user?.readerRegistrationNumber;
+
+    if (!authProvider.isAuthenticated || registrationNumber == null) {
+      return;
+    }
+
+    _fetchMyRank(registrationNumber, authProvider.user!.token);
+  }
+
+  Future<void> _fetchMyRank(String registrationNumber, String token) async {
     try {
       final ranking = await _apiService.getRanking(token: token, top: 100);
-      final index = ranking.indexWhere((r) => r.matricula == matricula);
+      final index = ranking.indexWhere(
+        (r) => r.registrationNumber == registrationNumber,
+      );
 
       if (mounted) {
         setState(() {
@@ -105,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       }
 
       final success = await _apiService.uploadProfilePicture(
-        auth.user!.matriculaAluno!,
+        auth.user!.readerRegistrationNumber!,
         auth.user!.token,
         image.path,
         webBytes: bytes,
@@ -128,6 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
@@ -180,21 +235,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
             ),
-            Tab(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SvgPicture.asset(
-                  _currentIndex == 2
-                      ? 'assets/icons/ranking-active.svg'
-                      : 'assets/icons/ranking.svg',
-                  height: 28,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
+            if (_rankingEnabled)
+              Tab(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SvgPicture.asset(
+                    _currentIndex == 2
+                        ? 'assets/icons/ranking-active.svg'
+                        : 'assets/icons/ranking.svg',
+                    height: 28,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -205,7 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               children: [
                 const LoansTab(),
                 const LikesTab(),
-                const RankingScreen(),
+                if (_rankingEnabled) const RankingScreen(),
               ],
             ),
     );
@@ -243,7 +299,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   static const Map<int, String> _guestTabSubtitles = {
     0: 'Acompanhe seus empréstimos ativos e histórico.',
     1: 'Salve seus livros favoritos para acompanhar depois.',
-    2: 'Compete com outros alunos no ranking de leituras.',
+    2: 'Compare suas leituras no ranking de leitores.',
   };
 
   Widget _buildProfileHeader(AuthProvider authProvider, ThemeData theme) {
@@ -254,9 +310,15 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
 
     String displayName =
-        _studentName ?? authProvider.user?.email.split('@')[0] ?? 'Aluno';
-    String matricula = authProvider.user?.matriculaAluno ?? '---';
+        _readerName ??
+        authProvider.user?.email.split('@')[0] ??
+        AppLocalizations.of(context)!.readerTerm;
+    String registrationNumber =
+        authProvider.user?.readerRegistrationNumber ?? '---';
     String rankingText = _myRankPosition != null ? '#$_myRankPosition' : '--';
+    final subtitle = _rankingEnabled
+        ? '$registrationNumber - Ranking: $rankingText'
+        : registrationNumber;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -320,7 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                '$matricula - Ranking: $rankingText',
+                subtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white70,
                 ),

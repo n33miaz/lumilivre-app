@@ -65,4 +65,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginAction => 'Sign in';
+
+  @override
+  String get readerTerm => 'Reader';
+
+  @override
+  String get filterRanking => 'Filter Ranking';
+
+  @override
+  String get courseLabel => 'Course';
+
+  @override
+  String get moduleLabel => 'Module';
+
+  @override
+  String get shiftLabel => 'Shift';
+
+  @override
+  String get applyFilters => 'APPLY FILTERS';
+
+  @override
+  String get clearFilters => 'Clear Filters';
+
+  @override
+  String get emptyRankingMessage => 'No readers found.';
+
+  @override
+  String get rankingLoginPrompt => 'Sign in to see the ranking.';
+
+  @override
+  String get rankingUnavailable => 'Ranking is not available for this library.';
 }

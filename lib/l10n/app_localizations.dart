@@ -211,6 +211,66 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Entrar'**
   String get loginAction;
+
+  /// No description provided for @readerTerm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Leitor'**
+  String get readerTerm;
+
+  /// No description provided for @filterRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtrar Ranking'**
+  String get filterRanking;
+
+  /// No description provided for @courseLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Curso'**
+  String get courseLabel;
+
+  /// No description provided for @moduleLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Módulo'**
+  String get moduleLabel;
+
+  /// No description provided for @shiftLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Turno'**
+  String get shiftLabel;
+
+  /// No description provided for @applyFilters.
+  ///
+  /// In pt, this message translates to:
+  /// **'APLICAR FILTROS'**
+  String get applyFilters;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar Filtros'**
+  String get clearFilters;
+
+  /// No description provided for @emptyRankingMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum leitor encontrado.'**
+  String get emptyRankingMessage;
+
+  /// No description provided for @rankingLoginPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para ver o ranking.'**
+  String get rankingLoginPrompt;
+
+  /// No description provided for @rankingUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking indisponível para esta biblioteca.'**
+  String get rankingUnavailable;
 }
 
 class _AppLocalizationsDelegate

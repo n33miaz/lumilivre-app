@@ -18,5 +18,15 @@
   "changePassword": "Mudar senha",
   "logout": "Sair da conta",
   "guestSettingsPrompt": "Faça login para acessar todas as configurações",
-  "loginAction": "Entrar"
+  "loginAction": "Entrar",
+  "readerTerm": "Leitor",
+  "filterRanking": "Filtrar Ranking",
+  "courseLabel": "Curso",
+  "moduleLabel": "Módulo",
+  "shiftLabel": "Turno",
+  "applyFilters": "APLICAR FILTROS",
+  "clearFilters": "Limpar Filtros",
+  "emptyRankingMessage": "Nenhum leitor encontrado.",
+  "rankingLoginPrompt": "Faça login para ver o ranking.",
+  "rankingUnavailable": "Ranking indisponível para esta biblioteca."
 }

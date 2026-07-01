@@ -66,4 +66,34 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get loginAction => 'Entrar';
+
+  @override
+  String get readerTerm => 'Leitor';
+
+  @override
+  String get filterRanking => 'Filtrar Ranking';
+
+  @override
+  String get courseLabel => 'Curso';
+
+  @override
+  String get moduleLabel => 'Módulo';
+
+  @override
+  String get shiftLabel => 'Turno';
+
+  @override
+  String get applyFilters => 'APLICAR FILTROS';
+
+  @override
+  String get clearFilters => 'Limpar Filtros';
+
+  @override
+  String get emptyRankingMessage => 'Nenhum leitor encontrado.';
+
+  @override
+  String get rankingLoginPrompt => 'Faça login para ver o ranking.';
+
+  @override
+  String get rankingUnavailable => 'Ranking indisponível para esta biblioteca.';
 }

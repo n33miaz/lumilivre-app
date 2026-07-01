@@ -18,5 +18,15 @@
   "changePassword": "Change password",
   "logout": "Sign out",
   "guestSettingsPrompt": "Sign in to access all settings",
-  "loginAction": "Sign in"
+  "loginAction": "Sign in",
+  "readerTerm": "Reader",
+  "filterRanking": "Filter Ranking",
+  "courseLabel": "Course",
+  "moduleLabel": "Module",
+  "shiftLabel": "Shift",
+  "applyFilters": "APPLY FILTERS",
+  "clearFilters": "Clear Filters",
+  "emptyRankingMessage": "No readers found.",
+  "rankingLoginPrompt": "Sign in to see the ranking.",
+  "rankingUnavailable": "Ranking is not available for this library."
 }

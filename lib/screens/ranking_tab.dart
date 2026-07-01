@@ -1,8 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/ranking.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/ranking_podium.dart';
@@ -18,6 +20,9 @@ class _RankingScreenState extends State<RankingScreen> {
   final ApiService _apiService = ApiService();
 
   bool _isLoading = true;
+  bool _hasLoaded = false;
+  bool _rankingEnabled = true;
+  bool _academicFiltersEnabled = true;
   List<RankingItem> _ranking = [];
 
   // Filtros
@@ -32,19 +37,64 @@ class _RankingScreenState extends State<RankingScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final settings = Provider.of<SettingsProvider>(context);
+    final rankingEnabled = settings.showRanking;
+    final academicFiltersEnabled = settings.showAcademicFields;
+
+    if (_hasLoaded &&
+        _rankingEnabled == rankingEnabled &&
+        _academicFiltersEnabled == academicFiltersEnabled) {
+      return;
+    }
+
+    _hasLoaded = true;
+    _rankingEnabled = rankingEnabled;
+    _academicFiltersEnabled = academicFiltersEnabled;
+
+    if (!_academicFiltersEnabled) {
+      _cursos = [];
+      _modulos = [];
+      _turnos = [];
+      _selectedCursoId = null;
+      _selectedModuloId = null;
+      _selectedTurnoId = null;
+    }
+
     _loadInitialData();
   }
 
   Future<void> _loadInitialData() async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    if (!auth.isAuthenticated) {
-      setState(() => _isLoading = false);
+    if (!auth.isAuthenticated || !_rankingEnabled) {
+      if (mounted) {
+        setState(() {
+          _ranking = [];
+          _isLoading = false;
+        });
+      }
       return;
     }
 
     final token = auth.user!.token;
 
-    // Carrega filtros e dados em paralelo
+    if (mounted) {
+      setState(() => _isLoading = true);
+    }
+
+    if (!_academicFiltersEnabled) {
+      await _fetchRankingData(token);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+      return;
+    }
+
     final results = await Future.wait([
       _apiService.getCursos(token),
       _apiService.getSimpleList('modulos', token),
@@ -65,9 +115,9 @@ class _RankingScreenState extends State<RankingScreen> {
   Future<List<RankingItem>> _fetchRankingData(String token) async {
     final data = await _apiService.getRanking(
       token: token,
-      cursoId: _selectedCursoId,
-      moduloId: _selectedModuloId,
-      turnoId: _selectedTurnoId,
+      cursoId: _academicFiltersEnabled ? _selectedCursoId : null,
+      moduloId: _academicFiltersEnabled ? _selectedModuloId : null,
+      turnoId: _academicFiltersEnabled ? _selectedTurnoId : null,
       top: 50,
     );
     _ranking = data;
@@ -75,13 +125,22 @@ class _RankingScreenState extends State<RankingScreen> {
   }
 
   Future<void> _applyFilters() async {
+    if (!_rankingEnabled) return;
     setState(() => _isLoading = true);
     final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (!auth.isAuthenticated) {
+      setState(() => _isLoading = false);
+      return;
+    }
     await _fetchRankingData(auth.user!.token);
     setState(() => _isLoading = false);
   }
 
   void _showFilterModal() {
+    if (!_academicFiltersEnabled) return;
+
+    final l10n = AppLocalizations.of(context)!;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -96,21 +155,30 @@ class _RankingScreenState extends State<RankingScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Filtrar Ranking',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.filterRanking,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
 
-                _buildDropdown('Curso', _cursos, _selectedCursoId, (val) {
+                _buildDropdown(l10n.courseLabel, _cursos, _selectedCursoId, (
+                  val,
+                ) {
                   setModalState(() => _selectedCursoId = val);
                 }),
                 const SizedBox(height: 16),
-                _buildDropdown('Módulo', _modulos, _selectedModuloId, (val) {
+                _buildDropdown(l10n.moduleLabel, _modulos, _selectedModuloId, (
+                  val,
+                ) {
                   setModalState(() => _selectedModuloId = val);
                 }),
                 const SizedBox(height: 16),
-                _buildDropdown('Turno', _turnos, _selectedTurnoId, (val) {
+                _buildDropdown(l10n.shiftLabel, _turnos, _selectedTurnoId, (
+                  val,
+                ) {
                   setModalState(() => _selectedTurnoId = val);
                 }),
 
@@ -122,7 +190,7 @@ class _RankingScreenState extends State<RankingScreen> {
                       Navigator.pop(context);
                       _applyFilters();
                     },
-                    child: const Text('APLICAR FILTROS'),
+                    child: Text(l10n.applyFilters),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -135,9 +203,9 @@ class _RankingScreenState extends State<RankingScreen> {
                         _selectedTurnoId = null;
                       });
                     },
-                    child: const Text(
-                      'Limpar Filtros',
-                      style: TextStyle(color: Colors.grey),
+                    child: Text(
+                      l10n.clearFilters,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ),
                 ),
@@ -180,9 +248,14 @@ class _RankingScreenState extends State<RankingScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (!auth.isAuthenticated) {
-      return const Center(child: Text('Faça login para ver o ranking.'));
+      return Center(child: Text(l10n.rankingLoginPrompt));
+    }
+
+    if (!_rankingEnabled) {
+      return Center(child: Text(l10n.rankingUnavailable));
     }
 
     if (_isLoading) {
@@ -192,17 +265,21 @@ class _RankingScreenState extends State<RankingScreen> {
     final top3 = _ranking.take(3).toList();
     final restList = _ranking.skip(3).toList();
 
-    final myMatricula = auth.user?.matriculaAluno;
-    int myRankIndex = _ranking.indexWhere((r) => r.matricula == myMatricula);
+    final myRegistrationNumber = auth.user?.readerRegistrationNumber;
+    int myRankIndex = _ranking.indexWhere(
+      (r) => r.registrationNumber == myRegistrationNumber,
+    );
     RankingItem? myRankItem = myRankIndex != -1 ? _ranking[myRankIndex] : null;
     bool amIInTop3 = myRankIndex != -1 && myRankIndex < 3;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showFilterModal,
-        backgroundColor: LumiLivreTheme.label,
-        child: const Icon(Icons.filter_list, color: Colors.white),
-      ),
+      floatingActionButton: _academicFiltersEnabled
+          ? FloatingActionButton(
+              onPressed: _showFilterModal,
+              backgroundColor: LumiLivreTheme.label,
+              child: const Icon(Icons.filter_list, color: Colors.white),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: _applyFilters,
         child: CustomScrollView(
@@ -212,9 +289,9 @@ class _RankingScreenState extends State<RankingScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 20, bottom: 10),
                 child: _ranking.isEmpty
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 200,
-                        child: Center(child: Text("Nenhum aluno encontrado.")),
+                        child: Center(child: Text(l10n.emptyRankingMessage)),
                       )
                     : RankingPodium(topThree: top3),
               ),
@@ -225,7 +302,7 @@ class _RankingScreenState extends State<RankingScreen> {
               delegate: SliverChildBuilderDelegate((context, index) {
                 final item = restList[index];
                 final position = index + 4;
-                final isMe = item.matricula == myMatricula;
+                final isMe = item.registrationNumber == myRegistrationNumber;
 
                 return _RankingCard(item: item, position: position, isMe: isMe);
               }, childCount: restList.length),
@@ -318,7 +395,7 @@ class _RankingCard extends StatelessWidget {
             // Nome
             Expanded(
               child: Text(
-                item.nome,
+                item.fullName,
                 style: TextStyle(
                   fontWeight: isMe ? FontWeight.bold : FontWeight.normal,
                   fontSize: 16,
@@ -336,7 +413,7 @@ class _RankingCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '${item.emprestimosCount}',
+                '${item.loanCount}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
