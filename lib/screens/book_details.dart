@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -288,14 +289,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Image.network(
-                (details.imagem != null && details.imagem!.isNotEmpty)
+              child: CachedNetworkImage(
+                imageUrl: (details.imagem != null && details.imagem!.isNotEmpty)
                     ? details.imagem!
                     : widget.book.imageUrl,
                 fit: BoxFit.cover,
                 width: 120,
                 height: 180,
-                errorBuilder: (context, error, stackTrace) {
+                memCacheWidth: 360,
+                placeholder: (context, url) => Container(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  child: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                errorWidget: (context, url, error) {
                   return Container(
                     color: Colors.grey[300],
                     child: const Column(
