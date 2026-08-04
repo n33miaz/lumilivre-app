@@ -11,6 +11,8 @@ class RequestContext {
   static Future<Map<String, String>> headers({String? token}) async {
     final headers = <String, String>{
       'Accept-Language': await currentLocaleTag(),
+      // Identifica o canal para a auditoria de acessos da API (WS-07).
+      'X-Client': 'APP',
     };
     if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
