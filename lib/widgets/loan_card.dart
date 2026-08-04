@@ -101,21 +101,7 @@ class LoanCard extends StatelessWidget {
               topLeft: Radius.circular(16),
               bottomLeft: Radius.circular(16),
             ),
-            child: Image.network(
-              loan.imagemUrl ??
-                  'https://via.placeholder.com/100x150.png?text=Lumi',
-              width: 90,
-              height: 130,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 90,
-                  height: 130,
-                  color: Colors.grey.shade300,
-                  child: const Icon(Icons.book, color: Colors.grey),
-                );
-              },
-            ),
+            child: _buildCover(loan.imagemUrl),
           ),
 
           // --- INFORMAÇÕES ---
@@ -186,6 +172,32 @@ class LoanCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Capa do exemplar. Sem URL (ou se o download falhar) cai na capa padrao
+  /// local — o placeholder remoto que existia aqui saiu do ar.
+  Widget _buildCover(String? imageUrl) {
+    const width = 90.0;
+    const height = 130.0;
+
+    Widget fallback() => Image.asset(
+      'assets/images/capa-padrao.png',
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+    );
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return fallback();
+    }
+
+    return Image.network(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => fallback(),
     );
   }
 }
