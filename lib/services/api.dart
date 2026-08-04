@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/app_content.dart';
 import '../models/book.dart';
 import '../models/book_details.dart';
 import '../models/library_settings.dart';
@@ -10,6 +11,7 @@ import '../models/user.dart';
 import 'auth_api.dart';
 import 'book_api.dart';
 import 'catalog_api.dart';
+import 'content_api.dart';
 import 'loan_api.dart';
 import 'reader_api.dart';
 import 'ranking_api.dart';
@@ -19,6 +21,7 @@ import 'upload_api.dart';
 export 'auth_api.dart';
 export 'book_api.dart';
 export 'catalog_api.dart';
+export 'content_api.dart';
 export 'loan_api.dart';
 export 'reader_api.dart';
 export 'ranking_api.dart';
@@ -36,6 +39,7 @@ class ApiService {
 
   final AuthApi _auth = AuthApi();
   final CatalogApi _catalog = CatalogApi();
+  final ContentApi _content = ContentApi();
   final BookApi _book = BookApi();
   final LoanApi _loan = LoanApi();
   final ReaderApi _reader = ReaderApi();
@@ -68,6 +72,15 @@ class ApiService {
 
   Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) =>
       _catalog.getBooksByGenre(genre, page: page);
+
+  // --- Contents (Mural) ---
+
+  Future<List<AppContent>> getContentFeedLocal() => _content.getFeedLocal();
+
+  Future<List<AppContent>> fetchAndSaveContentFeed({required String token}) =>
+      _content.fetchAndSaveFeed(token: token);
+
+  Future<void> clearContentFeedCache() => _content.clearFeedCache();
 
   // --- Books ---
 

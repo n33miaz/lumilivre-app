@@ -10,7 +10,7 @@ class LibrarySettings {
       features: SettingsFeatures(
         academicFields: true,
         ranking: true,
-        thesis: true,
+        contents: true,
       ),
     );
   }
@@ -43,19 +43,19 @@ enum LibraryType {
 class SettingsFeatures {
   final bool academicFields;
   final bool ranking;
-  final bool thesis;
+  final bool contents;
 
   const SettingsFeatures({
     required this.academicFields,
     required this.ranking,
-    required this.thesis,
+    required this.contents,
   });
 
   factory SettingsFeatures.fromJson(Map<String, dynamic> json) {
     return SettingsFeatures(
       academicFields: json['academicFields'] != false,
       ranking: json['ranking'] != false,
-      thesis: json['thesis'] != false,
+      contents: json['contents'] != false,
     );
   }
 }

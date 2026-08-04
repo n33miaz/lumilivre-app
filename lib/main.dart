@@ -9,6 +9,7 @@ import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/settings.dart';
+import 'package:lumilivre/providers/content_provider.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/screens/auth/login.dart';
@@ -44,6 +45,13 @@ void main() {
             ChangeNotifierProvider(create: (context) => ThemeProvider()),
             ChangeNotifierProvider(create: (context) => FavoritesProvider()),
             ChangeNotifierProvider(create: (context) => LocaleProvider()),
+            // Proxy: o mural é segmentado por público — limpa memória e cache
+            // local no logout/troca de usuário (ver ContentProvider.syncWithAuth).
+            ChangeNotifierProxyProvider<AuthProvider, ContentProvider>(
+              create: (context) => ContentProvider(),
+              update: (context, authProvider, contentProvider) =>
+                  contentProvider!..syncWithAuth(authProvider),
+            ),
           ],
           child: const LumiLivreApp(),
         ),

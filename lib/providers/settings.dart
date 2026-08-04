@@ -24,7 +24,7 @@ class SettingsProvider with ChangeNotifier {
   bool get isStandard => _settings.isStandard;
   bool get showAcademicFields => _settings.features.academicFields;
   bool get showRanking => _settings.features.ranking;
-  bool get showThesis => _settings.features.thesis;
+  bool get showContents => _settings.features.contents;
 
   void syncWithAuth(AuthProvider auth) {
     final token = auth.user?.token;

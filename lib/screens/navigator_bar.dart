@@ -3,13 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/header.dart';
 import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
 import 'package:lumilivre/widgets/offline_banner.dart';
 
 import 'catalog.dart';
+import 'contents.dart';
 import 'search.dart';
 import 'profile.dart';
 
@@ -23,12 +26,6 @@ class MainNavigator extends StatefulWidget {
 class _MainNavigatorState extends State<MainNavigator> {
   int _selectedIndex = 1;
   late PageController _pageController;
-
-  final List<Widget> _screens = [
-    const SearchScreen(),
-    const CatalogScreen(),
-    const ProfileScreen(),
-  ];
 
   @override
   void initState() {
@@ -95,9 +92,19 @@ class _MainNavigatorState extends State<MainNavigator> {
     );
   }
 
+  Widget _buildMuralIcon(int index) {
+    final isActive = _selectedIndex == index;
+    return Icon(
+      isActive ? Icons.campaign : Icons.campaign_outlined,
+      size: 24,
+      color: isActive ? Colors.white : Colors.grey.shade400,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
+    final showContents = Provider.of<SettingsProvider>(context).showContents;
 
     if (auth.isInitialPassword) {
       return Scaffold(
@@ -124,6 +131,38 @@ class _MainNavigatorState extends State<MainNavigator> {
     String headerTitle = 'LumiLivre';
     bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
 
+    // A aba "Mural" (índice 2) só existe quando a feature de conteúdos está
+    // habilitada. O landing padrão continua sendo o Catálogo (índice 1) em
+    // ambos os cenários.
+    final profileIndex = showContents ? 3 : 2;
+
+    final screens = <Widget>[
+      const SearchScreen(),
+      const CatalogScreen(),
+      if (showContents) const ContentsScreen(),
+      const ProfileScreen(),
+    ];
+
+    final navItems = <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: _buildIcon('search-category', 0),
+        label: 'Categorias',
+      ),
+      BottomNavigationBarItem(
+        icon: _buildIcon('logo', 1, isLogo: true),
+        label: 'Catálogo',
+      ),
+      if (showContents)
+        BottomNavigationBarItem(
+          icon: _buildMuralIcon(2),
+          label: AppLocalizations.of(context)!.muralTitle,
+        ),
+      BottomNavigationBarItem(
+        icon: _buildIcon('profile', profileIndex),
+        label: 'Perfil',
+      ),
+    ];
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         systemNavigationBarColor: LumiLivreTheme.primary,
@@ -147,7 +186,7 @@ class _MainNavigatorState extends State<MainNavigator> {
                       _selectedIndex = index;
                     });
                   },
-                  children: _screens,
+                  children: screens,
                 ),
 
                 AnimatedPositioned(
@@ -162,21 +201,8 @@ class _MainNavigatorState extends State<MainNavigator> {
             ),
 
             bottomNavigationBar: BottomNavigationBar(
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: _buildIcon('search-category', 0),
-                  label: 'Categorias',
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon('logo', 1, isLogo: true),
-                  label: 'Catálogo',
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon('profile', 2),
-                  label: 'Perfil',
-                ),
-              ],
-              currentIndex: _selectedIndex,
+              items: navItems,
+              currentIndex: _selectedIndex.clamp(0, screens.length - 1),
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.grey.shade400,
               onTap: _onItemTapped,
