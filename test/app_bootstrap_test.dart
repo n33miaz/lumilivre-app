@@ -22,7 +22,7 @@ import 'package:lumilivre/screens/navigator_bar.dart';
 import 'package:lumilivre/services/auth_storage.dart';
 
 Widget buildBootstrappedApp() {
-  // Espelha a árvore de providers de main.dart (incl. gate WS-08).
+  // Espelha a árvore de providers de main.dart (incluindo o gate de versão).
   return MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -64,7 +64,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     FlutterSecureStorage.setMockInitialValues({});
     // Sem o mock, PackageInfo.fromPlatform() nunca completa e o gate de
-    // versão (WS-08) seguraria o app no splash para sempre no teste.
+    // versão seguraria o app no splash para sempre no teste.
     PackageInfo.setMockInitialValues(
       appName: 'LumiLivre',
       packageName: 'br.com.lumilivre',
@@ -81,7 +81,7 @@ void main() {
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    // Auto-login + fail-open do gate de versão (WS-08): avança o relógio
+    // Auto-login + fail-open do gate de versão: avança o relógio
     // fake além do timeout de 5s da consulta de versão.
     await tester.pump(const Duration(seconds: 6));
     await tester.pump();

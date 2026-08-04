@@ -206,7 +206,7 @@ Future<void> _openUrl(
 ) async {
   final messenger = ScaffoldMessenger.of(context);
   final uri = Uri.tryParse(url);
-  // NEW-02: só abre http/https. URLs vêm de conteúdo autorado por admin/biblio;
+  // Só abre http/https. URLs vêm de conteúdo autorado por admin/biblio;
   // esquemas como intent://, tel:, market: ou custom são bloqueados.
   final allowed = uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
   var opened = false;

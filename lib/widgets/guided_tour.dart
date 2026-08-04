@@ -6,7 +6,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
 
-/// Exibe o tour guiado de boas-vindas (WS-10).
+/// Exibe o tour guiado de boas-vindas.
 ///
 /// Retorna quando o usuário conclui ou pula. Em ambos os casos o tour é
 /// marcado como concluído (backend + sessão local) para nunca reaparecer.

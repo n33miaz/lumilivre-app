@@ -1,6 +1,6 @@
 import '../utils/parsers.dart';
 
-/// Informações de versão do app devolvidas por `GET /api/app-version` (WS-08).
+/// Informações de versão do app devolvidas por `GET /api/app-version`.
 ///
 /// Endpoint público (sem autenticação) usado para o gate de atualização
 /// obrigatória. Os builds ([latestBuild] / [minSupportedBuild]) são comparados

@@ -6,7 +6,7 @@ import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/app_version_info.dart';
 import 'package:lumilivre/utils/constants.dart';
 
-/// Tela de bloqueio (WS-08) exibida quando a versão instalada não é mais
+/// Tela de bloqueio exibida quando a versão instalada não é mais
 /// suportada. Não é dispensável: precede a autenticação e o usuário só sai
 /// dela atualizando o app.
 class ForceUpdateScreen extends StatelessWidget {
@@ -17,7 +17,7 @@ class ForceUpdateScreen extends StatelessWidget {
   Future<void> _launchStore(BuildContext context, String url) async {
     final messenger = ScaffoldMessenger.of(context);
     final errorText = AppLocalizations.of(context)!.forceUpdateStoreError;
-    // NEW-02: só abre http/https (storeUrl vem da config de versão no banco).
+    // Só abre http/https (storeUrl vem da config de versão no banco).
     final uri = Uri.tryParse(url);
     var opened = false;
     if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {

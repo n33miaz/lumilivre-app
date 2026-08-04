@@ -55,7 +55,7 @@ class _MainNavigatorState extends State<MainNavigator> {
   }
 
   /// Encadeia os passos de onboarding pós-login: primeiro a troca de senha
-  /// obrigatória (WS-10) e, só depois de concluída, o tour guiado (WS-10).
+  /// obrigatória e, só depois de concluída, o tour guiado.
   Future<void> _runOnboardingFlow() async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
 

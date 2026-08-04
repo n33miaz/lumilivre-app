@@ -98,7 +98,7 @@ class LumiLivreApp extends StatelessWidget {
                 darkTheme: LumiLivreTheme.darkTheme,
                 themeMode: themeProvider.currentTheme,
 
-                // O gate de versão (WS-08) precede a autenticação: enquanto a
+                // O gate de versão precede a autenticação: enquanto a
                 // checagem ou o auto-login não terminam, mostramos o loader; se
                 // bloqueado, a tela de atualização impede o acesso.
                 home: (!auth.authAttempted || !appUpdate.checked)

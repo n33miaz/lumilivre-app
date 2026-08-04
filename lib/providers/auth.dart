@@ -66,7 +66,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Marca o tour guiado como concluído localmente e regrava a sessão (WS-10).
+  /// Marca o tour guiado como concluído localmente e regrava a sessão.
   Future<void> completeTour() async {
     _guidedTourCompleted = true;
     if (_user != null) {

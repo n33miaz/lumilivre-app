@@ -71,7 +71,7 @@ class AuthApi {
     }
   }
 
-  /// Marca o tour guiado como concluído para o usuário atual (WS-10).
+  /// Marca o tour guiado como concluído para o usuário atual.
   Future<bool> completeTour(String token) async {
     final url = Uri.parse('$apiBaseUrl/api/users/me/complete-tour');
 

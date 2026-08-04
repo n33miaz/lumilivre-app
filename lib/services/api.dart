@@ -65,7 +65,7 @@ class ApiService {
 
   Future<bool> completeTour(String token) => _auth.completeTour(token);
 
-  // --- App version (WS-08) ---
+  // --- App version ---
 
   Future<AppVersionInfo> getAppVersion({required String platform}) =>
       _appVersion.get(platform: platform);

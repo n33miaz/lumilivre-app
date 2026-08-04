@@ -6,7 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../models/app_version_info.dart';
 import '../services/api.dart';
 
-/// Resultado do gate de atualização (WS-08).
+/// Resultado do gate de atualização.
 enum AppUpdateStatus {
   /// App atualizado o suficiente; nada a fazer.
   ok,

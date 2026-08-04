@@ -36,7 +36,7 @@ class LoginResponse {
       isInitialPassword:
           json["initialPasswordChange"] ?? json["isInitialPassword"] ?? false,
       // Ausência da chave é tratada como "concluído" para não exibir o tour
-      // a usuários existentes (WS-10).
+      // a usuários existentes.
       guidedTourCompleted: json["guidedTourCompleted"] ?? true,
     );
   }
