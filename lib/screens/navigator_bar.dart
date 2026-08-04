@@ -7,6 +7,7 @@ import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/guided_tour.dart';
 import 'package:lumilivre/widgets/header.dart';
 import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
 import 'package:lumilivre/widgets/offline_banner.dart';
@@ -26,29 +27,54 @@ class MainNavigator extends StatefulWidget {
 class _MainNavigatorState extends State<MainNavigator> {
   int _selectedIndex = 1;
   late PageController _pageController;
+  String? _onboardedToken;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      if (authProvider.isAuthenticated && authProvider.isInitialPassword) {
-        _showMandatoryPasswordDialog(context);
-      }
-    });
   }
 
-  void _showMandatoryPasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const MandatoryPasswordDialog();
-      },
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Dispara o onboarding a cada NOVA sessão autenticada — inclusive quando o
+    // login acontece com o MainNavigator já montado (fluxo guest → login), que
+    // o initState não cobre.
+    final auth = Provider.of<AuthProvider>(context);
+    final token = auth.user?.token;
+    if (auth.isAuthenticated &&
+        token != null &&
+        token.isNotEmpty &&
+        token != _onboardedToken) {
+      _onboardedToken = token;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _runOnboardingFlow();
+      });
+    }
+  }
+
+  /// Encadeia os passos de onboarding pós-login: primeiro a troca de senha
+  /// obrigatória (WS-10) e, só depois de concluída, o tour guiado (WS-10).
+  Future<void> _runOnboardingFlow() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
+    if (auth.isAuthenticated && auth.isInitialPassword) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const MandatoryPasswordDialog(),
+      );
+    }
+
+    if (!mounted) return;
+
+    final refreshed = Provider.of<AuthProvider>(context, listen: false);
+    if (refreshed.isAuthenticated &&
+        !refreshed.isInitialPassword &&
+        !refreshed.guidedTourCompleted) {
+      await showGuidedTour(context);
+    }
   }
 
   void _onItemTapped(int index) {

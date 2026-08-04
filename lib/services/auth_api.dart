@@ -70,4 +70,19 @@ class AuthApi {
       rethrow;
     }
   }
+
+  /// Marca o tour guiado como concluído para o usuário atual (WS-10).
+  Future<bool> completeTour(String token) async {
+    final url = Uri.parse('$apiBaseUrl/api/users/me/complete-tour');
+
+    try {
+      final response = await _client
+          .post(url, headers: await RequestContext.headers(token: token))
+          .timeout(const Duration(seconds: 10));
+      return response.statusCode == 204 || response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Erro completeTour: $e');
+      return false;
+    }
+  }
 }

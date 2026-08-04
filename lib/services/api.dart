@@ -63,6 +63,8 @@ class ApiService {
     String token,
   ) => _auth.changePassword(matricula, currentPassword, newPassword, token);
 
+  Future<bool> completeTour(String token) => _auth.completeTour(token);
+
   // --- App version (WS-08) ---
 
   Future<AppVersionInfo> getAppVersion({required String platform}) =>

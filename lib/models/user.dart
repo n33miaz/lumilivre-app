@@ -10,6 +10,7 @@ class LoginResponse {
   final String? readerRegistrationNumber;
   final String token;
   final bool isInitialPassword;
+  final bool guidedTourCompleted;
 
   LoginResponse({
     required this.id,
@@ -18,6 +19,7 @@ class LoginResponse {
     this.readerRegistrationNumber,
     required this.token,
     required this.isInitialPassword,
+    this.guidedTourCompleted = true,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,9 @@ class LoginResponse {
       token: json["token"],
       isInitialPassword:
           json["initialPasswordChange"] ?? json["isInitialPassword"] ?? false,
+      // Ausência da chave é tratada como "concluído" para não exibir o tour
+      // a usuários existentes (WS-10).
+      guidedTourCompleted: json["guidedTourCompleted"] ?? true,
     );
   }
 
@@ -43,5 +48,6 @@ class LoginResponse {
     "readerRegistrationNumber": readerRegistrationNumber,
     "token": token,
     "initialPasswordChange": isInitialPassword,
+    "guidedTourCompleted": guidedTourCompleted,
   };
 }
