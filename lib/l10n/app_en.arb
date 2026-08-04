@@ -28,5 +28,42 @@
   "clearFilters": "Clear Filters",
   "emptyRankingMessage": "No readers found.",
   "rankingLoginPrompt": "Sign in to see the ranking.",
-  "rankingUnavailable": "Ranking is not available for this library."
+  "rankingUnavailable": "Ranking is not available for this library.",
+  "muralTitle": "Board",
+  "muralEmpty": "Nothing posted here yet.",
+  "muralError": "Couldn't load the board. Check your connection.",
+  "muralRetry": "Try again",
+  "muralLoginPrompt": "Sign in to see the board.",
+  "muralTypeAnnouncement": "Announcement",
+  "muralTypeAttachment": "Attachment",
+  "muralTypeWork": "Work",
+  "muralOpenDocument": "Open document",
+  "muralExternalLink": "External link",
+  "muralByAuthors": "by {authors}",
+  "@muralByAuthors": {
+    "placeholders": {
+      "authors": {
+        "type": "String"
+      }
+    }
+  },
+  "muralAuthorsLabel": "Author(s)",
+  "muralAdvisorsLabel": "Advisor(s)",
+  "muralYearLabel": "Year",
+  "muralSemesterLabel": "Semester",
+  "forceUpdateTitle": "Update the app",
+  "forceUpdateMessage": "A required new version is available. Please update to keep using LumiLivre.",
+  "forceUpdateButton": "Update now",
+  "forceUpdateStoreError": "Couldn't open the app store.",
+  "tourSkip": "Skip",
+  "tourNext": "Next",
+  "tourFinish": "Done",
+  "tourStep1Title": "Welcome to LumiLivre!",
+  "tourStep1Body": "Discover and keep track of your library's books all in one place.",
+  "tourStep2Title": "Explore the collection",
+  "tourStep2Body": "Browse the Catalog or filter by Categories to find your next read.",
+  "tourStep3Title": "Search and stay in the loop",
+  "tourStep3Body": "Use search to find titles quickly and check the Board for news and announcements.",
+  "tourStep4Title": "Your space",
+  "tourStep4Body": "In your Profile you can track loans, change your photo and adjust your preferences."
 }

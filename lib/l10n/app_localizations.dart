@@ -271,6 +271,186 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Ranking indisponível para esta biblioteca.'**
   String get rankingUnavailable;
+
+  /// No description provided for @muralTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mural'**
+  String get muralTitle;
+
+  /// No description provided for @muralEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma publicação por aqui ainda.'**
+  String get muralEmpty;
+
+  /// No description provided for @muralError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o mural. Verifique sua conexão.'**
+  String get muralError;
+
+  /// No description provided for @muralRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get muralRetry;
+
+  /// No description provided for @muralLoginPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para ver o mural.'**
+  String get muralLoginPrompt;
+
+  /// No description provided for @muralTypeAnnouncement.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comunicado'**
+  String get muralTypeAnnouncement;
+
+  /// No description provided for @muralTypeAttachment.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anexo'**
+  String get muralTypeAttachment;
+
+  /// No description provided for @muralTypeWork.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trabalho'**
+  String get muralTypeWork;
+
+  /// No description provided for @muralOpenDocument.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir documento'**
+  String get muralOpenDocument;
+
+  /// No description provided for @muralExternalLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link externo'**
+  String get muralExternalLink;
+
+  /// No description provided for @muralByAuthors.
+  ///
+  /// In pt, this message translates to:
+  /// **'por {authors}'**
+  String muralByAuthors(String authors);
+
+  /// No description provided for @muralAuthorsLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autor(es)'**
+  String get muralAuthorsLabel;
+
+  /// No description provided for @muralAdvisorsLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Orientador(es)'**
+  String get muralAdvisorsLabel;
+
+  /// No description provided for @muralYearLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ano'**
+  String get muralYearLabel;
+
+  /// No description provided for @muralSemesterLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semestre'**
+  String get muralSemesterLabel;
+
+  /// No description provided for @forceUpdateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualize o aplicativo'**
+  String get forceUpdateTitle;
+
+  /// No description provided for @forceUpdateMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Uma nova versão obrigatória está disponível. Atualize para continuar usando o LumiLivre.'**
+  String get forceUpdateMessage;
+
+  /// No description provided for @forceUpdateButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar agora'**
+  String get forceUpdateButton;
+
+  /// No description provided for @forceUpdateStoreError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir a loja de aplicativos.'**
+  String get forceUpdateStoreError;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get tourSkip;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo'**
+  String get tourNext;
+
+  /// No description provided for @tourFinish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir'**
+  String get tourFinish;
+
+  /// No description provided for @tourStep1Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bem-vindo(a) ao LumiLivre!'**
+  String get tourStep1Title;
+
+  /// No description provided for @tourStep1Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descubra e acompanhe os livros da sua biblioteca em um só lugar.'**
+  String get tourStep1Body;
+
+  /// No description provided for @tourStep2Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Explore o acervo'**
+  String get tourStep2Title;
+
+  /// No description provided for @tourStep2Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'Navegue pelo Catálogo ou filtre por Categorias para encontrar sua próxima leitura.'**
+  String get tourStep2Body;
+
+  /// No description provided for @tourStep3Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Busque e fique por dentro'**
+  String get tourStep3Title;
+
+  /// No description provided for @tourStep3Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use a busca para achar títulos rapidamente e confira o Mural para novidades e comunicados.'**
+  String get tourStep3Body;
+
+  /// No description provided for @tourStep4Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu espaço'**
+  String get tourStep4Title;
+
+  /// No description provided for @tourStep4Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências.'**
+  String get tourStep4Body;
 }
 
 class _AppLocalizationsDelegate

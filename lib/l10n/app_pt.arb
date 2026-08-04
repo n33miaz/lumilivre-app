@@ -28,5 +28,42 @@
   "clearFilters": "Limpar Filtros",
   "emptyRankingMessage": "Nenhum leitor encontrado.",
   "rankingLoginPrompt": "Faça login para ver o ranking.",
-  "rankingUnavailable": "Ranking indisponível para esta biblioteca."
+  "rankingUnavailable": "Ranking indisponível para esta biblioteca.",
+  "muralTitle": "Mural",
+  "muralEmpty": "Nenhuma publicação por aqui ainda.",
+  "muralError": "Não foi possível carregar o mural. Verifique sua conexão.",
+  "muralRetry": "Tentar novamente",
+  "muralLoginPrompt": "Faça login para ver o mural.",
+  "muralTypeAnnouncement": "Comunicado",
+  "muralTypeAttachment": "Anexo",
+  "muralTypeWork": "Trabalho",
+  "muralOpenDocument": "Abrir documento",
+  "muralExternalLink": "Link externo",
+  "muralByAuthors": "por {authors}",
+  "@muralByAuthors": {
+    "placeholders": {
+      "authors": {
+        "type": "String"
+      }
+    }
+  },
+  "muralAuthorsLabel": "Autor(es)",
+  "muralAdvisorsLabel": "Orientador(es)",
+  "muralYearLabel": "Ano",
+  "muralSemesterLabel": "Semestre",
+  "forceUpdateTitle": "Atualize o aplicativo",
+  "forceUpdateMessage": "Uma nova versão obrigatória está disponível. Atualize para continuar usando o LumiLivre.",
+  "forceUpdateButton": "Atualizar agora",
+  "forceUpdateStoreError": "Não foi possível abrir a loja de aplicativos.",
+  "tourSkip": "Pular",
+  "tourNext": "Próximo",
+  "tourFinish": "Concluir",
+  "tourStep1Title": "Bem-vindo(a) ao LumiLivre!",
+  "tourStep1Body": "Descubra e acompanhe os livros da sua biblioteca em um só lugar.",
+  "tourStep2Title": "Explore o acervo",
+  "tourStep2Body": "Navegue pelo Catálogo ou filtre por Categorias para encontrar sua próxima leitura.",
+  "tourStep3Title": "Busque e fique por dentro",
+  "tourStep3Body": "Use a busca para achar títulos rapidamente e confira o Mural para novidades e comunicados.",
+  "tourStep4Title": "Seu espaço",
+  "tourStep4Body": "No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências."
 }

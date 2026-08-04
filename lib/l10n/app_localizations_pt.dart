@@ -96,4 +96,103 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get rankingUnavailable => 'Ranking indisponível para esta biblioteca.';
+
+  @override
+  String get muralTitle => 'Mural';
+
+  @override
+  String get muralEmpty => 'Nenhuma publicação por aqui ainda.';
+
+  @override
+  String get muralError =>
+      'Não foi possível carregar o mural. Verifique sua conexão.';
+
+  @override
+  String get muralRetry => 'Tentar novamente';
+
+  @override
+  String get muralLoginPrompt => 'Faça login para ver o mural.';
+
+  @override
+  String get muralTypeAnnouncement => 'Comunicado';
+
+  @override
+  String get muralTypeAttachment => 'Anexo';
+
+  @override
+  String get muralTypeWork => 'Trabalho';
+
+  @override
+  String get muralOpenDocument => 'Abrir documento';
+
+  @override
+  String get muralExternalLink => 'Link externo';
+
+  @override
+  String muralByAuthors(String authors) {
+    return 'por $authors';
+  }
+
+  @override
+  String get muralAuthorsLabel => 'Autor(es)';
+
+  @override
+  String get muralAdvisorsLabel => 'Orientador(es)';
+
+  @override
+  String get muralYearLabel => 'Ano';
+
+  @override
+  String get muralSemesterLabel => 'Semestre';
+
+  @override
+  String get forceUpdateTitle => 'Atualize o aplicativo';
+
+  @override
+  String get forceUpdateMessage =>
+      'Uma nova versão obrigatória está disponível. Atualize para continuar usando o LumiLivre.';
+
+  @override
+  String get forceUpdateButton => 'Atualizar agora';
+
+  @override
+  String get forceUpdateStoreError =>
+      'Não foi possível abrir a loja de aplicativos.';
+
+  @override
+  String get tourSkip => 'Pular';
+
+  @override
+  String get tourNext => 'Próximo';
+
+  @override
+  String get tourFinish => 'Concluir';
+
+  @override
+  String get tourStep1Title => 'Bem-vindo(a) ao LumiLivre!';
+
+  @override
+  String get tourStep1Body =>
+      'Descubra e acompanhe os livros da sua biblioteca em um só lugar.';
+
+  @override
+  String get tourStep2Title => 'Explore o acervo';
+
+  @override
+  String get tourStep2Body =>
+      'Navegue pelo Catálogo ou filtre por Categorias para encontrar sua próxima leitura.';
+
+  @override
+  String get tourStep3Title => 'Busque e fique por dentro';
+
+  @override
+  String get tourStep3Body =>
+      'Use a busca para achar títulos rapidamente e confira o Mural para novidades e comunicados.';
+
+  @override
+  String get tourStep4Title => 'Seu espaço';
+
+  @override
+  String get tourStep4Body =>
+      'No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências.';
 }
