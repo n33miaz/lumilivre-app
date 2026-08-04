@@ -3,9 +3,9 @@
   <a href="https://n33miaz.github.io/n33miaz-links/#lumitcc"><img width="100%" src="https://github-stats-api-rfi2.onrender.com/api/banner?title=LumiLivre&subtitle=Library%20Management%20System&tag=(TCC)%20Bachelor%27s%20Thesis&title_color=762075&text_color=c9d1d9&v=1" /></a>
 
   <!-- Pins-->
-  <a href="https://n33miaz.github.io/n33miaz-links/#lumiweb"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-web&custom_title=WebSite&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
-  <a href="https://n33miaz.github.io/n33miaz-links/#lumiapp"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-app&custom_title=Application&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
-  <a href="https://n33miaz.github.io/n33miaz-links/#lumiapi"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-api&custom_title=API%20Restfull&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
+  <a href="https://github.com/n33miaz/lumilivre-web"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-web&custom_title=WebSite&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
+  <a href="https://github.com/n33miaz/lumilivre-app"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-app&custom_title=Application&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
+  <a href="https://github.com/n33miaz/lumilivre-api"><img src="https://github-stats-api-rfi2.onrender.com/api/pin?username=n33miaz&repo=lumilivre-api&custom_title=API%20Restfull&bg_color=0d1117&title_color=762075&text_color=c9d1d9&icon_color=762075&hide_border=true&min_width=270&show_description=false&v=1" /></a>
 </div>
 
 <br/>
@@ -13,10 +13,9 @@
 <div align="center">
 
 ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-762075?style=flat-square)
-![Flutter](https://img.shields.io/badge/Flutter-3-02569B?style=flat-square&logo=flutter)
-![Dart](https://img.shields.io/badge/Dart-3.9-0175C2?style=flat-square&logo=dart)
+![Flutter](https://img.shields.io/badge/Flutter-3.35%2B-02569B?style=flat-square&logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.10-0175C2?style=flat-square&logo=dart)
 ![Android](https://img.shields.io/badge/Android-ready-3DDC84?style=flat-square&logo=android)
-![iOS](https://img.shields.io/badge/iOS-ready-000000?style=flat-square&logo=apple)
 ![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blue?style=flat-square&logo=githubactions)
 
 </div>
@@ -24,12 +23,17 @@
 <br/>
 
 <div align="center">
-  <h1>Sobre o Projeto</h1>
+  <h1>LumiLivre App</h1>
+  <p><em>App do leitor — catálogo, empréstimos e mural da biblioteca escolar.</em></p>
 </div>
 
-O **LumiLivre APP** é a ponta do ecossistema voltada para os **alunos**. Desenvolvido em **Flutter**, o aplicativo funciona como uma vitrine digital, permitindo que os estudantes explorem o acervo da biblioteca, verifiquem a disponibilidade de livros e realizem solicitações de empréstimo de forma autônoma.
+O **LumiLivre App** é a ponta do ecossistema voltada para os leitores. Feito em
+Flutter, funciona como vitrine digital da biblioteca: o aluno explora o acervo,
+confere disponibilidade real de exemplares, solicita empréstimo sem passar pelo
+balcão, acompanha o próprio histórico e lê os avisos publicados pela biblioteca.
 
-Diferente de sistemas tradicionais, o app foca na experiência do usuário (UX), oferecendo recursos como **Gamificação (Ranking de Leitura)**, **Modo Offline** para consulta de catálogo e **Autenticação Biométrica**.
+Além do básico, traz ranking de leitura para incentivar o hábito, catálogo
+disponível offline e um mural segmentado por curso, módulo ou turno.
 
 <br/>
 
@@ -38,79 +42,125 @@ Diferente de sistemas tradicionais, o app foca na experiência do usuário (UX),
 </div>
 
 <div align="center">
-  <img src="assets/images/prints/print_splash.jpg" width="200" alt="Splash Screen" style="border-radius: 15px; margin: 10px;">
-  <img src="assets/images/prints/print_login.jpg" width="200" alt="Tela de Login" style="border-radius: 15px; margin: 10px;">
+  <img src="assets/images/prints/print_splash.jpg" width="200" alt="Splash" style="border-radius: 15px; margin: 10px;">
+  <img src="assets/images/prints/print_login.jpg" width="200" alt="Login" style="border-radius: 15px; margin: 10px;">
 </div>
 
-<br/>
-
-<div align="center">
-  <h1>Stack Técnica</h1>
-</div>
+## Stack
 
 | Camada | Tecnologia |
 |--------|------------|
-| Linguagem / SDK | Dart 3.9 + Flutter |
+| Linguagem / SDK | Dart 3.10 · Flutter 3.35+ |
 | Estado | Provider 6.1 (`ChangeNotifier`) |
-| HTTP | `http` 1.5 (+ `dio` para clients gerados) |
-| Persistência segura | **flutter_secure_storage** (token + user) |
-| Persistência leve | `shared_preferences` (tema, favoritos) |
-| UI | Material 3, `flutter_svg`, `cached_network_image`, Lottie |
-| Segurança local | `local_auth` |
+| HTTP | `http` 1.5 |
+| Token e sessão | `flutter_secure_storage` (Keystore no Android, Keychain no iOS) |
+| Preferências | `shared_preferences` (tema, idioma, favoritos, cache) |
+| UI | Material 3, `flutter_svg`, `cached_network_image` |
 | Upload | `image_picker`, `http_parser` |
-| Conectividade | `connectivity_plus`, `internet_connection_checker` |
-| Contratos | **openapi-generator-cli** (scripts/generate_api) |
+| Conectividade | `connectivity_plus` |
+| Versão do app | `package_info_plus` |
+| Localização | `flutter_localizations` + ARB (`gen-l10n`) |
 | Testes | `flutter_test`, `flutter_lints` |
-| Build por ambiente | **Flavors Android (dev/staging/prod)** + `--dart-define=API_BASE_URL` |
+| Ambientes | flavors Android (dev/staging/prod) + `--dart-define=API_BASE_URL` |
 
-<br/>
+## Rodando local
 
-<div align="center">
-  <h1>Funcionalidades Principais</h1>
-</div>
-
-### 📚 Catálogo & Busca
-- **Vitrine Virtual:** carrosséis por categoria com **infinite scroll**.
-- **Busca Inteligente:** por título, autor ou ISBN.
-- **Detalhes do Livro:** sinopse, classificação, disponibilidade em tempo real (estoque físico).
-- **Modo Offline:** cache local via `SharedPreferences` (`catalog_cache_v1`) com stale-while-revalidate.
-
-### 🔄 Empréstimos & Solicitações
-- **Solicitação Digital:** aluno solicita pelo app, bibliotecário aprova no web.
-- **Status em Tempo Real** (PENDENTE/ACEITA/REJEITADA).
-- **Histórico** de empréstimos e solicitações.
-
-### 👤 Perfil & Gamificação
-- **Ranking** de leitores com filtros por curso/módulo/turno.
-- **Foto de perfil** com upload para Supabase.
-- **Favoritos** locais por ID.
-
-### ⚙️ Recursos Técnicos Avançados
-- **Secure Storage:** token JWT em `flutter_secure_storage` (Keystore/Keychain).
-- **Restore de sessão** no boot (`tryAutoLogin` em `main.dart` + splash durante validação).
-- **Biometria:** suporte via `local_auth`.
-- **Temas:** claro / escuro / sistema.
-- **ApiService** dividido em facade (`AuthApi`, `BookApi`, `CatalogApi`, `LoanApi`, `RankingApi`, `StudentApi`, `UploadApi`) — cada domínio abaixo de 200 linhas.
-
-### Ambientes
-
-O app usa **flavors Android** e `--dart-define=API_BASE_URL` para selecionar a API:
-
-```bash
-flutter run --flavor dev     --dart-define=API_BASE_URL=http://127.0.0.1:8080
-flutter run --flavor staging --dart-define=API_BASE_URL=https://staging.lumilivre.example
-flutter run --flavor prod
+```powershell
+flutter pub get
+flutter run --flavor dev --dart-define=API_BASE_URL=http://10.0.2.2:8080
 ```
 
-Sem `API_BASE_URL`, o app usa `https://lumilivre-api.onrender.com`.
+`10.0.2.2` é como o emulador Android alcança o `localhost` da máquina. Em
+dispositivo físico use o IP da sua rede. Para subir a API junto, o
+`docker-compose.yml` do repositório de orquestração
+[`lumilivre`](https://github.com/n33miaz/lumilivre) levanta tudo em um comando.
 
-<br/>
+Credenciais de demonstração do stack local: matrícula `2024001`, senha `2024001`
+(o app pedirá a troca de senha no primeiro acesso — é o fluxo sendo demonstrado).
 
-<div align="center">
-  <h1>Arquitetura do Sistema</h1>
-</div>
+### Comandos
 
-Utilizamos uma arquitetura cliente-servidor moderna baseada em microsserviços e nuvem para garantir escalabilidade.
+```powershell
+flutter pub get
+flutter analyze
+dart format --set-exit-if-changed .
+flutter test
+flutter test --coverage
+```
+
+## Ambientes e build
+
+O único define lido pelo código é `API_BASE_URL` (`lib/utils/constants.dart`).
+Sem ele o app aponta para `https://lumilivre-api.onrender.com`.
+
+```powershell
+flutter run --flavor dev     --dart-define=API_BASE_URL=http://10.0.2.2:8080
+flutter run --flavor staging --dart-define=API_BASE_URL=https://staging.exemplo.com
+flutter run --flavor prod    --dart-define=API_BASE_URL=https://api.exemplo.com
+```
+
+Os flavors só existem no Android (`dev` e `staging` recebem sufixo no
+`applicationId` e permitem tráfego em claro; `prod` não). O projeto iOS tem um
+único scheme, então `flutter build ios --flavor` não se aplica.
+
+### Release Android
+
+O build de release precisa de `android/key.properties` apontando para o seu
+keystore:
+
+```properties
+storeFile=lumilivre-release-key.jks
+storePassword=<senha>
+keyAlias=<alias>
+keyPassword=<senha>
+```
+
+O arquivo e o `.jks` são ignorados pelo git e **nunca** devem ser versionados.
+Sem eles o build cai para a assinatura de debug, então ele conclui, mas o
+artefato não serve para publicação.
+
+```powershell
+flutter build apk       --release --flavor prod --dart-define=API_BASE_URL=https://api.exemplo.com
+flutter build appbundle --release --flavor prod --dart-define=API_BASE_URL=https://api.exemplo.com
+```
+
+| Item | Valor |
+|------|-------|
+| `applicationId` | `br.com.lumilivre.lumilivre` (`.dev` / `.staging` por flavor) |
+| Versão | `1.1.0+2` (vem do `pubspec.yaml`) |
+| `compileSdk` / `minSdk` | 36 / 24 |
+| Permissões | `INTERNET`, `USE_BIOMETRIC` |
+
+## Funcionalidades
+
+**Catálogo** — carrosséis por categoria com scroll infinito, busca por título,
+autor ou ISBN, e detalhe do livro com sinopse, classificação e disponibilidade
+real de exemplares.
+
+**Modo offline** — o catálogo e o mural ficam em cache local
+(`shared_preferences`) com estratégia stale-while-revalidate; um banner avisa
+quando os dados exibidos vêm do cache.
+
+**Empréstimos** — solicitação pelo app com aprovação do bibliotecário no painel
+web, acompanhamento de status (pendente, aceita, rejeitada, cancelada) e
+histórico completo.
+
+**Mural** — avisos, anexos e trabalhos acadêmicos publicados pela biblioteca,
+filtrados pelo público do leitor (todos, curso, módulo ou turno). Links abrem
+apenas em `http`/`https`.
+
+**Perfil e ranking** — ranking de leitores com filtro por curso, módulo e turno;
+foto de perfil enviada para a API (quando a biblioteca permite); favoritos
+locais.
+
+**Onboarding** — troca obrigatória de senha no primeiro acesso, seguida de um
+tour guiado pelas abas.
+
+**Controle de versão** — antes do login o app consulta `GET /api/app-version`; se
+a versão instalada não é mais suportada, uma tela bloqueia o uso e direciona
+para a loja. Falha de rede não bloqueia (fail-open).
+
+## Arquitetura
 
 ```mermaid
 flowchart TD
@@ -121,88 +171,79 @@ flowchart TD
     classDef storage fill:#3ECF8E,stroke:#fff,stroke-width:2px,color:#fff;
     classDef external fill:#ddd,stroke:#333,stroke-width:1px,color:#000,stroke-dasharray: 5 5;
 
-    UserMobile["Application (Aluno)"]:::mobile
-    UserWeb["WebSite (Bibliotecário)"]:::web
+    UserMobile["App do leitor"]:::mobile
+    UserWeb["Painel administrativo"]:::web
 
     subgraph Cloud["-"]
         direction TB
-        API["API RestFull"]:::api
+        API["LumiLivre API"]:::api
         DB[("PostgreSQL")]:::db
-        Storage["Supabase Storage"]:::storage
+        Storage["Storage local ou Supabase"]:::storage
     end
 
     External["Google Books / BrasilAPI"]:::external
 
-    UserMobile -->|REST API / JSON| API
-    UserWeb -->|REST API / JSON| API
+    UserMobile -->|REST + JWT| API
+    UserWeb -->|REST + JWT| API
 
     API -->|JPA / Hibernate| DB
-    API -->|Upload Capas e PDF's| Storage
-    API -.->|Consulta Metadados| External
+    API -->|Capas e anexos| Storage
+    API -.->|Metadados por ISBN| External
 ```
 
-### Estrutura interna
+### Estrutura
 
 ```
 lib/
-  main.dart                 (bootstrap + tryAutoLogin + splash)
-  providers/                (AuthProvider, ThemeProvider, FavoritesProvider)
-  services/                 (ApiService facade + AuthApi/BookApi/CatalogApi/LoanApi/RankingApi/StudentApi/UploadApi)
-  services/auth_storage.dart (flutter_secure_storage)
-  api/gen/                  (clients gerados pelo openapi-generator-cli)
+  main.dart                  (bootstrap, gate de versão, auto-login, splash)
+  l10n/                      (app_pt.arb, app_en.arb + gerados)
+  providers/                 (auth, theme, favorites, locale, settings,
+                              content, app_update)
+  services/
+    api.dart                 (facade)
+    auth_api · book_api · catalog_api · loan_api · reader_api ·
+    ranking_api · upload_api · app_version_api · content_api · settings_api
+    auth_storage.dart        (flutter_secure_storage)
+    loan_status_calculator.dart
   models/ · screens/ · widgets/ · utils/
 assets/ (images, icons, animations)
 android/ · ios/ · web/
-test/    (providers, services, models, utils, bootstrap)
-scripts/ (generate_api.sh | .bat)
+test/ (models, providers, services, screens, utils, helpers, bootstrap)
 ```
 
-<br/>
+A regra de status de empréstimo mora em `LoanStatusCalculator`, fora da camada de
+UI, o que a torna testável isoladamente.
 
-<div align="center">
-  <h1>Segurança</h1>
-</div>
+## Idiomas
 
-- **Autenticação JWT** em todas as requisições sensíveis.
-- **Secure Storage** (Keystore/Keychain) para token e dados de usuário.
-- **Validação de Senha Inicial** no primeiro acesso (bloqueia navegação principal até a troca).
-- **Convidado** navega sem token, mas não consegue solicitar empréstimo nem acessar dados pessoais.
+Português e inglês, com 59 mensagens cada em `lib/l10n/app_pt.arb` e
+`app_en.arb`. Os arquivos gerados por `gen-l10n` são versionados e `generate:
+true` no `pubspec.yaml` os regenera a cada `flutter pub get`. O idioma segue o
+sistema e pode ser trocado no app.
 
-<br/>
+> As telas mais antigas (login, catálogo, detalhes do livro e diálogos de senha)
+> ainda têm textos fixos em português — a migração para `AppLocalizations` está em
+> andamento.
 
-<div align="center">
-  <h1>Como rodar localmente</h1>
-</div>
+## Testes
 
 ```powershell
-# 1. Dependências
-flutter pub get
-
-# 2. Gerar clients OpenAPI (opcional; requer API com /v3/api-docs)
-.\scripts\generate_api.bat
-
-# 3. Executar
-flutter run --flavor dev --dart-define=API_BASE_URL=http://10.0.2.2:8080
-
-# 4. Testes
-flutter analyze
 flutter test
-
-# 5. Build de produção
-flutter build apk --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre.com.br
-flutter build ios --flavor prod --dart-define=API_BASE_URL=https://api.lumilivre.com.br
 ```
 
+A suíte cobre models, providers, serviços, cálculo de status de empréstimo,
+widgets de tela e o bootstrap completo do app (auto-login mais gate de versão).
+Os testes usam mocks de `SharedPreferences`, `FlutterSecureStorage` e
+`PackageInfo`, então não tocam rede nem disco real.
+
+## Licença
+
+**Proprietário — todos os direitos reservados.** Veja [`LICENSE`](LICENSE). O
+código é publicado para leitura, estudo e avaliação técnica; qualquer uso, cópia
+ou execução em produção requer licença comercial — **ncormino@gmail.com**.
+
 <br/>
 
 <div align="center">
-  <h1>Licença</h1>
-</div>
-
-**Proprietário — Todos os direitos reservados.** O código-fonte é público apenas para leitura, estudo e avaliação. Qualquer uso, cópia, modificação ou execução em produção requer licença comercial mediante negociação. Veja [`LICENSE`](LICENSE). Interessados: **ncormino@gmail.com**.
-
-<br/>
-
-<div align="center">
-  <sub>LumiLivre © 2026 - Todos os direitos reservados.</sub>
+  <sub>LumiLivre © 2026 — Gestão de bibliotecas escolares · Todos os direitos reservados.</sub>
 </div>
