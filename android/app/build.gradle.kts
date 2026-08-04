@@ -41,14 +41,19 @@ android {
     defaultConfig {
         applicationId = "br.com.lumilivre.lumilivre"
         minSdk = flutter.minSdkVersion
-        targetSdk = 34
-        versionCode = (localProperties.getProperty("flutter.versionCode")?.toIntOrNull()) ?: 1
-        versionName = localProperties.getProperty("flutter.versionName") ?: "1.0.0"
+        targetSdk = flutter.targetSdkVersion
+        // Vem do pubspec.yaml (version: x.y.z+n). Ler de local.properties fazia
+        // build sem esse arquivo (clone novo, CI) publicar 1.0.0/versionCode 1,
+        // e o gate de versao do app bloquearia todo mundo.
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
+
+    val hasReleaseKeystore = keystoreProperties.isNotEmpty()
 
     signingConfigs {
         create("release") {
-            if (keystoreProperties.isNotEmpty()) {
+            if (hasReleaseKeystore) {
                 storeFile = file(keystoreProperties["storeFile"] as String)
                 storePassword = keystoreProperties["storePassword"] as String
                 keyAlias = keystoreProperties["keyAlias"] as String
@@ -59,7 +64,13 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Sem android/key.properties o config de release fica vazio e o AGP
+            // aborta a validacao; cai para a chave de debug para o build passar.
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 
