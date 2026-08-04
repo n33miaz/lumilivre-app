@@ -1,12 +1,18 @@
 class LibrarySettings {
   final LibraryType libraryType;
+  final bool readerCanEditAvatar;
   final SettingsFeatures features;
 
-  const LibrarySettings({required this.libraryType, required this.features});
+  const LibrarySettings({
+    required this.libraryType,
+    required this.readerCanEditAvatar,
+    required this.features,
+  });
 
   factory LibrarySettings.school() {
     return const LibrarySettings(
       libraryType: LibraryType.school,
+      readerCanEditAvatar: true,
       features: SettingsFeatures(
         academicFields: true,
         ranking: true,
@@ -18,6 +24,7 @@ class LibrarySettings {
   factory LibrarySettings.fromJson(Map<String, dynamic> json) {
     return LibrarySettings(
       libraryType: LibraryType.fromJson(json['libraryType']),
+      readerCanEditAvatar: json['readerCanEditAvatar'] != false,
       features: SettingsFeatures.fromJson(
         json['features'] is Map<String, dynamic>
             ? json['features'] as Map<String, dynamic>

@@ -22,6 +22,7 @@ class SettingsProvider with ChangeNotifier {
   LibrarySettings get settings => _settings;
   bool get isLoading => _isLoading;
   bool get isStandard => _settings.isStandard;
+  bool get canEditAvatar => _settings.readerCanEditAvatar;
   bool get showAcademicFields => _settings.features.academicFields;
   bool get showRanking => _settings.features.ranking;
   bool get showContents => _settings.features.contents;

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -143,6 +144,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Future<void> _pickAndUploadImage() async {
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    if (!settings.canEditAvatar) return;
+
     final ImagePicker picker = ImagePicker();
     final messenger = ScaffoldMessenger.of(context);
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -320,6 +324,9 @@ class _ProfileScreenState extends State<ProfileScreen>
         ? '$registrationNumber - Ranking: $rankingText'
         : registrationNumber;
 
+    final canEditAvatar = Provider.of<SettingsProvider>(context).canEditAvatar;
+    final hasPhoto = _profileImageUrl != null && _profileImageUrl!.isNotEmpty;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -327,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           clipBehavior: Clip.none,
           children: [
             GestureDetector(
-              onTap: _pickAndUploadImage,
+              onTap: canEditAvatar ? _pickAndUploadImage : null,
               child: TweenAnimationBuilder<double>(
                 duration: const Duration(milliseconds: 300),
                 tween: Tween(begin: 1.0, end: 1.0),
@@ -336,31 +343,36 @@ class _ProfileScreenState extends State<ProfileScreen>
                 child: CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  backgroundImage: _profileImageUrl != null
-                      ? NetworkImage(_profileImageUrl!)
+                  backgroundImage: hasPhoto
+                      ? CachedNetworkImageProvider(_profileImageUrl!)
                       : null,
-                  child: _profileImageUrl == null
+                  child: !hasPhoto
                       ? const Icon(Icons.person, size: 40, color: Colors.white)
                       : null,
                 ),
               ),
             ),
-            Positioned(
-              right: -2,
-              bottom: -2,
-              child: GestureDetector(
-                onTap: _pickAndUploadImage,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
+            if (canEditAvatar)
+              Positioned(
+                right: -2,
+                bottom: -2,
+                child: GestureDetector(
+                  onTap: _pickAndUploadImage,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 10,
+                      color: Colors.white,
+                    ),
                   ),
-                  child: const Icon(Icons.edit, size: 10, color: Colors.white),
                 ),
               ),
-            ),
           ],
         ),
         const SizedBox(width: 16),
