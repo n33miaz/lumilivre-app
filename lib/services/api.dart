@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/app_content.dart';
+import '../models/app_version_info.dart';
 import '../models/book.dart';
 import '../models/book_details.dart';
 import '../models/library_settings.dart';
@@ -8,6 +9,7 @@ import '../models/loan.dart';
 import '../models/ranking.dart';
 import '../models/user.dart';
 
+import 'app_version_api.dart';
 import 'auth_api.dart';
 import 'book_api.dart';
 import 'catalog_api.dart';
@@ -18,6 +20,7 @@ import 'ranking_api.dart';
 import 'settings_api.dart';
 import 'upload_api.dart';
 
+export 'app_version_api.dart';
 export 'auth_api.dart';
 export 'book_api.dart';
 export 'catalog_api.dart';
@@ -38,6 +41,7 @@ class ApiService {
   ApiService._internal();
 
   final AuthApi _auth = AuthApi();
+  final AppVersionApi _appVersion = AppVersionApi();
   final CatalogApi _catalog = CatalogApi();
   final ContentApi _content = ContentApi();
   final BookApi _book = BookApi();
@@ -58,6 +62,11 @@ class ApiService {
     String newPassword,
     String token,
   ) => _auth.changePassword(matricula, currentPassword, newPassword, token);
+
+  // --- App version (WS-08) ---
+
+  Future<AppVersionInfo> getAppVersion({required String platform}) =>
+      _appVersion.get(platform: platform);
 
   // --- Catalog ---
 

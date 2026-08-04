@@ -45,6 +45,7 @@ dependencies:
   cached_network_image: ^3.3.0
   connectivity_plus: ^5.0.2
   internet_connection_checker: ^1.0.0+1
+  package_info_plus: ^8.0.0
   flutter_secure_storage: ^10.0.0
   # Necessário para modelos gerados via openapi-generator (dart-dio)
   dio: ^5.4.0

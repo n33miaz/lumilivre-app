@@ -4,20 +4,25 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lumilivre/main.dart';
 import 'package:lumilivre/models/user.dart';
+import 'package:lumilivre/providers/app_update_provider.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/content_provider.dart';
 import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/providers/locale.dart';
+import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
 import 'package:lumilivre/services/auth_storage.dart';
 
 Widget buildBootstrappedApp() {
+  // Espelha a árvore de providers de main.dart (incl. gate WS-08).
   return MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -27,9 +32,26 @@ Widget buildBootstrappedApp() {
           return authProvider;
         },
       ),
+      ChangeNotifierProxyProvider<AuthProvider, SettingsProvider>(
+        create: (context) => SettingsProvider(),
+        update: (context, authProvider, settingsProvider) =>
+            settingsProvider!..syncWithAuth(authProvider),
+      ),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ChangeNotifierProvider(create: (context) => FavoritesProvider()),
       ChangeNotifierProvider(create: (context) => LocaleProvider()),
+      ChangeNotifierProxyProvider<AuthProvider, ContentProvider>(
+        create: (context) => ContentProvider(),
+        update: (context, authProvider, contentProvider) =>
+            contentProvider!..syncWithAuth(authProvider),
+      ),
+      ChangeNotifierProvider(
+        create: (context) {
+          final appUpdateProvider = AppUpdateProvider();
+          unawaited(appUpdateProvider.check());
+          return appUpdateProvider;
+        },
+      ),
     ],
     child: const LumiLivreApp(),
   );
@@ -41,6 +63,15 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     FlutterSecureStorage.setMockInitialValues({});
+    // Sem o mock, PackageInfo.fromPlatform() nunca completa e o gate de
+    // versão (WS-08) seguraria o app no splash para sempre no teste.
+    PackageInfo.setMockInitialValues(
+      appName: 'LumiLivre',
+      packageName: 'br.com.lumilivre',
+      version: '1.0.0',
+      buildNumber: '1',
+      buildSignature: '',
+    );
   });
 
   testWidgets('mostra splash enquanto tenta restaurar a sessao', (
@@ -50,6 +81,9 @@ void main() {
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
+    // Auto-login + fail-open do gate de versão (WS-08): avança o relógio
+    // fake além do timeout de 5s da consulta de versão.
+    await tester.pump(const Duration(seconds: 6));
     await tester.pump();
 
     expect(find.byType(LoginScreen), findsOneWidget);
@@ -73,6 +107,7 @@ void main() {
     });
 
     await tester.pumpWidget(buildBootstrappedApp());
+    await tester.pump(const Duration(seconds: 6));
     await tester.pump();
 
     expect(find.byType(MainNavigator), findsOneWidget);
