@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
-import 'package:lumilivre/providers/settings.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/guided_tour.dart';
 import 'package:lumilivre/widgets/header.dart';
@@ -38,10 +38,23 @@ class _MainNavigatorState extends State<MainNavigator> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final auth = Provider.of<AuthProvider>(context);
+
+    // Biblioteca desligou o acesso de convidado com alguém já navegando assim:
+    // encerra a sessão sem conta, e o `home` do app volta para o login. Quem
+    // decide é a política única, não esta tela.
+    final access = GuestAccess.of(context);
+    if (access.isGuest && !access.canBrowseAsGuest) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) auth.logout();
+      });
+      return;
+    }
+
     // Dispara o onboarding a cada NOVA sessão autenticada — inclusive quando o
     // login acontece com o MainNavigator já montado (fluxo guest → login), que
     // o initState não cobre.
-    final auth = Provider.of<AuthProvider>(context);
     final token = auth.user?.token;
     if (auth.isAuthenticated &&
         token != null &&
@@ -130,7 +143,7 @@ class _MainNavigatorState extends State<MainNavigator> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    final showContents = Provider.of<SettingsProvider>(context).showContents;
+    final showContents = GuestAccess.of(context).contentsTabVisible;
 
     if (auth.isInitialPassword) {
       return Scaffold(

@@ -3,8 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,24 +43,29 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final auth = Provider.of<AuthProvider>(context);
-    if (auth.isGuest) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (Navigator.canPop(context)) {
-          Navigator.of(context).pop();
-        }
-      });
-    }
-  }
-
-  @override
   void dispose() {
     _animationController.dispose();
     _userController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  /// Fecha a tela quando ela é uma rota empilhada sobre o app.
+  ///
+  /// Esta tela tem dois papéis: é a raiz quando não há sessão (`main.dart`) e é
+  /// uma rota empilhada quando o convidado toca em "Entrar" dentro do app. No
+  /// segundo caso ela precisa sair de cena depois de resolver a entrada, senão
+  /// o usuário fica olhando o formulário de login já autenticado.
+  ///
+  /// O gatilho antes era `didChangeDependencies` disparando `pop()` só por o
+  /// usuário ser convidado: como o convidado já é convidado quando a rota abre,
+  /// ela se fechava no primeiro frame e todo botão "Entrar" do modo convidado
+  /// ficava inerte. Agora quem fecha é a ação concluída, não o estado.
+  void _dismissIfPushed() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   void _handleLogin() async {
@@ -72,6 +79,9 @@ class _LoginScreenState extends State<LoginScreen>
           context,
           listen: false,
         ).login(_userController.text, _passwordController.text);
+        if (mounted) {
+          _dismissIfPushed();
+        }
       } catch (e) {
         if (!mounted) {
           return;
@@ -99,6 +109,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final guestAccess = GuestAccess.of(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -182,23 +194,36 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         const SizedBox(height: 12),
 
-                        OutlinedButton(
-                          onPressed: () {
-                            Provider.of<AuthProvider>(
-                              context,
-                              listen: false,
-                            ).loginAsGuest();
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.grey[600],
-                            side: BorderSide(color: Colors.grey.shade400),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                        // O modo convidado é opção da biblioteca: quem decide é
+                        // a política única (`GuestAccess`), não esta tela.
+                        if (guestAccess.guestModeOffered)
+                          OutlinedButton(
+                            onPressed: () {
+                              Provider.of<AuthProvider>(
+                                context,
+                                listen: false,
+                              ).loginAsGuest();
+                              _dismissIfPushed();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.grey[600],
+                              side: BorderSide(color: Colors.grey.shade400),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text('ENTRAR COMO CONVIDADO'),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Text(
+                              AppLocalizations.of(context)!.guestAccessDisabled,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey.shade600),
                             ),
                           ),
-                          child: const Text('ENTRAR COMO CONVIDADO'),
-                        ),
                         const SizedBox(height: 4),
                         Align(
                           alignment: Alignment.center,
