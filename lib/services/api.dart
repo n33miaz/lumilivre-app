@@ -6,6 +6,7 @@ import '../models/book.dart';
 import '../models/book_details.dart';
 import '../models/library_settings.dart';
 import '../models/loan.dart';
+import '../models/paged_result.dart';
 import '../models/ranking.dart';
 import '../models/user.dart';
 
@@ -78,14 +79,20 @@ class ApiService {
   Future<Map<String, List<Book>>?> getCatalogLocal() =>
       _catalog.getCatalogLocal();
 
-  Future<Map<String, List<Book>>> fetchAndSaveCatalog() =>
-      _catalog.fetchAndSaveCatalog();
+  Future<Map<String, List<Book>>> fetchAndSaveCatalog({String? token}) =>
+      _catalog.fetchAndSaveCatalog(token: token);
 
-  Future<List<Book>> searchBooks(String query, {int page = 0}) =>
-      _catalog.searchBooks(query, page: page);
+  Future<PagedResult<Book>> searchBooks(
+    String query, {
+    int page = 0,
+    String? token,
+  }) => _catalog.searchBooks(query, page: page, token: token);
 
-  Future<List<Book>> getBooksByGenre(String genre, {int page = 0}) =>
-      _catalog.getBooksByGenre(genre, page: page);
+  Future<PagedResult<Book>> getBooksByGenre(
+    String genre, {
+    int page = 0,
+    String? token,
+  }) => _catalog.getBooksByGenre(genre, page: page, token: token);
 
   // --- Contents (Mural) ---
 

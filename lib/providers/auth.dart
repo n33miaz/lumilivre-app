@@ -34,6 +34,15 @@ class AuthProvider with ChangeNotifier {
   /// tentar de novo), só não é exposta.
   bool get biometricLocked => _biometricLocked;
 
+  /// Único token que pode sair em `Authorization`.
+  ///
+  /// `null` sempre que não há sessão *para este app agora*: convidado, sessão
+  /// travada pela biometria, ou nenhuma sessão. Existe para os serviços não
+  /// buscarem o token no `flutter_secure_storage` por conta própria — lá o token
+  /// continua gravado justamente nos casos em que ele **não** deve ser usado, e é
+  /// assim que o modo convidado passou a mandar credencial de leitor.
+  String? get sessionToken => _user?.token;
+
   Future<void> login(String username, String password) async {
     final response = await _apiService.login(username, password);
     _user = response;

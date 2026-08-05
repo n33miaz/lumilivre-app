@@ -81,6 +81,72 @@ void main() {
         authProvider.loginAsGuest();
         expect(notifyCount, 1);
       });
+
+      /// O convidado não pode ter token para mandar, mesmo com uma sessão
+      /// gravada. O armazenamento seguro continua com o token de propósito (o
+      /// gate biométrico permite nova tentativa), então quem responde "qual token
+      /// sai em `Authorization`" tem que ser o provider — era ler o storage
+      /// direto, no `CatalogApi`, que fazia o modo convidado sair autenticado.
+      test('nao deve expor token de sessao gravada', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey: _savedUserData,
+        });
+        final provider = AuthProvider();
+
+        provider.loginAsGuest();
+
+        expect(provider.sessionToken, isNull);
+        // A sessão segue gravada: o convidado não destrói o login de ninguém.
+        expect(await AuthStorage().getToken(), 'jwt-token-mock-123');
+      });
+    });
+
+    group('sessionToken', () {
+      test('acompanha a sessao restaurada', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey: _savedUserData,
+        });
+        final provider = AuthProvider();
+
+        await provider.tryAutoLogin();
+
+        expect(provider.sessionToken, 'jwt-token-mock-123');
+      });
+
+      /// Sessão recusada pela biometria não tem token para o app usar, ainda que
+      /// ele esteja no armazenamento seguro. Era este o vazamento: a sessão que o
+      /// gate fechou continuava mandando `Authorization` nas rotas de catálogo.
+      test('e nulo quando a biometria recusou a sessao', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey: _savedUserData,
+        });
+        final provider = AuthProvider(
+          biometrics: _FakeBiometricAuth(enabled: true, confirms: false),
+        );
+
+        await provider.tryAutoLogin();
+
+        expect(provider.biometricLocked, isTrue);
+        expect(provider.sessionToken, isNull);
+        expect(await AuthStorage().getToken(), 'jwt-token-mock-123');
+      });
+
+      test('e nulo depois do logout', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-token-mock-123',
+          AuthStorage.userDataKey: _savedUserData,
+        });
+        final provider = AuthProvider();
+        await provider.tryAutoLogin();
+        expect(provider.sessionToken, isNotNull);
+
+        await provider.logout();
+
+        expect(provider.sessionToken, isNull);
+      });
     });
 
     group('completePasswordChange', () {
