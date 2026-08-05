@@ -1,11 +1,14 @@
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
+import 'package:lumilivre/models/paged_result.dart';
+import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_card.dart';
+import 'package:provider/provider.dart';
 
 class CategoryBooksScreen extends StatefulWidget {
   final String categoryName;
@@ -20,60 +23,67 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
   final ApiService _apiService = ApiService();
   final ScrollController _scrollController = ScrollController();
 
-  final List<Book> _books = [];
-  int _currentPage = 0;
-  bool _isLoading = false;
-  bool _hasMore = true;
+  late final IncrementalPager<Book> _pager = IncrementalPager<Book>(
+    fetchPage: _fetchPage,
+    keyOf: (book) => book.id,
+  );
 
   @override
   void initState() {
     super.initState();
-    _fetchBooks();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 200 &&
-          !_isLoading) {
-        _fetchBooks();
-      }
-    });
+    _loadMore();
+    _scrollController.addListener(_onScroll);
   }
 
-  Future<void> _fetchBooks() async {
-    if (_isLoading || !_hasMore) return;
+  Future<PagedResult<Book>> _fetchPage(int page) {
+    final token = Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    ).sessionToken;
 
-    setState(() {
-      _isLoading = true;
-    });
+    return _apiService.getBooksByGenre(
+      widget.categoryName,
+      page: page,
+      token: token,
+    );
+  }
 
-    try {
-      final newBooks = await _apiService.getBooksByGenre(
-        widget.categoryName,
-        page: _currentPage,
-      );
+  void _onScroll() {
+    if (!_scrollController.hasClients || !_pager.canLoadMore) {
+      return;
+    }
+    final position = _scrollController.position;
+    if (position.maxScrollExtent - position.pixels <= 200) {
+      _loadMore();
+    }
+  }
 
-      if (!mounted) return;
+  void _loadMore() => _track(_pager.loadMore());
 
-      setState(() {
-        _isLoading = false;
-        if (newBooks.isEmpty) {
-          _hasMore = false;
-        } else {
-          _books.addAll(newBooks);
-          _currentPage++;
+  void _retry() => _track(_pager.retry());
+
+  /// Redesenha, e avisa uma vez por falha.
+  ///
+  /// A tela antes desligava a paginação para sempre no primeiro erro (`_hasMore =
+  /// false`) e, quando a falha era na primeira página, caía no estado vazio
+  /// "Nenhum livro encontrado" — dizendo que a categoria não tem livro quando o
+  /// que houve foi falta de rede.
+  void _track(Future<void> loading) {
+    setState(() {});
+    loading.then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+      if (_pager.failed && _pager.items.isNotEmpty) {
+        AppToast.of(context).error(AppLocalizations.of(context)!.loadMoreError);
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _onScroll();
         }
       });
-    } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao buscar livros: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _hasMore = false;
-        });
-        final l10n = AppLocalizations.of(context)!;
-        AppToast.of(context).error(l10n.bookListLoadError);
-      }
-    }
+    });
   }
 
   @override
@@ -96,17 +106,51 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
   }
 
   Widget _buildBody() {
-    // Initial loading
-    if (_books.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // Empty state
-    if (_books.isEmpty && !_hasMore) {
+    if (_pager.isEmpty) {
+      if (_pager.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (_pager.failed) {
+        return _buildFailureState();
+      }
       return _buildEmptyState();
     }
 
     return _buildBookGrid();
+  }
+
+  /// Falha na primeira página. Antes isto se disfarçava de "categoria vazia".
+  Widget _buildFailureState() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wifi_off_outlined,
+              size: 56,
+              color: theme.hintColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.bookListLoadError,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: theme.hintColor),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _retry,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.retryAction),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildEmptyState() {
@@ -172,6 +216,9 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
   }
 
   Widget _buildBookGrid() {
+    final books = _pager.items;
+    final l10n = AppLocalizations.of(context)!;
+
     return GridView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -181,12 +228,23 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
         mainAxisSpacing: 24,
         childAspectRatio: 0.5,
       ),
-      itemCount: _books.length + (_hasMore ? 1 : 0),
+      itemCount: books.length + (_pager.hasFooter ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index == _books.length) {
+        if (index == books.length) {
+          // Erro na página seguinte mantém a grade: o último slot vira o botão de
+          // tentar de novo, e não o vazio.
+          if (_pager.failed) {
+            return Center(
+              child: IconButton(
+                onPressed: _retry,
+                icon: const Icon(Icons.refresh),
+                tooltip: l10n.retryAction,
+              ),
+            );
+          }
           return const Center(child: CircularProgressIndicator());
         }
-        return BookCard(book: _books[index]);
+        return BookCard(book: books[index]);
       },
     );
   }

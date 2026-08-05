@@ -33,6 +33,7 @@
   "offlineCachedDataMessage": "Offline: showing saved data.",
   "catalogRefreshError": "Couldn't refresh the catalog.",
   "bookListLoadError": "Couldn't load the books. Check your connection.",
+  "loadMoreError": "Couldn't load more items.",
   "searchError": "Couldn't search for books right now.",
   "passwordChangedMessage": "Password changed.",
   "passwordChangeFailedMessage": "Couldn't change the password. Please try again.",

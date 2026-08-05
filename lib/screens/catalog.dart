@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
+import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
+import 'package:provider/provider.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -119,7 +121,9 @@ class _CatalogScreenState extends State<CatalogScreen>
     }
 
     try {
-      final remoteCatalog = await _apiService.fetchAndSaveCatalog();
+      final remoteCatalog = await _apiService.fetchAndSaveCatalog(
+        token: _sessionToken(),
+      );
 
       if (mounted) {
         setState(() {
@@ -189,10 +193,21 @@ class _CatalogScreenState extends State<CatalogScreen>
     super.dispose();
   }
 
+  /// Token da sessão real, ou `null` em modo convidado.
+  ///
+  /// O catálogo é rota pública: o token aqui só serve para a auditoria de acessos
+  /// atribuir a visita ao leitor certo. Vem do `AuthProvider` porque é ele que
+  /// conhece o estado de sessão depois do gate biométrico — o `CatalogApi` lia
+  /// direto do armazenamento seguro e mandava credencial de uma sessão travada.
+  String? _sessionToken() =>
+      Provider.of<AuthProvider>(context, listen: false).sessionToken;
+
   Future<void> _handleRefresh() async {
     // Refresh manual força a busca na API
     try {
-      final newCatalog = await _apiService.fetchAndSaveCatalog();
+      final newCatalog = await _apiService.fetchAndSaveCatalog(
+        token: _sessionToken(),
+      );
       if (mounted) {
         setState(() {
           _allCategories = _processCatalog(newCatalog);
@@ -225,6 +240,11 @@ class _CatalogScreenState extends State<CatalogScreen>
                     )
                   : ListView.builder(
                       controller: _scrollController,
+                      // `cacheExtent` está depreciado em favor de
+                      // `scrollCacheExtent`, mas o substituto (e o tipo
+                      // `ScrollCacheExtent`) só entrou no Flutter 3.43. O CI fixa
+                      // 3.41.4, onde trocar não seria aviso: seria erro de
+                      // compilação.
                       cacheExtent: 500,
                       addAutomaticKeepAlives: true,
                       physics: const AlwaysScrollableScrollPhysics(),

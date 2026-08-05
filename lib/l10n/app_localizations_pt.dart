@@ -120,6 +120,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível carregar os livros. Verifique sua conexão.';
 
   @override
+  String get loadMoreError => 'Não foi possível carregar mais itens.';
+
+  @override
   String get searchError => 'Não foi possível buscar livros agora.';
 
   @override

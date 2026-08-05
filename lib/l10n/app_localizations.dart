@@ -296,6 +296,12 @@ abstract class AppLocalizations {
   /// **'Não foi possível carregar os livros. Verifique sua conexão.'**
   String get bookListLoadError;
 
+  /// No description provided for @loadMoreError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar mais itens.'**
+  String get loadMoreError;
+
   /// No description provided for @searchError.
   ///
   /// In pt, this message translates to:

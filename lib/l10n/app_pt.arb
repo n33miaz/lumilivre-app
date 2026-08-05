@@ -33,6 +33,7 @@
   "offlineCachedDataMessage": "Sem conexão: mostrando os dados salvos.",
   "catalogRefreshError": "Não foi possível atualizar o catálogo.",
   "bookListLoadError": "Não foi possível carregar os livros. Verifique sua conexão.",
+  "loadMoreError": "Não foi possível carregar mais itens.",
   "searchError": "Não foi possível buscar livros agora.",
   "passwordChangedMessage": "Senha alterada.",
   "passwordChangeFailedMessage": "Não foi possível alterar a senha. Tente novamente.",

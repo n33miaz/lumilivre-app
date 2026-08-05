@@ -118,6 +118,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t load the books. Check your connection.';
 
   @override
+  String get loadMoreError => 'Couldn\'t load more items.';
+
+  @override
   String get searchError => 'Couldn\'t search for books right now.';
 
   @override
