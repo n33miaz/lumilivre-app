@@ -54,6 +54,7 @@ disponível offline e um mural segmentado por curso, módulo ou turno.
 | Estado | Provider 6.1 (`ChangeNotifier`) |
 | HTTP | `http` 1.5 |
 | Token e sessão | `flutter_secure_storage` (Keystore no Android, Keychain no iOS) |
+| Biometria | `local_auth` (gate opcional na restauração da sessão) |
 | Preferências | `shared_preferences` (tema, idioma, favoritos, cache) |
 | UI | Material 3, `flutter_svg`, `cached_network_image` |
 | Upload | `image_picker`, `http_parser` |
@@ -131,6 +132,36 @@ flutter build appbundle --release --flavor prod --dart-define=API_BASE_URL=https
 | `compileSdk` / `minSdk` | 36 / 24 |
 | Permissões | `INTERNET`, `USE_BIOMETRIC` |
 
+#### Ofuscação
+
+O APK é distribuído por download direto: qualquer pessoa baixa e descompila. Duas
+camadas independentes de ofuscação, porque cada uma cobre um lado do binário:
+
+**Java/Kotlin (R8).** `isMinifyEnabled` e `isShrinkResources` estão explícitos no
+`android/app/build.gradle.kts`, com as regras em `android/app/proguard-rules.pro`.
+O que é resolvido por reflexão ou JNI (embedding do Flutter, Tink do
+`flutter_secure_storage`, `local_auth`) tem `-keep` lá, cada um com o motivo —
+**uma regra faltando só aparece em release**, e um APK que minifica e crasha é
+pior que um não minificado. O mapa de renomeação sai em
+`build/app/outputs/mapping/<flavor>Release/mapping.txt`.
+
+**Dart (AOT).** O snapshot Dart não passa pelo R8; nomes de classe e função do
+`lib/` continuam legíveis no binário a menos que se peça:
+
+```powershell
+flutter build apk --release --flavor prod `
+  --dart-define=API_BASE_URL=https://api.exemplo.com `
+  --obfuscate --split-debug-info=build/symbols
+```
+
+`--obfuscate` exige `--split-debug-info`: os nomes originais saem do binário e vão
+para os `.symbols` do diretório indicado. **Guarde esses arquivos junto do
+artefato publicado** (e o `mapping.txt` do R8) — sem eles um stack trace de
+produção é uma lista de símbolos sem nome e não há como voltar ao código; com
+eles, `flutter symbolize -i trace.txt -d build/symbols/app.android-arm64.symbols`
+reconstrói o trace. `.symbols` e `mapping.txt` **não** vão para o git (nem para o
+APK): são artefatos de release, um por build.
+
 ## Funcionalidades
 
 **Catálogo** — carrosséis por categoria com scroll infinito, busca por título,
@@ -151,7 +182,14 @@ apenas em `http`/`https`.
 
 **Perfil e ranking** — ranking de leitores com filtro por curso, módulo e turno;
 foto de perfil enviada para a API (quando a biblioteca permite); favoritos
-locais.
+locais. Capa e avatar só são renderizados por `https` (URL em `http` é
+promovida, esquema estranho é recusado e cai no asset local).
+
+**Biometria** — opcional, em Configurações. Ligar exige autenticar no sensor na
+hora; com a opção ligada, a sessão salva só é restaurada depois de nova
+confirmação na abertura do app. Falha fechado: sem biometria confirmada não há
+sessão restaurada, e o acesso volta a ser por senha. Aparelho sem sensor ou sem
+biometria cadastrada mostra o motivo e o controle desabilitado.
 
 **Onboarding** — troca obrigatória de senha no primeiro acesso, seguida de um
 tour guiado pelas abas.
@@ -204,6 +242,7 @@ lib/
     auth_api · book_api · catalog_api · loan_api · reader_api ·
     ranking_api · upload_api · app_version_api · content_api · settings_api
     auth_storage.dart        (flutter_secure_storage)
+    biometric_auth.dart      (gate biométrico da sessão)
     loan_status_calculator.dart
   models/ · screens/ · widgets/ · utils/
 assets/ (images, icons, animations)
@@ -216,7 +255,7 @@ UI, o que a torna testável isoladamente.
 
 ## Idiomas
 
-Português e inglês, com 59 mensagens cada em `lib/l10n/app_pt.arb` e
+Português e inglês, com 63 mensagens cada em `lib/l10n/app_pt.arb` e
 `app_en.arb`. Os arquivos gerados por `gen-l10n` são versionados e `generate:
 true` no `pubspec.yaml` os regenera a cada `flutter pub get`. O idioma segue o
 sistema e pode ser trocado no app.
@@ -235,6 +274,10 @@ A suíte cobre models, providers, serviços, cálculo de status de empréstimo,
 widgets de tela e o bootstrap completo do app (auto-login mais gate de versão).
 Os testes usam mocks de `SharedPreferences`, `FlutterSecureStorage` e
 `PackageInfo`, então não tocam rede nem disco real.
+
+Duas guardas de regressão em `test/log_guard_test.dart` varrem o `lib/` e falham
+se aparecer `debugPrint`/`print` fora de `kDebugMode` ou log com corpo de
+requisição/resposta, senha ou token.
 
 ## Licença
 

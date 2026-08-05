@@ -71,6 +71,18 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+
+            // O plugin do Flutter liga minificacao por default, mas isso e um
+            // default do SDK: ele muda de versao para versao e `-Pshrink=false`
+            // o desliga sem aviso. O APK e distribuido por download direto, so
+            // explicito aqui para que o release nunca saia com nome original de
+            // classe por conta de um default alheio.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 
