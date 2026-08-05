@@ -52,7 +52,7 @@ class Loan {
           json['livroTitulo']?.toString() ??
           json['bookTitle']?.toString() ??
           'Livro sem título',
-      imagemUrl: json['imagemUrl']?.toString() ?? json['coverUrl']?.toString(),
+      imagemUrl: secureMediaUrl(json['imagemUrl'] ?? json['coverUrl']),
       isRequest: false,
     );
   }

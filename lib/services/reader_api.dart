@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/constants.dart';
+import '../utils/parsers.dart';
 import 'request_context.dart';
 
 class ReaderApi {
@@ -45,7 +46,9 @@ class ReaderApi {
         return {
           ...jsonResponse,
           'nomeCompleto': jsonResponse['fullName'],
-          'foto': jsonResponse['avatarUrl'],
+          // A foto do aluno é dado pessoal: passa pelo filtro de HTTPS antes de
+          // chegar à tela. URL recusada vira null e o perfil usa o ícone local.
+          'foto': secureMediaUrl(jsonResponse['avatarUrl']),
           'penalidade': jsonResponse['penaltyCode']?['code'],
         };
       }

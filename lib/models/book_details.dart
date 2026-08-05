@@ -76,7 +76,7 @@ class BookDetails {
       tipoCapa:
           (json['tipoCapa'] ?? json['coverType']?['label'] ?? 'Capa comum')
               .toString(),
-      imagem: (json['imagem'] ?? json['coverUrl'])?.toString(),
+      imagem: secureMediaUrl(json['imagem'] ?? json['coverUrl']),
       generos: genresRaw is List
           ? genresRaw
                 .map((e) => e?.toString() ?? '')

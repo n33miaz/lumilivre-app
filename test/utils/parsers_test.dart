@@ -91,4 +91,72 @@ void main() {
       expect(safeParseDouble(true), 0.0);
     });
   });
+
+  group('secureMediaUrl', () {
+    test('deve manter URL https intacta', () {
+      expect(
+        secureMediaUrl('https://cdn.exemplo.com/capa.jpg'),
+        'https://cdn.exemplo.com/capa.jpg',
+      );
+    });
+
+    test('deve subir http de host publico para https', () {
+      expect(
+        secureMediaUrl('http://cdn.exemplo.com/capa.jpg'),
+        'https://cdn.exemplo.com/capa.jpg',
+      );
+    });
+
+    test('deve recusar esquema que nao seja http(s)', () {
+      expect(secureMediaUrl('data:image/png;base64,AAAA'), isNull);
+      expect(secureMediaUrl('file:///sdcard/foto.jpg'), isNull);
+      expect(secureMediaUrl('javascript:alert(1)'), isNull);
+    });
+
+    test('deve recusar valor sem esquema', () {
+      expect(secureMediaUrl('www.exemplo.com/capa.jpg'), isNull);
+      expect(secureMediaUrl('/storage/avatars/1.jpg'), isNull);
+    });
+
+    test('deve recusar null e vazio', () {
+      expect(secureMediaUrl(null), isNull);
+      expect(secureMediaUrl(''), isNull);
+      expect(secureMediaUrl('   '), isNull);
+    });
+
+    test('deve normalizar esquema em caixa alta', () {
+      expect(
+        secureMediaUrl('HTTP://cdn.exemplo.com/capa.jpg'),
+        'https://cdn.exemplo.com/capa.jpg',
+      );
+    });
+
+    // A suite roda em debug, onde o cleartext para host local continua
+    // liberado — é como o stack local serve as imagens.
+    test('deve aceitar http de host local em debug', () {
+      expect(
+        secureMediaUrl('http://localhost:8080/storage/avatars/1.jpg'),
+        'http://localhost:8080/storage/avatars/1.jpg',
+      );
+      expect(
+        secureMediaUrl('http://10.0.2.2:8080/storage/avatars/1.jpg'),
+        'http://10.0.2.2:8080/storage/avatars/1.jpg',
+      );
+      expect(
+        secureMediaUrl('http://192.168.0.10:8080/storage/capa.jpg'),
+        'http://192.168.0.10:8080/storage/capa.jpg',
+      );
+    });
+
+    test('deve tratar 172.x fora da faixa privada como host publico', () {
+      expect(
+        secureMediaUrl('http://172.15.0.1/capa.jpg'),
+        'https://172.15.0.1/capa.jpg',
+      );
+      expect(
+        secureMediaUrl('http://172.20.0.1/capa.jpg'),
+        'http://172.20.0.1/capa.jpg',
+      );
+    });
+  });
 }

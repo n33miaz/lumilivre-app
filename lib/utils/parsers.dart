@@ -1,6 +1,8 @@
 /// Utilitários de parsing seguros para dados dinâmicos da API.
 library;
 
+import 'package:flutter/foundation.dart' show kDebugMode;
+
 /// Converte datas da API que podem vir como List [y,m,d], String ISO ou null.
 ///
 /// [fallback] define o valor retornado quando a conversão falha.
@@ -55,6 +57,68 @@ double safeParseDouble(dynamic value) {
     return double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
   }
   return 0.0;
+}
+
+/// Devolve a URL de mídia (capa, avatar, anexo) pronta para uso, ou `null`
+/// quando ela não é confiável — nesse caso quem chama cai no asset local.
+///
+/// O valor vem do banco e é editável pelo painel: não é entrada confiável.
+/// Duas regras:
+///
+/// - `http://` sobe para `https://`. Capa e, principalmente, **foto do aluno**
+///   baixadas em claro entregam a imagem a qualquer um na mesma rede, e em
+///   Android 9+ o tráfego em claro é recusado pela plataforma no flavor `prod`
+///   (`usesCleartextTraffic=false`) — renderizar viraria erro silencioso.
+/// - Esquema que não seja http(s) é **recusado**: `data:`, `file:`,
+///   `javascript:` ou caminho relativo não têm razão de aparecer aqui e são o
+///   caminho curto para carregar conteúdo local ou injetado.
+///
+/// Em debug o cleartext continua valendo para host da própria máquina ou de
+/// rede privada, porque o stack local serve as imagens por
+/// `http://localhost:8080/storage/...` (mesma tolerância do flavor `dev`).
+String? secureMediaUrl(dynamic rawUrl) {
+  if (rawUrl == null) {
+    return null;
+  }
+  final text = rawUrl.toString().trim();
+  if (text.isEmpty) {
+    return null;
+  }
+
+  final uri = Uri.tryParse(text);
+  if (uri == null || !uri.hasScheme) {
+    return null;
+  }
+
+  switch (uri.scheme.toLowerCase()) {
+    case 'https':
+      return text;
+    case 'http':
+      if (kDebugMode && _isPrivateHost(uri.host)) {
+        return text;
+      }
+      return uri.replace(scheme: 'https').toString();
+    default:
+      return null;
+  }
+}
+
+/// Host de loopback ou de faixa privada (RFC 1918), incluindo o `10.0.2.2` que
+/// o emulador Android usa para alcançar o host.
+bool _isPrivateHost(String host) {
+  final h = host.toLowerCase();
+  if (h == 'localhost' || h == '::1' || h.endsWith('.local')) {
+    return true;
+  }
+  if (h.startsWith('127.') || h.startsWith('10.') || h.startsWith('192.168.')) {
+    return true;
+  }
+  final match = RegExp(r'^172\.(\d{1,2})\.').firstMatch(h);
+  if (match != null) {
+    final second = int.tryParse(match.group(1)!) ?? 0;
+    return second >= 16 && second <= 31;
+  }
+  return false;
 }
 
 extension StringExtension on String {

@@ -50,9 +50,9 @@ class AppContent {
       advisors: _stringOrNull(map['advisors']),
       completionYear: _stringOrNull(map['completionYear']),
       completionSemester: _stringOrNull(map['completionSemester']),
-      coverUrl: _normalizeUrl(_stringOrNull(map['coverUrl'])),
-      fileUrl: _normalizeUrl(_stringOrNull(map['fileUrl'])),
-      externalUrl: _normalizeUrl(_stringOrNull(map['externalUrl'])),
+      coverUrl: secureMediaUrl(map['coverUrl']),
+      fileUrl: secureMediaUrl(map['fileUrl']),
+      externalUrl: secureMediaUrl(map['externalUrl']),
       pinned: map['pinned'] == true,
       createdAt: parseDate(map['createdAt'], fallback: DateTime.now),
     );
@@ -67,14 +67,5 @@ class AppContent {
     }
     final text = value.toString().trim();
     return text.isEmpty ? null : text;
-  }
-
-  static String? _normalizeUrl(String? rawUrl) {
-    if (rawUrl == null) {
-      return null;
-    }
-    return rawUrl.startsWith('http://')
-        ? rawUrl.replaceFirst('http://', 'https://')
-        : rawUrl;
   }
 }

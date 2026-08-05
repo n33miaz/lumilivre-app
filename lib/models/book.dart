@@ -30,8 +30,7 @@ class Book {
   String toJson() => json.encode(toMap());
 
   factory Book.fromMap(Map<String, dynamic> map) {
-    final rawImage = (map['imageUrl'] ?? map['coverUrl'] ?? map['imagem'] ?? '')
-        .toString();
+    final rawImage = map['imageUrl'] ?? map['coverUrl'] ?? map['imagem'];
 
     return Book(
       id: _idToString(map['id']),
@@ -43,7 +42,9 @@ class Book {
               .toString(),
       author: (map['author'] ?? map['autor'] ?? 'Autor Desconhecido')
           .toString(),
-      imageUrl: _normalizeImageUrl(rawImage),
+      // URL recusada vira string vazia: o card já trata isso como "sem capa"
+      // e desenha a capa padrão local.
+      imageUrl: secureMediaUrl(rawImage) ?? '',
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),
     );
   }
@@ -85,12 +86,6 @@ class Book {
       imageUrl: imageUrl ?? this.imageUrl,
       rating: rating ?? this.rating,
     );
-  }
-
-  static String _normalizeImageUrl(String rawImage) {
-    return rawImage.startsWith('http://')
-        ? rawImage.replaceFirst('http://', 'https://')
-        : rawImage;
   }
 
   static String _idToString(dynamic value) {
