@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/services/biometric_auth.dart';
@@ -80,10 +81,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final auth = Provider.of<AuthProvider>(context);
+    // Aparência e idioma valem para todo mundo; conta e segurança só existem
+    // com sessão — quem decide isso é a política única.
+    final access = GuestAccess.of(context);
     final localeProvider = Provider.of<LocaleProvider>(context);
     final localeTag = localeProvider.locale.toLanguageTag();
-    final isGuest = auth.isGuest;
     final roundedShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     );
@@ -126,8 +128,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          if (!isGuest) ..._buildAccountOptions(roundedShape, l10n),
-          if (isGuest) _buildGuestLoginPrompt(context, roundedShape, l10n),
+          if (access.canManageAccount)
+            ..._buildAccountOptions(roundedShape, l10n)
+          else
+            _buildGuestLoginPrompt(context, roundedShape, l10n),
         ],
       ),
     );

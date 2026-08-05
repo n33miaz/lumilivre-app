@@ -7,6 +7,7 @@ import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/app_content.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/content_provider.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/utils/constants.dart';
 
 class ContentsScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _ContentsScreenState extends State<ContentsScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final l10n = AppLocalizations.of(context)!;
-    final auth = Provider.of<AuthProvider>(context);
+    final access = GuestAccess.of(context);
     final provider = Provider.of<ContentProvider>(context);
 
     return Scaffold(
@@ -66,17 +67,18 @@ class _ContentsScreenState extends State<ContentsScreen>
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: _buildBody(context, l10n, auth, provider),
+      body: _buildBody(context, l10n, access, provider),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
     AppLocalizations l10n,
-    AuthProvider auth,
+    GuestAccess access,
     ContentProvider provider,
   ) {
-    if (!auth.isAuthenticated) {
+    // O mural é segmentado por público: sem sessão não há o que carregar.
+    if (!access.canReadContents) {
       return Center(child: Text(l10n.muralLoginPrompt));
     }
 

@@ -236,6 +236,102 @@ abstract class AppLocalizations {
   /// **'Entrar'**
   String get loginAction;
 
+  /// No description provided for @guestName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convidado'**
+  String get guestName;
+
+  /// No description provided for @guestAccessDisabled.
+  ///
+  /// In pt, this message translates to:
+  /// **'O acesso de convidado está desativado nesta biblioteca.'**
+  String get guestAccessDisabled;
+
+  /// No description provided for @retryAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get retryAction;
+
+  /// No description provided for @sessionExpiredMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua sessão expirou. Entre novamente para continuar.'**
+  String get sessionExpiredMessage;
+
+  /// No description provided for @bookDetailsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os detalhes do livro.'**
+  String get bookDetailsLoadError;
+
+  /// No description provided for @guestBookTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para ver este livro'**
+  String get guestBookTitle;
+
+  /// No description provided for @guestBookMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'A ficha completa, a disponibilidade e o empréstimo são para leitores da biblioteca.'**
+  String get guestBookMessage;
+
+  /// No description provided for @profileTabLoans.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empréstimos'**
+  String get profileTabLoans;
+
+  /// No description provided for @profileTabLikes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Curtidos'**
+  String get profileTabLikes;
+
+  /// No description provided for @profileTabRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get profileTabRanking;
+
+  /// No description provided for @guestLoansTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para ver seus empréstimos'**
+  String get guestLoansTitle;
+
+  /// No description provided for @guestLoansMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acompanhe seus empréstimos ativos e o histórico.'**
+  String get guestLoansMessage;
+
+  /// No description provided for @guestLikesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para curtir livros'**
+  String get guestLikesTitle;
+
+  /// No description provided for @guestLikesMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salve seus livros favoritos para acompanhar depois.'**
+  String get guestLikesMessage;
+
+  /// No description provided for @guestRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faça login para ver o ranking'**
+  String get guestRankingTitle;
+
+  /// No description provided for @guestRankingMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compare suas leituras no ranking de leitores.'**
+  String get guestRankingMessage;
+
   /// No description provided for @readerTerm.
   ///
   /// In pt, this message translates to:

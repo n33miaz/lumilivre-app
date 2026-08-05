@@ -83,6 +83,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginAction => 'Sign in';
 
   @override
+  String get guestName => 'Guest';
+
+  @override
+  String get guestAccessDisabled =>
+      'Guest access is turned off for this library.';
+
+  @override
+  String get retryAction => 'Try again';
+
+  @override
+  String get sessionExpiredMessage =>
+      'Your session expired. Sign in again to continue.';
+
+  @override
+  String get bookDetailsLoadError => 'Couldn\'t load the book details.';
+
+  @override
+  String get guestBookTitle => 'Sign in to see this book';
+
+  @override
+  String get guestBookMessage =>
+      'Full details, availability and loans are for library readers.';
+
+  @override
+  String get profileTabLoans => 'Loans';
+
+  @override
+  String get profileTabLikes => 'Likes';
+
+  @override
+  String get profileTabRanking => 'Ranking';
+
+  @override
+  String get guestLoansTitle => 'Sign in to see your loans';
+
+  @override
+  String get guestLoansMessage =>
+      'Keep track of your active loans and history.';
+
+  @override
+  String get guestLikesTitle => 'Sign in to like books';
+
+  @override
+  String get guestLikesMessage =>
+      'Save your favorite books to check them later.';
+
+  @override
+  String get guestRankingTitle => 'Sign in to see the ranking';
+
+  @override
+  String get guestRankingMessage =>
+      'Compare your reading in the readers ranking.';
+
+  @override
   String get readerTerm => 'Reader';
 
   @override

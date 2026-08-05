@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/favorites.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/services/loan_status_calculator.dart';
@@ -43,61 +45,53 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   LoanStatus _status = LoanStatus.loading;
   DateTime? _dueDate;
   bool _isGuest = false;
-  bool _hasError = false;
+
+  /// Motivo da última falha, não só "deu erro": a tela responde diferente para
+  /// falta de sessão e para falta de rede.
+  ApiFailure? _failure;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      if (!auth.isAuthenticated) {
-        _loadGuestOnly();
-      } else {
-        _loadAllData();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  /// Carrega a ficha e, para quem tem sessão, o estado de empréstimo.
+  ///
+  /// A requisição é tentada também sem sessão: o catálogo é vitrine e
+  /// `GET /api/books/{id}` pode virar público. Enquanto exigir papel READER, o
+  /// 401 chega tipado e a tela convida ao login em vez de acusar rede.
+  Future<void> _load() async {
+    if (!mounted) return;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final user = auth.user;
+    final isGuest = !auth.isAuthenticated || user == null;
+
+    setState(() {
+      _isGuest = isGuest;
+      _failure = null;
+      if (_details == null) {
+        _status = LoanStatus.loading;
       }
     });
-  }
 
-  Future<void> _loadGuestOnly() async {
-    if (!mounted) return;
     try {
-      final details = await _apiService.getBookDetails(widget.book.id);
+      final details = await _apiService.getBookDetails(
+        widget.book.id,
+        token: user?.token,
+      );
+
       if (!mounted) return;
-      setState(() {
-        _details = details;
-        _isGuest = true;
-        _hasError = false;
-      });
-    } catch (e) {
-      if (mounted) {
+
+      if (isGuest) {
         setState(() {
-          _hasError = true;
-          _isGuest = true;
+          _details = details;
+          _status = LoanStatus.guest;
         });
-      }
-    }
-  }
-
-  Future<void> _loadAllData() async {
-    if (!mounted) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    try {
-      final details = await _apiService.getBookDetails(widget.book.id);
-
-      if (!authProvider.isAuthenticated || authProvider.user == null) {
-        if (mounted) {
-          setState(() {
-            _details = details;
-            _status = LoanStatus.guest;
-            _hasError = false;
-          });
-        }
         return;
       }
 
-      final user = authProvider.user!;
       final registrationNumber = user.readerRegistrationNumber!;
       final token = user.token;
 
@@ -113,15 +107,27 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
       if (mounted) {
         _calculateStatus(details, loans, requests, readerData);
-        setState(() => _hasError = false);
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _hasError = true;
-          _status = LoanStatus.available;
+          _failure = ApiException.fromError(e).failure;
+          if (_details != null) {
+            _status = LoanStatus.available;
+          }
         });
       }
+    }
+  }
+
+  /// Abre o login empilhado e recarrega ao voltar: entrar aqui tem que revelar a
+  /// ficha do livro que estava na tela, sem o usuário precisar navegar de novo.
+  Future<void> _openLogin() async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    if (mounted) {
+      await _load();
     }
   }
 
@@ -157,7 +163,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     );
 
     if (success) {
-      await _loadAllData();
+      await _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -181,44 +187,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_hasError && _details == null) {
+    if (_failure != null && _details == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Detalhes')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text(
-                'Não foi possível carregar os detalhes do livro.',
-                style: TextStyle(color: Colors.red),
-              ),
-              if (_isGuest) ...[
-                const SizedBox(height: 16),
-                const Text(
-                  'Faça login para acessar mais informações.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.login, size: 18),
-                  label: const Text('Entrar'),
-                ),
-              ] else ...[
-                ElevatedButton(
-                  onPressed: _loadAllData,
-                  child: const Text('Tentar Novamente'),
-                ),
-              ],
-            ],
-          ),
-        ),
+        body: _buildFailureBody(context),
       );
     }
 
@@ -242,6 +214,78 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
               ],
             ),
+    );
+  }
+
+  /// Falta de sessão não é erro: é convite.
+  ///
+  /// Só a falha de rede/servidor merece cara de erro com "tentar novamente" —
+  /// era o que aparecia para o convidado e fazia parecer app offline.
+  Widget _buildFailureBody(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final needsLogin = _failure == ApiFailure.unauthorized;
+
+    // 401 tem duas leituras: o visitante nunca teve sessão, o leitor tinha e ela
+    // caiu. A ação é a mesma, a frase não.
+    final String title;
+    if (!needsLogin) {
+      title = l10n.bookDetailsLoadError;
+    } else {
+      title = _isGuest ? l10n.guestBookTitle : l10n.sessionExpiredMessage;
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              needsLogin ? Icons.lock_outline : Icons.wifi_off_outlined,
+              size: 64,
+              color: needsLogin
+                  ? LumiLivreTheme.primary
+                  : theme.hintColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (needsLogin && _isGuest) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.guestBookMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: theme.hintColor),
+              ),
+            ],
+            const SizedBox(height: 28),
+            if (needsLogin)
+              ElevatedButton.icon(
+                onPressed: _openLogin,
+                icon: const Icon(Icons.login, size: 18),
+                label: Text(l10n.loginAction),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
+                ),
+              )
+            else
+              OutlinedButton.icon(
+                onPressed: _load,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.retryAction),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -415,25 +459,30 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    // Curtir e solicitar são do leitor identificado — a política única responde,
+    // a tela só obedece.
+    final access = GuestAccess.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: Row(
         children: [
-          if (!_isGuest) _LikeButton(book: widget.book),
-          if (_isGuest) ...[
-            Expanded(
-              child: _BorrowButton(status: LoanStatus.guest, onPressed: null),
-            ),
-          ] else ...[
+          if (access.canLikeBooks) ...[
+            _LikeButton(book: widget.book),
             const SizedBox(width: 16),
-            Expanded(
-              child: _BorrowButton(
-                status: _status,
-                dueDate: _dueDate,
-                onPressed: _handleLoanRequest,
-              ),
-            ),
           ],
+          Expanded(
+            child: access.canRequestLoan
+                ? _BorrowButton(
+                    status: _status,
+                    dueDate: _dueDate,
+                    onPressed: _handleLoanRequest,
+                  )
+                : _BorrowButton(
+                    status: LoanStatus.guest,
+                    onPressed: _openLogin,
+                  ),
+          ),
         ],
       ),
     );
@@ -621,12 +670,10 @@ class _BorrowButton extends StatelessWidget {
     }
 
     return GestureDetector(
+      // Sem sessão o botão leva ao login; com sessão, só clica quando a regra de
+      // empréstimo permite.
       onTap: status == LoanStatus.guest
-          ? () {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
-            }
+          ? onPressed
           : (isClickable ? onPressed : null),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),

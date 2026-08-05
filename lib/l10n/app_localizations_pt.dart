@@ -84,6 +84,61 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginAction => 'Entrar';
 
   @override
+  String get guestName => 'Convidado';
+
+  @override
+  String get guestAccessDisabled =>
+      'O acesso de convidado está desativado nesta biblioteca.';
+
+  @override
+  String get retryAction => 'Tentar novamente';
+
+  @override
+  String get sessionExpiredMessage =>
+      'Sua sessão expirou. Entre novamente para continuar.';
+
+  @override
+  String get bookDetailsLoadError =>
+      'Não foi possível carregar os detalhes do livro.';
+
+  @override
+  String get guestBookTitle => 'Faça login para ver este livro';
+
+  @override
+  String get guestBookMessage =>
+      'A ficha completa, a disponibilidade e o empréstimo são para leitores da biblioteca.';
+
+  @override
+  String get profileTabLoans => 'Empréstimos';
+
+  @override
+  String get profileTabLikes => 'Curtidos';
+
+  @override
+  String get profileTabRanking => 'Ranking';
+
+  @override
+  String get guestLoansTitle => 'Faça login para ver seus empréstimos';
+
+  @override
+  String get guestLoansMessage =>
+      'Acompanhe seus empréstimos ativos e o histórico.';
+
+  @override
+  String get guestLikesTitle => 'Faça login para curtir livros';
+
+  @override
+  String get guestLikesMessage =>
+      'Salve seus livros favoritos para acompanhar depois.';
+
+  @override
+  String get guestRankingTitle => 'Faça login para ver o ranking';
+
+  @override
+  String get guestRankingMessage =>
+      'Compare suas leituras no ranking de leitores.';
+
+  @override
   String get readerTerm => 'Leitor';
 
   @override
