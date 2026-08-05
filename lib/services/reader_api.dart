@@ -43,13 +43,16 @@ class ReaderApi {
         final jsonResponse =
             json.decode(utf8.decode(response.bodyBytes))
                 as Map<String, dynamic>;
+        // `penaltyCode` e `penaltyExpiresAt` seguem crus no mapa: quem precisa da
+        // penalidade lê com `ReaderPenalty.fromReaderJson`. Antes havia aqui uma
+        // chave derivada `penalidade` com só o código, que jogava a data de
+        // validade no lixo — e é a data que decide se a restrição ainda vale.
         return {
           ...jsonResponse,
           'nomeCompleto': jsonResponse['fullName'],
           // A foto do aluno é dado pessoal: passa pelo filtro de HTTPS antes de
           // chegar à tela. URL recusada vira null e o perfil usa o ícone local.
           'foto': secureMediaUrl(jsonResponse['avatarUrl']),
-          'penalidade': jsonResponse['penaltyCode']?['code'],
         };
       }
     } catch (e) {

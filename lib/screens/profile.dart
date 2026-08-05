@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
+import 'package:lumilivre/models/reader_penalty.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/settings.dart';
@@ -16,6 +18,7 @@ import 'package:lumilivre/screens/ranking_tab.dart';
 import 'package:lumilivre/screens/settings.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -34,6 +37,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   String? _profileImageUrl;
   int _currentIndex = 0;
   bool _rankingEnabled = true;
+
+  /// Penalidade em vigor, quando existe. É o dado que o leitor penalizado só
+  /// descobria pelo botão de solicitar livro travado, sem explicação.
+  ReaderPenalty? _penalty;
 
   /// Sessão que o cabeçalho já carregou, para recarregar quando ela mudar.
   String? _loadedHeaderToken;
@@ -62,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       _readerName = null;
       _profileImageUrl = null;
       _myRankPosition = null;
+      _penalty = null;
       if (token != null) {
         _loadHeaderData();
       }
@@ -120,6 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       setState(() {
         _readerName = data['nomeCompleto'];
         _profileImageUrl = data['foto'];
+        _penalty = ReaderPenalty.fromReaderJson(data);
       });
     }
 
@@ -165,14 +174,15 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (!settings.canEditAvatar) return;
 
     final ImagePicker picker = ImagePicker();
-    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final toast = AppToast.of(context);
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       if (!mounted) return;
       final auth = Provider.of<AuthProvider>(context, listen: false);
 
-      messenger.showSnackBar(const SnackBar(content: Text('Enviando foto...')));
+      toast.info(l10n.avatarUploading);
 
       Uint8List? bytes;
       if (kIsWeb) {
@@ -189,14 +199,10 @@ class _ProfileScreenState extends State<ProfileScreen>
       if (success) {
         _loadHeaderData();
         if (mounted) {
-          messenger.showSnackBar(
-            const SnackBar(content: Text('Foto atualizada com sucesso!')),
-          );
+          toast.success(l10n.avatarUploadSuccess);
         }
       } else if (mounted) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Erro ao atualizar foto.')),
-        );
+        toast.error(l10n.avatarUploadError);
       }
     }
   }
@@ -280,11 +286,23 @@ class _ProfileScreenState extends State<ProfileScreen>
           ],
         ),
       ),
+      // A penalidade fica acima das abas, não dentro de uma: ela é da conta, não
+      // de "empréstimos" nem de "curtidos", e quem está penalizado precisa ver o
+      // aviso em qualquer aba que abra. Sem penalidade o aviso não existe — nada
+      // de card vazio dizendo "você não tem pendências".
       body: access.isGuest
           ? _buildGuestTabBody(tabs[selected], selected)
-          : TabBarView(
-              controller: _tabController,
-              children: [for (final tab in tabs) tab.body],
+          : Column(
+              children: [
+                if (_penalty?.blocksLoans ?? false)
+                  _PenaltyNotice(penalty: _penalty!),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [for (final tab in tabs) tab.body],
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -538,6 +556,86 @@ class _ProfileScreenState extends State<ProfileScreen>
             child: FadeTransition(opacity: animation, child: child),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Aviso de penalidade no perfil: o que é, por quê e até quando.
+///
+/// Tom informativo de propósito. O app é da escola e quem lê é aluno: chamar de
+/// devedor não devolve livro nenhum. A frase diz o que está pausado, qual é o
+/// tipo de penalidade (rótulo que a própria API traduz), a data em que passa, e o
+/// que continua funcionando enquanto isso.
+class _PenaltyNotice extends StatelessWidget {
+  /// O aviso só existe enquanto a restrição vale — é o que garante a data de
+  /// término abaixo e o que evita contar ao aluno uma penalidade já vencida.
+  _PenaltyNotice({required this.penalty})
+    : assert(penalty.blocksLoans, 'penalidade vencida não vira aviso');
+
+  final ReaderPenalty penalty;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    // Cor de aviso, não de erro: nada quebrou, há uma restrição temporária.
+    const accent = Color(0xFFB26A00);
+    final until = DateFormat.yMMMMd(
+      Localizations.localeOf(context).toLanguageTag(),
+    ).format(penalty.expiresAt!);
+
+    return Semantics(
+      container: true,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: accent.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.schedule_outlined, color: accent, size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.penaltyNoticeTitle,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.penaltyNoticeUntil(until),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.penaltyNoticeKind(penalty.label),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.hintColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.penaltyNoticeHint,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.hintColor,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
