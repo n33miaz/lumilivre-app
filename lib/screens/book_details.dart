@@ -35,6 +35,13 @@ enum LoanStatus {
   limitReached,
 }
 
+/// Data curta no formato que a tela já mostrava (d/M/aaaa).
+///
+/// Sai daqui só a repetição: o formato continua fixo de propósito, porque trocar
+/// para o padrão de cada idioma muda o que aparece na tela e é revisão de outra
+/// natureza — está registrado no relatório da tarefa.
+String _shortDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
+
 class BookDetailsScreen extends StatefulWidget {
   final Book book;
 
@@ -207,7 +214,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   Widget build(BuildContext context) {
     if (_failure != null && _details == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Detalhes')),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.bookDetailsTitle),
+        ),
         body: _buildFailureBody(context),
       );
     }
@@ -336,6 +345,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   Widget _buildHeaderSection(BuildContext context, BookDetails details) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
@@ -379,7 +390,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Sem Capa',
+                          AppLocalizations.of(context)!.bookCoverMissing,
                           style: TextStyle(
                             fontSize: 10,
                             color: scheme.onSurfaceVariant,
@@ -418,7 +429,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Lançado em ${details.dataLancamento.day}/${details.dataLancamento.month}/${details.dataLancamento.year}',
+                  l10n.bookReleasedOn(_shortDate(details.dataLancamento)),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).hintColor,
                   ),
@@ -432,6 +443,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   Widget _buildInfoRow(BuildContext context, BookDetails details) {
+    final l10n = AppLocalizations.of(context)!;
+
     final tipoCapaFormatado = details.tipoCapa
         .replaceAll('_', ' ')
         .toUpperCase()
@@ -452,8 +465,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _InfoItem(top: '★ ${details.rating}', bottom: 'Avaliações'),
-          _InfoItem(top: tipoCapaFormatado, bottom: 'Tipo da Capa'),
+          _InfoItem(top: '★ ${details.rating}', bottom: l10n.bookRatingsLabel),
+          _InfoItem(top: tipoCapaFormatado, bottom: l10n.bookCoverTypeLabel),
           Column(
             children: [
               SizedBox(
@@ -472,7 +485,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Faixa Etária',
+                l10n.bookAgeRatingLabel,
                 style: TextStyle(
                   color: Theme.of(context).hintColor,
                   fontSize: 12,
@@ -516,17 +529,19 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   Widget _buildAdditionalInfo(BuildContext context, BookDetails details) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _InfoRow(label: 'Editora', value: details.editora),
+          _InfoRow(label: l10n.bookPublisherLabel, value: details.editora),
           const Divider(height: 32),
           Row(
             children: [
               Text(
-                'Gêneros',
+                l10n.bookGenresLabel,
                 style: TextStyle(color: Theme.of(context).hintColor),
               ),
               const SizedBox(width: 16),
@@ -543,7 +558,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           ),
           const Divider(height: 32),
           Text(
-            'Sinopse',
+            l10n.bookSynopsisLabel,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -632,6 +647,7 @@ class _BorrowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
     Color backgroundColor;
@@ -652,25 +668,25 @@ class _BorrowButton extends StatelessWidget {
         // dizia o contrário, então ele fica em tom de marca, sem preenchimento.
         backgroundColor = scheme.primary.withValues(alpha: 0.12);
         textColor = scheme.primary;
-        text = 'FAÇA LOGIN PARA SOLICITAR';
+        text = l10n.loanButtonGuest;
         iconPath = '';
         break;
 
       case LoanStatus.noCopies:
         backgroundColor = scheme.surfaceContainerHighest;
         textColor = scheme.onSurfaceVariant;
-        text = 'SEM EXEMPLARES CADASTRADOS';
+        text = l10n.loanButtonNoCopies;
         iconPath = 'assets/icons/cancel.svg';
         break;
 
       case LoanStatus.limitReached:
         backgroundColor = LumiStatusColors.warningFill;
-        text = 'LIMITE DE EMPRÉSTIMOS ATINGIDO';
+        text = l10n.loanButtonLimitReached;
         break;
 
       case LoanStatus.available:
         backgroundColor = LumiLivreTheme.primary;
-        text = 'SOLICITAR EMPRÉSTIMO';
+        text = l10n.loanButtonRequest;
         isClickable = true;
         break;
 
@@ -678,31 +694,28 @@ class _BorrowButton extends StatelessWidget {
         // Era `Colors.amber` com texto branco: 1,7:1 de contraste, ou seja, a
         // frase mais importante do fluxo de solicitação ilegível ao sol.
         backgroundColor = LumiStatusColors.warningFill;
-        text = 'AGUARDANDO APROVAÇÃO';
+        text = l10n.loanButtonPending;
         iconPath = 'assets/icons/loans-active.svg';
         break;
 
       case LoanStatus.active:
         backgroundColor = LumiStatusColors.successFill;
-        String dateStr = dueDate != null
-            ? '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}'
-            : '?';
-        text = 'EM USO ATÉ: $dateStr';
+        String dateStr = dueDate != null ? _shortDate(dueDate!) : '?';
+        text = l10n.loanButtonActiveUntil(dateStr);
         break;
 
       case LoanStatus.overdue:
         backgroundColor = LumiStatusColors.dangerFill;
-        text = 'DEVOLUÇÃO EXCEDIDA';
+        text = l10n.loanButtonOverdue;
         break;
 
       case LoanStatus.unavailable:
         backgroundColor = scheme.surfaceContainerHighest;
         textColor = scheme.onSurfaceVariant;
         if (dueDate != null && dueDate!.isAfter(DateTime.now())) {
-          String dateStr = '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}';
-          text = 'DISPONÍVEL A PARTIR DE: $dateStr';
+          text = l10n.loanButtonAvailableFrom(_shortDate(dueDate!));
         } else {
-          text = 'INDISPONÍVEL NO MOMENTO';
+          text = l10n.loanButtonUnavailable;
         }
         break;
     }

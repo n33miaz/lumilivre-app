@@ -1,0 +1,285 @@
+{
+  "@@locale": "hi",
+  "appTitle": "LumiLivre",
+  "settingsTitle": "सेटिंग्स",
+  "appearanceSection": "दिखावट",
+  "languageSection": "भाषा",
+  "securitySection": "सुरक्षा",
+  "accountSection": "खाता",
+  "themeLabel": "थीम",
+  "themeLight": "हल्की",
+  "themeSystem": "सिस्टम",
+  "themeDark": "गहरी",
+  "languagePortuguese": "पुर्तगाली (ब्राज़ील)",
+  "languageEnglish": "अंग्रेज़ी (अमेरिका)",
+  "languageSpanish": "स्पेनिश (स्पेन)",
+  "languageChinese": "चीनी (सरलीकृत)",
+  "languageHindi": "हिन्दी (भारत)",
+  "biometricAccess": "बायोमेट्रिक प्रवेश",
+  "biometricSubtitle": "फ़िंगरप्रिंट या चेहरे से लॉग इन करें।",
+  "biometricUnavailable": "इस डिवाइस पर बायोमेट्रिक उपलब्ध नहीं है।",
+  "biometricEnablePrompt": "बायोमेट्रिक प्रवेश चालू करने के लिए अपनी पहचान सत्यापित करें।",
+  "biometricUnlockPrompt": "LumiLivre में जारी रखने के लिए अपनी पहचान सत्यापित करें।",
+  "biometricEnableFailed": "हम आपकी पहचान सत्यापित नहीं कर सके। बायोमेट्रिक बंद ही रहेगा।",
+  "biometricEnabledConfirmation": "बायोमेट्रिक चालू हो गया। अगली बार ऐप खोलने पर यह पूछा जाएगा।",
+  "changePassword": "पासवर्ड बदलें",
+  "logout": "खाते से लॉग आउट करें",
+  "guestSettingsPrompt": "सभी सेटिंग्स के लिए लॉग इन करें",
+  "loginAction": "लॉग इन करें",
+  "guestName": "अतिथि",
+  "guestAccessDisabled": "इस पुस्तकालय में अतिथि प्रवेश बंद है।",
+  "retryAction": "पुनः प्रयास करें",
+  "sessionExpiredMessage": "आपका सत्र समाप्त हो गया। जारी रखने के लिए फिर लॉग इन करें।",
+  "connectionErrorMessage": "सर्वर से संपर्क नहीं हो सका। अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+  "loginFailedMessage": "लॉग इन नहीं हो सका। नामांकन संख्या और पासवर्ड जाँचें।",
+  "linkOpenError": "इस डिवाइस पर लिंक नहीं खुल सका।",
+  "offlineCachedDataMessage": "कनेक्शन नहीं है: सहेजा गया डेटा दिखा रहे हैं।",
+  "catalogRefreshError": "कैटलॉग अद्यतन नहीं हो सका।",
+  "bookListLoadError": "किताबें लोड नहीं हो सकीं। अपना कनेक्शन जाँचें।",
+  "loadMoreError": "और आइटम लोड नहीं हो सके।",
+  "searchError": "अभी किताबें नहीं खोजी जा सकतीं।",
+  "passwordChangedMessage": "पासवर्ड बदल गया।",
+  "passwordChangeFailedMessage": "पासवर्ड नहीं बदला जा सका। पुनः प्रयास करें।",
+  "passwordChangeRequiredMessage": "इस सुविधा के लिए पहले अपना शुरुआती पासवर्ड बदलें।",
+  "avatarUploading": "फ़ोटो भेजी जा रही है...",
+  "avatarUploadSuccess": "फ़ोटो अद्यतन हो गई।",
+  "avatarUploadError": "फ़ोटो अद्यतन नहीं हो सकी।",
+  "loanRequestSent": "अनुरोध भेज दिया गया। पुस्तकालय की स्वीकृति की प्रतीक्षा करें।",
+  "loanRequestFailed": "अभी इस किताब का अनुरोध नहीं किया जा सकता।",
+  "penaltyNoticeTitle": "फ़िलहाल ऋण रोक दिए गए हैं",
+  "penaltyNoticeUntil": "आप {date} से फिर किताबें ले सकेंगे।",
+  "@penaltyNoticeUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeKind": "इस रूप में दर्ज: {kind}",
+  "@penaltyNoticeKind": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeHint": "तब तक आप कैटलॉग देख सकते हैं और किताबें पसंद कर सकते हैं। कोई सवाल हो तो पुस्तकालय से बात करें।",
+  "bookDetailsLoadError": "किताब का विवरण लोड नहीं हो सका।",
+  "guestBookTitle": "यह किताब देखने के लिए लॉग इन करें",
+  "guestBookMessage": "पूरा विवरण, उपलब्धता और ऋण पुस्तकालय के पाठकों के लिए हैं।",
+  "profileTabLoans": "ऋण",
+  "profileTabLikes": "पसंदीदा",
+  "profileTabRanking": "रैंकिंग",
+  "guestLoansTitle": "अपने ऋण देखने के लिए लॉग इन करें",
+  "guestLoansMessage": "अपने चालू ऋण और इतिहास पर नज़र रखें।",
+  "guestLikesTitle": "किताबें पसंद करने के लिए लॉग इन करें",
+  "guestLikesMessage": "अपनी पसंदीदा किताबें सहेजें और बाद में देखें।",
+  "guestRankingTitle": "रैंकिंग देखने के लिए लॉग इन करें",
+  "guestRankingMessage": "पाठकों की रैंकिंग में अपनी पढ़ाई की तुलना करें।",
+  "readerTerm": "पाठक",
+  "filterRanking": "रैंकिंग फ़िल्टर करें",
+  "courseLabel": "पाठ्यक्रम",
+  "moduleLabel": "मॉड्यूल",
+  "shiftLabel": "पारी",
+  "applyFilters": "फ़िल्टर लागू करें",
+  "clearFilters": "फ़िल्टर साफ़ करें",
+  "emptyRankingMessage": "कोई पाठक नहीं मिला।",
+  "rankingLoginPrompt": "रैंकिंग देखने के लिए लॉग इन करें।",
+  "rankingUnavailable": "इस पुस्तकालय के लिए रैंकिंग उपलब्ध नहीं है।",
+  "muralTitle": "सूचना पट्ट",
+  "muralEmpty": "यहाँ अभी कोई प्रकाशन नहीं है।",
+  "muralError": "सूचना पट्ट लोड नहीं हो सका। अपना कनेक्शन जाँचें।",
+  "muralRetry": "पुनः प्रयास करें",
+  "muralLoginPrompt": "सूचना पट्ट देखने के लिए लॉग इन करें।",
+  "muralTypeAnnouncement": "सूचना",
+  "muralTypeAttachment": "संलग्नक",
+  "muralTypeWork": "कार्य",
+  "muralOpenDocument": "दस्तावेज़ खोलें",
+  "muralExternalLink": "बाहरी लिंक",
+  "muralByAuthors": "{authors} द्वारा",
+  "@muralByAuthors": {
+    "placeholders": {
+      "authors": {
+        "type": "String"
+      }
+    }
+  },
+  "muralAuthorsLabel": "लेखक",
+  "muralAdvisorsLabel": "मार्गदर्शक",
+  "muralYearLabel": "वर्ष",
+  "muralSemesterLabel": "सत्र",
+  "forceUpdateTitle": "ऐप अद्यतन करें",
+  "forceUpdateMessage": "एक नया अनिवार्य संस्करण उपलब्ध है। LumiLivre का उपयोग जारी रखने के लिए अद्यतन करें।",
+  "forceUpdateButton": "अभी अद्यतन करें",
+  "forceUpdateStoreError": "ऐप स्टोर नहीं खुल सका।",
+  "tourSkip": "छोड़ें",
+  "tourNext": "आगे",
+  "tourFinish": "समाप्त",
+  "tourStep1Title": "LumiLivre में आपका स्वागत है!",
+  "tourStep1Body": "अपने पुस्तकालय की किताबें एक ही जगह खोजें और उन पर नज़र रखें।",
+  "tourStep2Title": "संग्रह देखें",
+  "tourStep2Body": "कैटलॉग में घूमें या श्रेणियों से छानकर अपनी अगली किताब चुनें।",
+  "tourStep3Title": "खोजें और अद्यतन रहें",
+  "tourStep3Body": "खोज से किताबें तुरंत ढूँढें और नई सूचनाओं के लिए सूचना पट्ट देखें।",
+  "tourStep4Title": "आपकी जगह",
+  "tourStep4Body": "प्रोफ़ाइल में आप ऋण देखते हैं, फ़ोटो बदलते हैं और अपनी पसंद तय करते हैं।",
+  "cancelAction": "रद्द करें",
+  "saveAction": "सहेजें",
+  "refreshAction": "अद्यतन करें",
+  "logoSemanticLabel": "LumiLivre लोगो",
+  "loginSubmit": "लॉग इन करें",
+  "loginAsGuest": "अतिथि के रूप में प्रवेश करें",
+  "loginUserFieldLabel": "नामांकन संख्या या ईमेल",
+  "loginUserFieldRequired": "अपना उपयोगकर्ता नाम लिखें",
+  "loginPasswordRequired": "अपना पासवर्ड लिखें",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "passwordLabel": "पासवर्ड",
+  "changePasswordTitle": "पासवर्ड बदलें",
+  "mandatoryPasswordTitle": "पहला पासवर्ड बदलें",
+  "mandatoryPasswordMessage": "आपकी सुरक्षा के लिए, जारी रखने से पहले अपना वर्तमान लॉगिन पासवर्ड बदलें।",
+  "currentPasswordLabel": "वर्तमान पासवर्ड",
+  "currentPasswordRequired": "वर्तमान पासवर्ड बताएँ",
+  "newPasswordLabel": "नया पासवर्ड",
+  "newPasswordRequired": "नया पासवर्ड बताएँ",
+  "confirmNewPasswordLabel": "नया पासवर्ड पुष्ट करें",
+  "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+  "passwordMinLength": "{count, plural, one{कम से कम {count} अक्षर} other{कम से कम {count} अक्षर}}",
+  "@passwordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "awaitingPasswordChange": "पासवर्ड बदलने की प्रतीक्षा...",
+  "navCategories": "श्रेणियाँ",
+  "navCatalog": "कैटलॉग",
+  "navProfile": "प्रोफ़ाइल",
+  "searchHint": "किताब या लेखक खोजें",
+  "searchResultsTitle": "\"{query}\" के परिणाम",
+  "@searchResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResults": "कोई किताब नहीं मिली।",
+  "browseAllTitle": "सभी श्रेणियाँ देखें",
+  "genreThesis": "शोध-प्रबंध",
+  "genreAdventure": "साहसिक",
+  "genreRomance": "प्रेमकथा",
+  "genreEducational": "शैक्षिक",
+  "genreThriller": "रहस्य-रोमांच",
+  "genreBiography": "जीवनी",
+  "genreFiction": "कथा-साहित्य",
+  "genreHistory": "इतिहास",
+  "genreSelfHelp": "स्वयं-सहायता",
+  "genreFantasy": "फ़ैंटेसी",
+  "genreHorror": "डरावनी",
+  "genrePoetry": "कविता",
+  "genreScienceTechnology": "विज्ञान और तकनीक",
+  "genreChildrenAndTeens": "बाल एवं किशोर",
+  "categoryEmptyTitle": "कोई किताब नहीं मिली",
+  "categoryEmptyMessage": "\"{category}\" में अभी कोई किताब दर्ज नहीं है।\nनई किताबों के लिए जल्द ही फिर आएँ!",
+  "@categoryEmptyMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryExploreOthers": "अन्य श्रेणियाँ देखें",
+  "bookDetailsTitle": "विवरण",
+  "bookCoverMissing": "आवरण नहीं",
+  "bookReleasedOn": "{date} को प्रकाशित",
+  "@bookReleasedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookRatingsLabel": "रेटिंग",
+  "bookCoverTypeLabel": "आवरण का प्रकार",
+  "bookAgeRatingLabel": "आयु वर्ग",
+  "bookPublisherLabel": "प्रकाशक",
+  "bookGenresLabel": "श्रेणियाँ",
+  "bookSynopsisLabel": "सारांश",
+  "loanButtonGuest": "अनुरोध के लिए लॉग इन करें",
+  "loanButtonNoCopies": "कोई प्रति दर्ज नहीं",
+  "loanButtonLimitReached": "ऋण की सीमा पूरी",
+  "loanButtonRequest": "ऋण का अनुरोध करें",
+  "loanButtonPending": "स्वीकृति की प्रतीक्षा",
+  "loanButtonActiveUntil": "{date} तक आपके पास",
+  "@loanButtonActiveUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonOverdue": "वापसी की तारीख़ बीत चुकी",
+  "loanButtonAvailableFrom": "{date} से उपलब्ध",
+  "@loanButtonAvailableFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonUnavailable": "इस समय उपलब्ध नहीं",
+  "loansTabInProgress": "चालू",
+  "loansTabHistory": "इतिहास",
+  "loansHistoryEmpty": "कोई इतिहास नहीं मिला।",
+  "loansActiveEmpty": "कोई चालू ऋण या अनुरोध नहीं।",
+  "loanStatusRejected": "अनुरोध अस्वीकृत",
+  "loanStatusPending": "स्वीकृति की प्रतीक्षा",
+  "loanStatusReturned": "वापस कर दी",
+  "loanStatusOverdue": "{count, plural, one{{count} दिन विलंबित} other{{count} दिन विलंबित}}",
+  "@loanStatusOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanStatusDueToday": "आज वापसी का दिन!",
+  "loanStatusDueInDays": "{count, plural, one{{count} दिन में वापसी} other{{count} दिन में वापसी}}",
+  "@loanStatusDueInDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanRequestedOn": "अनुरोध किया: {date}",
+  "@loanRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanBorrowedOn": "ऋण लिया: {date}",
+  "@loanBorrowedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "likesEmptyMessage": "आपने अभी कोई किताब पसंद नहीं की।",
+  "profileSubtitleWithRank": "{registration} - रैंकिंग: {rank}",
+  "@profileSubtitleWithRank": {
+    "placeholders": {
+      "registration": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineBannerMessage": "आप ऑफ़लाइन हैं। सहेजा गया डेटा दिख रहा है।"
+}

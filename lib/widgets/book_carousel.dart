@@ -127,10 +127,14 @@ class _BookCarouselState extends State<BookCarousel> {
   }
 
   void _navigateToCategory(BuildContext context) {
+    // Aqui gênero e rótulo são a mesma string de propósito: o título da esteira
+    // vem do catálogo da API, que já responde no idioma pedido pelo cabeçalho
+    // `Accept-Language`. Não há par pt-BR/traduzido para separar.
     Navigator.of(context).push(
       AppPageRoute<void>(
         context: context,
-        builder: (_) => CategoryBooksScreen(categoryName: widget.title),
+        builder: (_) =>
+            CategoryBooksScreen(genre: widget.title, title: widget.title),
       ),
     );
   }

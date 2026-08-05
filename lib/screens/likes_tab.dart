@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/favorites.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 
@@ -29,7 +30,7 @@ class LikesTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Você ainda não curtiu nenhum livro.',
+                  AppLocalizations.of(context)!.likesEmptyMessage,
                   style: TextStyle(color: theme.hintColor),
                 ),
               ],

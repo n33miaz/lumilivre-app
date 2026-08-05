@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/loan.dart';
 import '../models/loan_status_code.dart';
 import '../utils/constants.dart';
@@ -25,6 +26,7 @@ class LoanCard extends StatelessWidget {
   /// selo é tinta sobre a carta, e `Colors.green`/`Colors.grey` cravados eram
   /// escuros sobre a carta escura.
   (LoanCardStatus, Color, String, IconData) _getStatusAttributes(
+    AppLocalizations l10n,
     LumiStatusColors statusColors,
     ColorScheme scheme,
   ) {
@@ -35,14 +37,14 @@ class LoanCard extends StatelessWidget {
         return (
           LoanCardStatus.rejected,
           scheme.onSurfaceVariant,
-          'Solicitação Recusada',
+          l10n.loanStatusRejected,
           Icons.cancel_outlined,
         );
       }
       return (
         LoanCardStatus.pending,
         scheme.primary,
-        'Aguardando Aprovação',
+        l10n.loanStatusPending,
         Icons.hourglass_empty,
       );
     }
@@ -51,7 +53,7 @@ class LoanCard extends StatelessWidget {
       return (
         LoanCardStatus.returned,
         scheme.onSurfaceVariant,
-        'Devolvido',
+        l10n.loanStatusReturned,
         Icons.check_circle_outline,
       );
     }
@@ -70,21 +72,21 @@ class LoanCard extends StatelessWidget {
       return (
         LoanCardStatus.overdue,
         statusColors.danger,
-        'Atrasado (${difference.abs()} dias)',
+        l10n.loanStatusOverdue(difference.abs()),
         Icons.warning_amber_rounded,
       );
     } else if (difference == 0) {
       return (
         LoanCardStatus.dueToday,
         statusColors.warning,
-        'Vence Hoje!',
+        l10n.loanStatusDueToday,
         Icons.access_time,
       );
     } else {
       return (
         LoanCardStatus.active,
         statusColors.success,
-        'Devolve em $difference dias',
+        l10n.loanStatusDueInDays(difference),
         Icons.calendar_today,
       );
     }
@@ -92,9 +94,19 @@ class LoanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final (statusEnum, statusColor, statusText, statusIcon) =
-        _getStatusAttributes(LumiStatusColors.of(context), theme.colorScheme);
+    final startDate = DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo);
+    final (
+      statusEnum,
+      statusColor,
+      statusText,
+      statusIcon,
+    ) = _getStatusAttributes(
+      l10n,
+      LumiStatusColors.of(context),
+      theme.colorScheme,
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -145,8 +157,8 @@ class LoanCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         isRequest
-                            ? 'Solicitado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}'
-                            : 'Emprestado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
+                            ? l10n.loanRequestedOn(startDate)
+                            : l10n.loanBorrowedOn(startDate),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.hintColor,
                         ),

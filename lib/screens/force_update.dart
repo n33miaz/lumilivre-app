@@ -58,7 +58,7 @@ class ForceUpdateScreen extends StatelessWidget {
                   SvgPicture.asset(
                     'assets/icons/logo.svg',
                     height: 120,
-                    semanticsLabel: 'Logo LumiLivre',
+                    semanticsLabel: l10n.logoSemanticLabel,
                     colorFilter: ColorFilter.mode(
                       theme.colorScheme.primary,
                       BlendMode.srcIn,

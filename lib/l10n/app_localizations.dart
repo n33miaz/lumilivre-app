@@ -6,7 +6,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_hi.dart';
 import 'app_localizations_pt.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -95,7 +98,10 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
+    Locale('hi'),
     Locale('pt'),
+    Locale('zh'),
   ];
 
   /// No description provided for @appTitle.
@@ -169,6 +175,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'English (US)'**
   String get languageEnglish;
+
+  /// No description provided for @languageSpanish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Espanhol (Espanha)'**
+  String get languageSpanish;
+
+  /// No description provided for @languageChinese.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chinês (simplificado)'**
+  String get languageChinese;
+
+  /// No description provided for @languageHindi.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hindi (Índia)'**
+  String get languageHindi;
 
   /// No description provided for @biometricAccess.
   ///
@@ -691,6 +715,480 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências.'**
   String get tourStep4Body;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'CANCELAR'**
+  String get cancelAction;
+
+  /// No description provided for @saveAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'SALVAR'**
+  String get saveAction;
+
+  /// No description provided for @refreshAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar'**
+  String get refreshAction;
+
+  /// No description provided for @logoSemanticLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Logo LumiLivre'**
+  String get logoSemanticLabel;
+
+  /// No description provided for @loginSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENTRAR'**
+  String get loginSubmit;
+
+  /// No description provided for @loginAsGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENTRAR COMO CONVIDADO'**
+  String get loginAsGuest;
+
+  /// No description provided for @loginUserFieldLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Matrícula ou Email'**
+  String get loginUserFieldLabel;
+
+  /// No description provided for @loginUserFieldRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite seu usuário'**
+  String get loginUserFieldRequired;
+
+  /// No description provided for @loginPasswordRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite sua senha'**
+  String get loginPasswordRequired;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esqueceu sua senha?'**
+  String get forgotPassword;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha'**
+  String get passwordLabel;
+
+  /// No description provided for @changePasswordTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alterar Senha'**
+  String get changePasswordTitle;
+
+  /// No description provided for @mandatoryPasswordTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alterar Primeira Senha'**
+  String get mandatoryPasswordTitle;
+
+  /// No description provided for @mandatoryPasswordMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para sua segurança, altere sua senha atual de login antes de continuar.'**
+  String get mandatoryPasswordMessage;
+
+  /// No description provided for @currentPasswordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha Atual'**
+  String get currentPasswordLabel;
+
+  /// No description provided for @currentPasswordRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe a senha atual'**
+  String get currentPasswordRequired;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova Senha'**
+  String get newPasswordLabel;
+
+  /// No description provided for @newPasswordRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe a nova senha'**
+  String get newPasswordRequired;
+
+  /// No description provided for @confirmNewPasswordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar Nova Senha'**
+  String get confirmNewPasswordLabel;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'As senhas não conferem'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Mínimo de 1 caractere} other{Mínimo de {count} caracteres}}'**
+  String passwordMinLength(int count);
+
+  /// No description provided for @awaitingPasswordChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando alteração de senha...'**
+  String get awaitingPasswordChange;
+
+  /// No description provided for @navCategories.
+  ///
+  /// In pt, this message translates to:
+  /// **'Categorias'**
+  String get navCategories;
+
+  /// No description provided for @navCatalog.
+  ///
+  /// In pt, this message translates to:
+  /// **'Catálogo'**
+  String get navCatalog;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perfil'**
+  String get navProfile;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Procure por um livro ou autor'**
+  String get searchHint;
+
+  /// No description provided for @searchResultsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultados para \"{query}\"'**
+  String searchResultsTitle(String query);
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum livro encontrado.'**
+  String get searchNoResults;
+
+  /// No description provided for @browseAllTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Navegue por todos'**
+  String get browseAllTitle;
+
+  /// No description provided for @genreThesis.
+  ///
+  /// In pt, this message translates to:
+  /// **'TCCs'**
+  String get genreThesis;
+
+  /// No description provided for @genreAdventure.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aventura'**
+  String get genreAdventure;
+
+  /// No description provided for @genreRomance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Romance'**
+  String get genreRomance;
+
+  /// No description provided for @genreEducational.
+  ///
+  /// In pt, this message translates to:
+  /// **'Educativo'**
+  String get genreEducational;
+
+  /// No description provided for @genreThriller.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suspense'**
+  String get genreThriller;
+
+  /// No description provided for @genreBiography.
+  ///
+  /// In pt, this message translates to:
+  /// **'Biografia'**
+  String get genreBiography;
+
+  /// No description provided for @genreFiction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ficção'**
+  String get genreFiction;
+
+  /// No description provided for @genreHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'História'**
+  String get genreHistory;
+
+  /// No description provided for @genreSelfHelp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autoajuda'**
+  String get genreSelfHelp;
+
+  /// No description provided for @genreFantasy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fantasia'**
+  String get genreFantasy;
+
+  /// No description provided for @genreHorror.
+  ///
+  /// In pt, this message translates to:
+  /// **'Terror'**
+  String get genreHorror;
+
+  /// No description provided for @genrePoetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Poesia'**
+  String get genrePoetry;
+
+  /// No description provided for @genreScienceTechnology.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ciência e Tecnologia'**
+  String get genreScienceTechnology;
+
+  /// No description provided for @genreChildrenAndTeens.
+  ///
+  /// In pt, this message translates to:
+  /// **'Infantojuvenil'**
+  String get genreChildrenAndTeens;
+
+  /// No description provided for @categoryEmptyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum livro encontrado'**
+  String get categoryEmptyTitle;
+
+  /// No description provided for @categoryEmptyMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não há livros cadastrados em \"{category}\".\nVolte em breve para novas adições!'**
+  String categoryEmptyMessage(String category);
+
+  /// No description provided for @categoryExploreOthers.
+  ///
+  /// In pt, this message translates to:
+  /// **'EXPLORAR OUTROS'**
+  String get categoryExploreOthers;
+
+  /// No description provided for @bookDetailsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhes'**
+  String get bookDetailsTitle;
+
+  /// No description provided for @bookCoverMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem Capa'**
+  String get bookCoverMissing;
+
+  /// No description provided for @bookReleasedOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lançado em {date}'**
+  String bookReleasedOn(String date);
+
+  /// No description provided for @bookRatingsLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliações'**
+  String get bookRatingsLabel;
+
+  /// No description provided for @bookCoverTypeLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tipo da Capa'**
+  String get bookCoverTypeLabel;
+
+  /// No description provided for @bookAgeRatingLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faixa Etária'**
+  String get bookAgeRatingLabel;
+
+  /// No description provided for @bookPublisherLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editora'**
+  String get bookPublisherLabel;
+
+  /// No description provided for @bookGenresLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gêneros'**
+  String get bookGenresLabel;
+
+  /// No description provided for @bookSynopsisLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sinopse'**
+  String get bookSynopsisLabel;
+
+  /// No description provided for @loanButtonGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'FAÇA LOGIN PARA SOLICITAR'**
+  String get loanButtonGuest;
+
+  /// No description provided for @loanButtonNoCopies.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEM EXEMPLARES CADASTRADOS'**
+  String get loanButtonNoCopies;
+
+  /// No description provided for @loanButtonLimitReached.
+  ///
+  /// In pt, this message translates to:
+  /// **'LIMITE DE EMPRÉSTIMOS ATINGIDO'**
+  String get loanButtonLimitReached;
+
+  /// No description provided for @loanButtonRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'SOLICITAR EMPRÉSTIMO'**
+  String get loanButtonRequest;
+
+  /// No description provided for @loanButtonPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'AGUARDANDO APROVAÇÃO'**
+  String get loanButtonPending;
+
+  /// No description provided for @loanButtonActiveUntil.
+  ///
+  /// In pt, this message translates to:
+  /// **'EM USO ATÉ: {date}'**
+  String loanButtonActiveUntil(String date);
+
+  /// No description provided for @loanButtonOverdue.
+  ///
+  /// In pt, this message translates to:
+  /// **'DEVOLUÇÃO EXCEDIDA'**
+  String get loanButtonOverdue;
+
+  /// No description provided for @loanButtonAvailableFrom.
+  ///
+  /// In pt, this message translates to:
+  /// **'DISPONÍVEL A PARTIR DE: {date}'**
+  String loanButtonAvailableFrom(String date);
+
+  /// No description provided for @loanButtonUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'INDISPONÍVEL NO MOMENTO'**
+  String get loanButtonUnavailable;
+
+  /// No description provided for @loansTabInProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'Em Andamento'**
+  String get loansTabInProgress;
+
+  /// No description provided for @loansTabHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Histórico'**
+  String get loansTabHistory;
+
+  /// No description provided for @loansHistoryEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum histórico encontrado.'**
+  String get loansHistoryEmpty;
+
+  /// No description provided for @loansActiveEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum empréstimo ou solicitação ativa.'**
+  String get loansActiveEmpty;
+
+  /// No description provided for @loanStatusRejected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação Recusada'**
+  String get loanStatusRejected;
+
+  /// No description provided for @loanStatusPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando Aprovação'**
+  String get loanStatusPending;
+
+  /// No description provided for @loanStatusReturned.
+  ///
+  /// In pt, this message translates to:
+  /// **'Devolvido'**
+  String get loanStatusReturned;
+
+  /// No description provided for @loanStatusOverdue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Atrasado (1 dia)} other{Atrasado ({count} dias)}}'**
+  String loanStatusOverdue(int count);
+
+  /// No description provided for @loanStatusDueToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vence Hoje!'**
+  String get loanStatusDueToday;
+
+  /// No description provided for @loanStatusDueInDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Devolve em 1 dia} other{Devolve em {count} dias}}'**
+  String loanStatusDueInDays(int count);
+
+  /// No description provided for @loanRequestedOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitado em: {date}'**
+  String loanRequestedOn(String date);
+
+  /// No description provided for @loanBorrowedOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Emprestado em: {date}'**
+  String loanBorrowedOn(String date);
+
+  /// No description provided for @likesEmptyMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não curtiu nenhum livro.'**
+  String get likesEmptyMessage;
+
+  /// No description provided for @profileSubtitleWithRank.
+  ///
+  /// In pt, this message translates to:
+  /// **'{registration} - Ranking: {rank}'**
+  String profileSubtitleWithRank(String registration, String rank);
+
+  /// No description provided for @offlineBannerMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você está offline. Exibindo dados salvos.'**
+  String get offlineBannerMessage;
 }
 
 class _AppLocalizationsDelegate
@@ -704,7 +1202,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'pt'].contains(locale.languageCode);
+      <String>['en', 'es', 'hi', 'pt', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -715,8 +1213,14 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'hi':
+      return AppLocalizationsHi();
     case 'pt':
       return AppLocalizationsPt();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

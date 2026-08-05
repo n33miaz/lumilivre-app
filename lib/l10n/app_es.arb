@@ -1,0 +1,285 @@
+{
+  "@@locale": "es",
+  "appTitle": "LumiLivre",
+  "settingsTitle": "Configuración",
+  "appearanceSection": "Apariencia",
+  "languageSection": "Idioma",
+  "securitySection": "Seguridad",
+  "accountSection": "Cuenta",
+  "themeLabel": "Tema",
+  "themeLight": "Claro",
+  "themeSystem": "Sistema",
+  "themeDark": "Oscuro",
+  "languagePortuguese": "Portugués (Brasil)",
+  "languageEnglish": "Inglés (EE. UU.)",
+  "languageSpanish": "Español (España)",
+  "languageChinese": "Chino (simplificado)",
+  "languageHindi": "Hindi (India)",
+  "biometricAccess": "Acceso con biometría",
+  "biometricSubtitle": "Entra con huella o rostro.",
+  "biometricUnavailable": "La biometría no está disponible en este dispositivo.",
+  "biometricEnablePrompt": "Confirma tu identidad para activar el acceso con biometría.",
+  "biometricUnlockPrompt": "Confirma tu identidad para continuar en LumiLivre.",
+  "biometricEnableFailed": "No pudimos confirmar tu identidad. La biometría sigue desactivada.",
+  "biometricEnabledConfirmation": "Biometría activada. Se te pedirá la próxima vez que abras la app.",
+  "changePassword": "Cambiar contraseña",
+  "logout": "Salir de la cuenta",
+  "guestSettingsPrompt": "Inicia sesión para acceder a toda la configuración",
+  "loginAction": "Entrar",
+  "guestName": "Invitado",
+  "guestAccessDisabled": "El acceso de invitado está desactivado en esta biblioteca.",
+  "retryAction": "Intentar de nuevo",
+  "sessionExpiredMessage": "Tu sesión ha caducado. Entra de nuevo para continuar.",
+  "connectionErrorMessage": "No pudimos contactar con el servidor. Verifica tu conexión e inténtalo de nuevo.",
+  "loginFailedMessage": "No pudimos iniciar tu sesión. Revisa la matrícula y la contraseña.",
+  "linkOpenError": "No se pudo abrir el enlace en este dispositivo.",
+  "offlineCachedDataMessage": "Sin conexión: mostrando los datos guardados.",
+  "catalogRefreshError": "No se pudo actualizar el catálogo.",
+  "bookListLoadError": "No se pudieron cargar los libros. Verifica tu conexión.",
+  "loadMoreError": "No se pudieron cargar más elementos.",
+  "searchError": "No se pueden buscar libros en este momento.",
+  "passwordChangedMessage": "Contraseña cambiada.",
+  "passwordChangeFailedMessage": "No se pudo cambiar la contraseña. Inténtalo de nuevo.",
+  "passwordChangeRequiredMessage": "Cambia tu contraseña inicial para usar esta función.",
+  "avatarUploading": "Enviando foto...",
+  "avatarUploadSuccess": "Foto actualizada.",
+  "avatarUploadError": "No se pudo actualizar la foto.",
+  "loanRequestSent": "Solicitud enviada. Espera la aprobación de la biblioteca.",
+  "loanRequestFailed": "No se puede solicitar este libro en este momento.",
+  "penaltyNoticeTitle": "Préstamos pausados por ahora",
+  "penaltyNoticeUntil": "Podrás volver a solicitar libros el {date}.",
+  "@penaltyNoticeUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeKind": "Registrado como: {kind}",
+  "@penaltyNoticeKind": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeHint": "Hasta entonces puedes seguir explorando el catálogo y marcando libros como favoritos. Si tienes alguna duda, habla con la biblioteca.",
+  "bookDetailsLoadError": "No se pudieron cargar los detalles del libro.",
+  "guestBookTitle": "Inicia sesión para ver este libro",
+  "guestBookMessage": "La ficha completa, la disponibilidad y el préstamo son para lectores de la biblioteca.",
+  "profileTabLoans": "Préstamos",
+  "profileTabLikes": "Favoritos",
+  "profileTabRanking": "Clasificación",
+  "guestLoansTitle": "Inicia sesión para ver tus préstamos",
+  "guestLoansMessage": "Sigue tus préstamos activos y tu historial.",
+  "guestLikesTitle": "Inicia sesión para marcar libros como favoritos",
+  "guestLikesMessage": "Guarda tus libros favoritos para verlos después.",
+  "guestRankingTitle": "Inicia sesión para ver la clasificación",
+  "guestRankingMessage": "Compara tus lecturas en la clasificación de lectores.",
+  "readerTerm": "Lector",
+  "filterRanking": "Filtrar clasificación",
+  "courseLabel": "Curso",
+  "moduleLabel": "Módulo",
+  "shiftLabel": "Turno",
+  "applyFilters": "APLICAR FILTROS",
+  "clearFilters": "Limpiar filtros",
+  "emptyRankingMessage": "No se encontró ningún lector.",
+  "rankingLoginPrompt": "Inicia sesión para ver la clasificación.",
+  "rankingUnavailable": "Clasificación no disponible para esta biblioteca.",
+  "muralTitle": "Tablón",
+  "muralEmpty": "Todavía no hay publicaciones por aquí.",
+  "muralError": "No se pudo cargar el tablón. Verifica tu conexión.",
+  "muralRetry": "Intentar de nuevo",
+  "muralLoginPrompt": "Inicia sesión para ver el tablón.",
+  "muralTypeAnnouncement": "Comunicado",
+  "muralTypeAttachment": "Adjunto",
+  "muralTypeWork": "Trabajo",
+  "muralOpenDocument": "Abrir documento",
+  "muralExternalLink": "Enlace externo",
+  "muralByAuthors": "por {authors}",
+  "@muralByAuthors": {
+    "placeholders": {
+      "authors": {
+        "type": "String"
+      }
+    }
+  },
+  "muralAuthorsLabel": "Autor(es)",
+  "muralAdvisorsLabel": "Tutor(es)",
+  "muralYearLabel": "Año",
+  "muralSemesterLabel": "Semestre",
+  "forceUpdateTitle": "Actualiza la aplicación",
+  "forceUpdateMessage": "Hay una nueva versión obligatoria disponible. Actualiza para seguir usando LumiLivre.",
+  "forceUpdateButton": "Actualizar ahora",
+  "forceUpdateStoreError": "No se pudo abrir la tienda de aplicaciones.",
+  "tourSkip": "Omitir",
+  "tourNext": "Siguiente",
+  "tourFinish": "Finalizar",
+  "tourStep1Title": "¡Bienvenido(a) a LumiLivre!",
+  "tourStep1Body": "Descubre y sigue los libros de tu biblioteca en un solo lugar.",
+  "tourStep2Title": "Explora la colección",
+  "tourStep2Body": "Navega por el Catálogo o filtra por Categorías para encontrar tu próxima lectura.",
+  "tourStep3Title": "Busca y mantente al día",
+  "tourStep3Body": "Usa la búsqueda para encontrar títulos rápidamente y consulta el Tablón para ver novedades y comunicados.",
+  "tourStep4Title": "Tu espacio",
+  "tourStep4Body": "En el Perfil sigues tus préstamos, cambias tu foto y ajustas tus preferencias.",
+  "cancelAction": "CANCELAR",
+  "saveAction": "GUARDAR",
+  "refreshAction": "Actualizar",
+  "logoSemanticLabel": "Logotipo de LumiLivre",
+  "loginSubmit": "ENTRAR",
+  "loginAsGuest": "ENTRAR COMO INVITADO",
+  "loginUserFieldLabel": "Matrícula o correo electrónico",
+  "loginUserFieldRequired": "Escribe tu usuario",
+  "loginPasswordRequired": "Escribe tu contraseña",
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "passwordLabel": "Contraseña",
+  "changePasswordTitle": "Cambiar contraseña",
+  "mandatoryPasswordTitle": "Cambiar la primera contraseña",
+  "mandatoryPasswordMessage": "Por tu seguridad, cambia tu contraseña actual de acceso antes de continuar.",
+  "currentPasswordLabel": "Contraseña actual",
+  "currentPasswordRequired": "Indica la contraseña actual",
+  "newPasswordLabel": "Nueva contraseña",
+  "newPasswordRequired": "Indica la nueva contraseña",
+  "confirmNewPasswordLabel": "Confirmar nueva contraseña",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden",
+  "passwordMinLength": "{count, plural, =1{Mínimo 1 carácter} other{Mínimo {count} caracteres}}",
+  "@passwordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "awaitingPasswordChange": "Esperando el cambio de contraseña...",
+  "navCategories": "Categorías",
+  "navCatalog": "Catálogo",
+  "navProfile": "Perfil",
+  "searchHint": "Busca un libro o autor",
+  "searchResultsTitle": "Resultados de \"{query}\"",
+  "@searchResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResults": "No se encontró ningún libro.",
+  "browseAllTitle": "Explora todas",
+  "genreThesis": "Trabajos finales",
+  "genreAdventure": "Aventura",
+  "genreRomance": "Romance",
+  "genreEducational": "Educativo",
+  "genreThriller": "Suspense",
+  "genreBiography": "Biografía",
+  "genreFiction": "Ficción",
+  "genreHistory": "Historia",
+  "genreSelfHelp": "Autoayuda",
+  "genreFantasy": "Fantasía",
+  "genreHorror": "Terror",
+  "genrePoetry": "Poesía",
+  "genreScienceTechnology": "Ciencia y Tecnología",
+  "genreChildrenAndTeens": "Infantil y juvenil",
+  "categoryEmptyTitle": "No se encontró ningún libro",
+  "categoryEmptyMessage": "Todavía no hay libros registrados en \"{category}\".\n¡Vuelve pronto para ver las novedades!",
+  "@categoryEmptyMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryExploreOthers": "EXPLORAR OTRAS",
+  "bookDetailsTitle": "Detalles",
+  "bookCoverMissing": "Sin portada",
+  "bookReleasedOn": "Publicado el {date}",
+  "@bookReleasedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookRatingsLabel": "Valoraciones",
+  "bookCoverTypeLabel": "Tipo de portada",
+  "bookAgeRatingLabel": "Edad recomendada",
+  "bookPublisherLabel": "Editorial",
+  "bookGenresLabel": "Géneros",
+  "bookSynopsisLabel": "Sinopsis",
+  "loanButtonGuest": "INICIA SESIÓN PARA SOLICITAR",
+  "loanButtonNoCopies": "SIN EJEMPLARES REGISTRADOS",
+  "loanButtonLimitReached": "LÍMITE DE PRÉSTAMOS ALCANZADO",
+  "loanButtonRequest": "SOLICITAR PRÉSTAMO",
+  "loanButtonPending": "ESPERANDO APROBACIÓN",
+  "loanButtonActiveUntil": "EN USO HASTA: {date}",
+  "@loanButtonActiveUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonOverdue": "DEVOLUCIÓN VENCIDA",
+  "loanButtonAvailableFrom": "DISPONIBLE A PARTIR DE: {date}",
+  "@loanButtonAvailableFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonUnavailable": "NO DISPONIBLE AHORA",
+  "loansTabInProgress": "En curso",
+  "loansTabHistory": "Historial",
+  "loansHistoryEmpty": "No se encontró historial.",
+  "loansActiveEmpty": "No hay préstamos ni solicitudes activas.",
+  "loanStatusRejected": "Solicitud rechazada",
+  "loanStatusPending": "Esperando aprobación",
+  "loanStatusReturned": "Devuelto",
+  "loanStatusOverdue": "{count, plural, =1{Atrasado (1 día)} other{Atrasado ({count} días)}}",
+  "@loanStatusOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanStatusDueToday": "¡Vence hoy!",
+  "loanStatusDueInDays": "{count, plural, =1{Se devuelve en 1 día} other{Se devuelve en {count} días}}",
+  "@loanStatusDueInDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanRequestedOn": "Solicitado el: {date}",
+  "@loanRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanBorrowedOn": "Prestado el: {date}",
+  "@loanBorrowedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "likesEmptyMessage": "Todavía no has marcado ningún libro como favorito.",
+  "profileSubtitleWithRank": "{registration} - Clasificación: {rank}",
+  "@profileSubtitleWithRank": {
+    "placeholders": {
+      "registration": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineBannerMessage": "Estás sin conexión. Mostrando los datos guardados."
+}

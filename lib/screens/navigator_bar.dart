@@ -152,6 +152,7 @@ class _MainNavigatorState extends State<MainNavigator> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
     final showContents = GuestAccess.of(context).contentsTabVisible;
 
     if (auth.isInitialPassword) {
@@ -169,14 +170,14 @@ class _MainNavigatorState extends State<MainNavigator> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text("Aguardando alteração de senha..."),
+              Text(l10n.awaitingPasswordChange),
             ],
           ),
         ),
       );
     }
 
-    String headerTitle = 'LumiLivre';
+    String headerTitle = l10n.appTitle;
     bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
 
     // A aba "Mural" (índice 2) só existe quando a feature de conteúdos está
@@ -194,20 +195,20 @@ class _MainNavigatorState extends State<MainNavigator> {
     final navItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: _buildIcon('search-category', 0),
-        label: 'Categorias',
+        label: l10n.navCategories,
       ),
       BottomNavigationBarItem(
         icon: _buildIcon('logo', 1, isLogo: true),
-        label: 'Catálogo',
+        label: l10n.navCatalog,
       ),
       if (showContents)
         BottomNavigationBarItem(
           icon: _buildMuralIcon(2),
-          label: AppLocalizations.of(context)!.muralTitle,
+          label: l10n.muralTitle,
         ),
       BottomNavigationBarItem(
         icon: _buildIcon('profile', profileIndex),
-        label: 'Perfil',
+        label: l10n.navProfile,
       ),
     ];
 

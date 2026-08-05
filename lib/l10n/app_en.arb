@@ -12,6 +12,9 @@
   "themeDark": "Dark",
   "languagePortuguese": "Portuguese (Brazil)",
   "languageEnglish": "English (US)",
+  "languageSpanish": "Spanish (Spain)",
+  "languageChinese": "Chinese (Simplified)",
+  "languageHindi": "Hindi (India)",
   "biometricAccess": "Biometric access",
   "biometricSubtitle": "Sign in with fingerprint or face.",
   "biometricUnavailable": "Biometrics are not available on this device.",
@@ -119,5 +122,164 @@
   "tourStep3Title": "Search and stay in the loop",
   "tourStep3Body": "Use search to find titles quickly and check the Board for news and announcements.",
   "tourStep4Title": "Your space",
-  "tourStep4Body": "In your Profile you can track loans, change your photo and adjust your preferences."
+  "tourStep4Body": "In your Profile you can track loans, change your photo and adjust your preferences.",
+  "cancelAction": "CANCEL",
+  "saveAction": "SAVE",
+  "refreshAction": "Refresh",
+  "logoSemanticLabel": "LumiLivre logo",
+  "loginSubmit": "SIGN IN",
+  "loginAsGuest": "CONTINUE AS GUEST",
+  "loginUserFieldLabel": "ID number or email",
+  "loginUserFieldRequired": "Enter your username",
+  "loginPasswordRequired": "Enter your password",
+  "forgotPassword": "Forgot your password?",
+  "passwordLabel": "Password",
+  "changePasswordTitle": "Change Password",
+  "mandatoryPasswordTitle": "Change Your First Password",
+  "mandatoryPasswordMessage": "For your security, change your current login password before continuing.",
+  "currentPasswordLabel": "Current Password",
+  "currentPasswordRequired": "Enter your current password",
+  "newPasswordLabel": "New Password",
+  "newPasswordRequired": "Enter the new password",
+  "confirmNewPasswordLabel": "Confirm New Password",
+  "passwordsDoNotMatch": "The passwords don't match",
+  "passwordMinLength": "{count, plural, =1{At least 1 character} other{At least {count} characters}}",
+  "@passwordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "awaitingPasswordChange": "Waiting for the password change...",
+  "navCategories": "Categories",
+  "navCatalog": "Catalog",
+  "navProfile": "Profile",
+  "searchHint": "Search for a book or author",
+  "searchResultsTitle": "Results for \"{query}\"",
+  "@searchResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResults": "No books found.",
+  "browseAllTitle": "Browse all",
+  "genreThesis": "Theses",
+  "genreAdventure": "Adventure",
+  "genreRomance": "Romance",
+  "genreEducational": "Educational",
+  "genreThriller": "Thriller",
+  "genreBiography": "Biography",
+  "genreFiction": "Fiction",
+  "genreHistory": "History",
+  "genreSelfHelp": "Self-help",
+  "genreFantasy": "Fantasy",
+  "genreHorror": "Horror",
+  "genrePoetry": "Poetry",
+  "genreScienceTechnology": "Science and Technology",
+  "genreChildrenAndTeens": "Children and Teens",
+  "categoryEmptyTitle": "No books found",
+  "categoryEmptyMessage": "There are no books in \"{category}\" yet.\nCheck back soon for new additions!",
+  "@categoryEmptyMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryExploreOthers": "EXPLORE OTHERS",
+  "bookDetailsTitle": "Details",
+  "bookCoverMissing": "No Cover",
+  "bookReleasedOn": "Released on {date}",
+  "@bookReleasedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookRatingsLabel": "Ratings",
+  "bookCoverTypeLabel": "Cover Type",
+  "bookAgeRatingLabel": "Age Rating",
+  "bookPublisherLabel": "Publisher",
+  "bookGenresLabel": "Genres",
+  "bookSynopsisLabel": "Synopsis",
+  "loanButtonGuest": "SIGN IN TO REQUEST",
+  "loanButtonNoCopies": "NO COPIES REGISTERED",
+  "loanButtonLimitReached": "LOAN LIMIT REACHED",
+  "loanButtonRequest": "REQUEST LOAN",
+  "loanButtonPending": "AWAITING APPROVAL",
+  "loanButtonActiveUntil": "IN USE UNTIL: {date}",
+  "@loanButtonActiveUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonOverdue": "RETURN OVERDUE",
+  "loanButtonAvailableFrom": "AVAILABLE FROM: {date}",
+  "@loanButtonAvailableFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonUnavailable": "CURRENTLY UNAVAILABLE",
+  "loansTabInProgress": "In Progress",
+  "loansTabHistory": "History",
+  "loansHistoryEmpty": "No history found.",
+  "loansActiveEmpty": "No active loans or requests.",
+  "loanStatusRejected": "Request Declined",
+  "loanStatusPending": "Awaiting Approval",
+  "loanStatusReturned": "Returned",
+  "loanStatusOverdue": "{count, plural, =1{Overdue (1 day)} other{Overdue ({count} days)}}",
+  "@loanStatusOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanStatusDueToday": "Due Today!",
+  "loanStatusDueInDays": "{count, plural, =1{Due in 1 day} other{Due in {count} days}}",
+  "@loanStatusDueInDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanRequestedOn": "Requested on: {date}",
+  "@loanRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanBorrowedOn": "Borrowed on: {date}",
+  "@loanBorrowedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "likesEmptyMessage": "You haven't liked any books yet.",
+  "profileSubtitleWithRank": "{registration} - Ranking: {rank}",
+  "@profileSubtitleWithRank": {
+    "placeholders": {
+      "registration": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineBannerMessage": "You're offline. Showing saved data."
 }

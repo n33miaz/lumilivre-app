@@ -214,6 +214,7 @@ class _LoansTabState extends State<LoansTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Column(
@@ -268,14 +269,14 @@ class _LoansTabState extends State<LoansTab> {
                     children: [
                       Expanded(
                         child: _FilterButton(
-                          label: 'Em Andamento',
+                          label: l10n.loansTabInProgress,
                           isSelected: _currentIndex == 0,
                           onTap: () => _onTabChanged(0),
                         ),
                       ),
                       Expanded(
                         child: _FilterButton(
-                          label: 'Histórico',
+                          label: l10n.loansTabHistory,
                           isSelected: _currentIndex == 1,
                           onTap: () => _onTabChanged(1),
                         ),
@@ -516,6 +517,7 @@ class _LoansListSimple extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     if (loans.isEmpty) {
@@ -532,12 +534,10 @@ class _LoansListSimple extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              isHistory
-                  ? 'Nenhum histórico encontrado.'
-                  : 'Nenhum empréstimo ou solicitação ativa.',
+              isHistory ? l10n.loansHistoryEmpty : l10n.loansActiveEmpty,
               style: TextStyle(color: theme.hintColor),
             ),
-            TextButton(onPressed: onRetry, child: const Text('Atualizar')),
+            TextButton(onPressed: onRetry, child: Text(l10n.refreshAction)),
           ],
         ),
       );

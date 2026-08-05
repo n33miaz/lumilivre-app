@@ -154,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final guestAccess = GuestAccess.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -181,16 +182,16 @@ class _LoginScreenState extends State<LoginScreen>
                         SvgPicture.asset(
                           'assets/icons/logo.svg',
                           height: 200,
-                          semanticsLabel: 'Logo LumiLivre',
+                          semanticsLabel: l10n.logoSemanticLabel,
                           colorFilter: ColorFilter.mode(
                             theme.colorScheme.primary,
                             BlendMode.srcIn,
                           ),
                         ),
-                        const Text(
-                          'LumiLivre',
+                        Text(
+                          l10n.appTitle,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                           ),
@@ -198,24 +199,24 @@ class _LoginScreenState extends State<LoginScreen>
                         const SizedBox(height: 25),
                         TextFormField(
                           controller: _userController,
-                          decoration: const InputDecoration(
-                            labelText: 'Matrícula ou Email',
-                            prefixIcon: Icon(Icons.person_outline),
+                          decoration: InputDecoration(
+                            labelText: l10n.loginUserFieldLabel,
+                            prefixIcon: const Icon(Icons.person_outline),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) =>
-                              v!.isEmpty ? 'Digite seu usuário' : null,
+                              v!.isEmpty ? l10n.loginUserFieldRequired : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Senha',
-                            prefixIcon: Icon(Icons.lock_outline),
+                          decoration: InputDecoration(
+                            labelText: l10n.passwordLabel,
+                            prefixIcon: const Icon(Icons.lock_outline),
                           ),
                           obscureText: true,
                           validator: (v) =>
-                              v!.isEmpty ? 'Digite sua senha' : null,
+                              v!.isEmpty ? l10n.loginPasswordRequired : null,
                         ),
 
                         const SizedBox(height: 16),
@@ -231,12 +232,12 @@ class _LoginScreenState extends State<LoginScreen>
                                     strokeWidth: 3,
                                   ),
                                 )
-                              : const Text(
-                                  style: TextStyle(
+                              : Text(
+                                  style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                  'ENTRAR',
+                                  l10n.loginSubmit,
                                 ),
                         ),
                         const SizedBox(height: 12),
@@ -264,13 +265,13 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                               ),
                             ),
-                            child: const Text('ENTRAR COMO CONVIDADO'),
+                            child: Text(l10n.loginAsGuest),
                           )
                         else
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             child: Text(
-                              AppLocalizations.of(context)!.guestAccessDisabled,
+                              l10n.guestAccessDisabled,
                               textAlign: TextAlign.center,
                               style: TextStyle(color: theme.hintColor),
                             ),
@@ -287,7 +288,7 @@ class _LoginScreenState extends State<LoginScreen>
                             style: TextButton.styleFrom(
                               foregroundColor: theme.hintColor,
                             ),
-                            child: const Text('Esqueceu sua senha?'),
+                            child: Text(l10n.forgotPassword),
                           ),
                         ),
                       ],

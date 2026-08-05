@@ -15,6 +15,11 @@ class ChangePasswordDialog extends StatefulWidget {
 }
 
 class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
+  /// Tamanho mínimo aceito localmente. A regra que vale é a da API (que responde
+  /// com a própria frase quando recusa); esta só evita a ida à rede — por isso o
+  /// número vem daqui e não do texto, senão traduzir a frase mudaria a validação.
+  static const int _minPasswordLength = 6;
+
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -78,8 +83,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     // Cor, raio, elevação e tipografia do título vêm do `dialogTheme`: os dois
     // diálogos de senha repetiam essas decisões e chegavam a resultados
     // diferentes entre si e do resto do app.
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
-      title: const Text('Alterar Senha'),
+      title: Text(l10n.changePasswordTitle),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -88,11 +95,13 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
             children: [
               TextFormField(
                 controller: _currentPasswordController,
-                decoration: const InputDecoration(labelText: 'Senha Atual'),
+                decoration: InputDecoration(
+                  labelText: l10n.currentPasswordLabel,
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Informe a senha atual';
+                    return l10n.currentPasswordRequired;
                   }
                   return null;
                 },
@@ -100,26 +109,28 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _newPasswordController,
-                decoration: const InputDecoration(labelText: 'Nova Senha'),
+                decoration: InputDecoration(labelText: l10n.newPasswordLabel),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Informe a nova senha';
+                    return l10n.newPasswordRequired;
                   }
-                  if (value.length < 6) return 'Mínimo de 6 caracteres';
+                  if (value.length < _minPasswordLength) {
+                    return l10n.passwordMinLength(_minPasswordLength);
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirmar Nova Senha',
+                decoration: InputDecoration(
+                  labelText: l10n.confirmNewPasswordLabel,
                 ),
                 obscureText: true,
                 validator: (value) {
                   if (value != _newPasswordController.text) {
-                    return 'As senhas não conferem';
+                    return l10n.passwordsDoNotMatch;
                   }
                   return null;
                 },
@@ -134,7 +145,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           style: TextButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-          child: const Text('CANCELAR'),
+          child: Text(l10n.cancelAction),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _submit,
@@ -147,7 +158,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                     strokeWidth: 2,
                   ),
                 )
-              : const Text('SALVAR'),
+              : Text(l10n.saveAction),
         ),
       ],
     );

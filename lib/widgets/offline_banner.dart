@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/utils/app_motion.dart';
 
 class OfflineBanner extends StatefulWidget {
@@ -82,7 +83,7 @@ class _OfflineBannerState extends State<OfflineBanner> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Você está offline. Exibindo dados salvos.',
+                      AppLocalizations.of(context)!.offlineBannerMessage,
                       style: TextStyle(
                         color: scheme.onInverseSurface,
                         fontSize: 12,

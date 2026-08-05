@@ -398,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         authProvider.user?.readerRegistrationNumber ?? '---';
     String rankingText = _myRankPosition != null ? '#$_myRankPosition' : '--';
     final subtitle = _rankingEnabled
-        ? '$registrationNumber - Ranking: $rankingText'
+        ? l10n.profileSubtitleWithRank(registrationNumber, rankingText)
         : registrationNumber;
 
     final canEditAvatar = access.canEditAvatar;

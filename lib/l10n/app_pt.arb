@@ -12,6 +12,9 @@
   "themeDark": "Escuro",
   "languagePortuguese": "Português (Brasil)",
   "languageEnglish": "English (US)",
+  "languageSpanish": "Espanhol (Espanha)",
+  "languageChinese": "Chinês (simplificado)",
+  "languageHindi": "Hindi (Índia)",
   "biometricAccess": "Acesso com biometria",
   "biometricSubtitle": "Entrar com digital ou rosto.",
   "biometricUnavailable": "Biometria não disponível neste dispositivo.",
@@ -119,5 +122,164 @@
   "tourStep3Title": "Busque e fique por dentro",
   "tourStep3Body": "Use a busca para achar títulos rapidamente e confira o Mural para novidades e comunicados.",
   "tourStep4Title": "Seu espaço",
-  "tourStep4Body": "No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências."
+  "tourStep4Body": "No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências.",
+  "cancelAction": "CANCELAR",
+  "saveAction": "SALVAR",
+  "refreshAction": "Atualizar",
+  "logoSemanticLabel": "Logo LumiLivre",
+  "loginSubmit": "ENTRAR",
+  "loginAsGuest": "ENTRAR COMO CONVIDADO",
+  "loginUserFieldLabel": "Matrícula ou Email",
+  "loginUserFieldRequired": "Digite seu usuário",
+  "loginPasswordRequired": "Digite sua senha",
+  "forgotPassword": "Esqueceu sua senha?",
+  "passwordLabel": "Senha",
+  "changePasswordTitle": "Alterar Senha",
+  "mandatoryPasswordTitle": "Alterar Primeira Senha",
+  "mandatoryPasswordMessage": "Para sua segurança, altere sua senha atual de login antes de continuar.",
+  "currentPasswordLabel": "Senha Atual",
+  "currentPasswordRequired": "Informe a senha atual",
+  "newPasswordLabel": "Nova Senha",
+  "newPasswordRequired": "Informe a nova senha",
+  "confirmNewPasswordLabel": "Confirmar Nova Senha",
+  "passwordsDoNotMatch": "As senhas não conferem",
+  "passwordMinLength": "{count, plural, =1{Mínimo de 1 caractere} other{Mínimo de {count} caracteres}}",
+  "@passwordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "awaitingPasswordChange": "Aguardando alteração de senha...",
+  "navCategories": "Categorias",
+  "navCatalog": "Catálogo",
+  "navProfile": "Perfil",
+  "searchHint": "Procure por um livro ou autor",
+  "searchResultsTitle": "Resultados para \"{query}\"",
+  "@searchResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResults": "Nenhum livro encontrado.",
+  "browseAllTitle": "Navegue por todos",
+  "genreThesis": "TCCs",
+  "genreAdventure": "Aventura",
+  "genreRomance": "Romance",
+  "genreEducational": "Educativo",
+  "genreThriller": "Suspense",
+  "genreBiography": "Biografia",
+  "genreFiction": "Ficção",
+  "genreHistory": "História",
+  "genreSelfHelp": "Autoajuda",
+  "genreFantasy": "Fantasia",
+  "genreHorror": "Terror",
+  "genrePoetry": "Poesia",
+  "genreScienceTechnology": "Ciência e Tecnologia",
+  "genreChildrenAndTeens": "Infantojuvenil",
+  "categoryEmptyTitle": "Nenhum livro encontrado",
+  "categoryEmptyMessage": "Ainda não há livros cadastrados em \"{category}\".\nVolte em breve para novas adições!",
+  "@categoryEmptyMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryExploreOthers": "EXPLORAR OUTROS",
+  "bookDetailsTitle": "Detalhes",
+  "bookCoverMissing": "Sem Capa",
+  "bookReleasedOn": "Lançado em {date}",
+  "@bookReleasedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookRatingsLabel": "Avaliações",
+  "bookCoverTypeLabel": "Tipo da Capa",
+  "bookAgeRatingLabel": "Faixa Etária",
+  "bookPublisherLabel": "Editora",
+  "bookGenresLabel": "Gêneros",
+  "bookSynopsisLabel": "Sinopse",
+  "loanButtonGuest": "FAÇA LOGIN PARA SOLICITAR",
+  "loanButtonNoCopies": "SEM EXEMPLARES CADASTRADOS",
+  "loanButtonLimitReached": "LIMITE DE EMPRÉSTIMOS ATINGIDO",
+  "loanButtonRequest": "SOLICITAR EMPRÉSTIMO",
+  "loanButtonPending": "AGUARDANDO APROVAÇÃO",
+  "loanButtonActiveUntil": "EM USO ATÉ: {date}",
+  "@loanButtonActiveUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonOverdue": "DEVOLUÇÃO EXCEDIDA",
+  "loanButtonAvailableFrom": "DISPONÍVEL A PARTIR DE: {date}",
+  "@loanButtonAvailableFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanButtonUnavailable": "INDISPONÍVEL NO MOMENTO",
+  "loansTabInProgress": "Em Andamento",
+  "loansTabHistory": "Histórico",
+  "loansHistoryEmpty": "Nenhum histórico encontrado.",
+  "loansActiveEmpty": "Nenhum empréstimo ou solicitação ativa.",
+  "loanStatusRejected": "Solicitação Recusada",
+  "loanStatusPending": "Aguardando Aprovação",
+  "loanStatusReturned": "Devolvido",
+  "loanStatusOverdue": "{count, plural, =1{Atrasado (1 dia)} other{Atrasado ({count} dias)}}",
+  "@loanStatusOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanStatusDueToday": "Vence Hoje!",
+  "loanStatusDueInDays": "{count, plural, =1{Devolve em 1 dia} other{Devolve em {count} dias}}",
+  "@loanStatusDueInDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "loanRequestedOn": "Solicitado em: {date}",
+  "@loanRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanBorrowedOn": "Emprestado em: {date}",
+  "@loanBorrowedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "likesEmptyMessage": "Você ainda não curtiu nenhum livro.",
+  "profileSubtitleWithRank": "{registration} - Ranking: {rank}",
+  "@profileSubtitleWithRank": {
+    "placeholders": {
+      "registration": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineBannerMessage": "Você está offline. Exibindo dados salvos."
 }

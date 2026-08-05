@@ -45,6 +45,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get languageEnglish => 'English (US)';
 
   @override
+  String get languageSpanish => 'Espanhol (Espanha)';
+
+  @override
+  String get languageChinese => 'Chinês (simplificado)';
+
+  @override
+  String get languageHindi => 'Hindi (Índia)';
+
+  @override
   String get biometricAccess => 'Acesso com biometria';
 
   @override
@@ -339,4 +348,283 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get tourStep4Body =>
       'No Perfil você acompanha empréstimos, troca sua foto e ajusta suas preferências.';
+
+  @override
+  String get cancelAction => 'CANCELAR';
+
+  @override
+  String get saveAction => 'SALVAR';
+
+  @override
+  String get refreshAction => 'Atualizar';
+
+  @override
+  String get logoSemanticLabel => 'Logo LumiLivre';
+
+  @override
+  String get loginSubmit => 'ENTRAR';
+
+  @override
+  String get loginAsGuest => 'ENTRAR COMO CONVIDADO';
+
+  @override
+  String get loginUserFieldLabel => 'Matrícula ou Email';
+
+  @override
+  String get loginUserFieldRequired => 'Digite seu usuário';
+
+  @override
+  String get loginPasswordRequired => 'Digite sua senha';
+
+  @override
+  String get forgotPassword => 'Esqueceu sua senha?';
+
+  @override
+  String get passwordLabel => 'Senha';
+
+  @override
+  String get changePasswordTitle => 'Alterar Senha';
+
+  @override
+  String get mandatoryPasswordTitle => 'Alterar Primeira Senha';
+
+  @override
+  String get mandatoryPasswordMessage =>
+      'Para sua segurança, altere sua senha atual de login antes de continuar.';
+
+  @override
+  String get currentPasswordLabel => 'Senha Atual';
+
+  @override
+  String get currentPasswordRequired => 'Informe a senha atual';
+
+  @override
+  String get newPasswordLabel => 'Nova Senha';
+
+  @override
+  String get newPasswordRequired => 'Informe a nova senha';
+
+  @override
+  String get confirmNewPasswordLabel => 'Confirmar Nova Senha';
+
+  @override
+  String get passwordsDoNotMatch => 'As senhas não conferem';
+
+  @override
+  String passwordMinLength(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mínimo de $count caracteres',
+      one: 'Mínimo de 1 caractere',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get awaitingPasswordChange => 'Aguardando alteração de senha...';
+
+  @override
+  String get navCategories => 'Categorias';
+
+  @override
+  String get navCatalog => 'Catálogo';
+
+  @override
+  String get navProfile => 'Perfil';
+
+  @override
+  String get searchHint => 'Procure por um livro ou autor';
+
+  @override
+  String searchResultsTitle(String query) {
+    return 'Resultados para \"$query\"';
+  }
+
+  @override
+  String get searchNoResults => 'Nenhum livro encontrado.';
+
+  @override
+  String get browseAllTitle => 'Navegue por todos';
+
+  @override
+  String get genreThesis => 'TCCs';
+
+  @override
+  String get genreAdventure => 'Aventura';
+
+  @override
+  String get genreRomance => 'Romance';
+
+  @override
+  String get genreEducational => 'Educativo';
+
+  @override
+  String get genreThriller => 'Suspense';
+
+  @override
+  String get genreBiography => 'Biografia';
+
+  @override
+  String get genreFiction => 'Ficção';
+
+  @override
+  String get genreHistory => 'História';
+
+  @override
+  String get genreSelfHelp => 'Autoajuda';
+
+  @override
+  String get genreFantasy => 'Fantasia';
+
+  @override
+  String get genreHorror => 'Terror';
+
+  @override
+  String get genrePoetry => 'Poesia';
+
+  @override
+  String get genreScienceTechnology => 'Ciência e Tecnologia';
+
+  @override
+  String get genreChildrenAndTeens => 'Infantojuvenil';
+
+  @override
+  String get categoryEmptyTitle => 'Nenhum livro encontrado';
+
+  @override
+  String categoryEmptyMessage(String category) {
+    return 'Ainda não há livros cadastrados em \"$category\".\nVolte em breve para novas adições!';
+  }
+
+  @override
+  String get categoryExploreOthers => 'EXPLORAR OUTROS';
+
+  @override
+  String get bookDetailsTitle => 'Detalhes';
+
+  @override
+  String get bookCoverMissing => 'Sem Capa';
+
+  @override
+  String bookReleasedOn(String date) {
+    return 'Lançado em $date';
+  }
+
+  @override
+  String get bookRatingsLabel => 'Avaliações';
+
+  @override
+  String get bookCoverTypeLabel => 'Tipo da Capa';
+
+  @override
+  String get bookAgeRatingLabel => 'Faixa Etária';
+
+  @override
+  String get bookPublisherLabel => 'Editora';
+
+  @override
+  String get bookGenresLabel => 'Gêneros';
+
+  @override
+  String get bookSynopsisLabel => 'Sinopse';
+
+  @override
+  String get loanButtonGuest => 'FAÇA LOGIN PARA SOLICITAR';
+
+  @override
+  String get loanButtonNoCopies => 'SEM EXEMPLARES CADASTRADOS';
+
+  @override
+  String get loanButtonLimitReached => 'LIMITE DE EMPRÉSTIMOS ATINGIDO';
+
+  @override
+  String get loanButtonRequest => 'SOLICITAR EMPRÉSTIMO';
+
+  @override
+  String get loanButtonPending => 'AGUARDANDO APROVAÇÃO';
+
+  @override
+  String loanButtonActiveUntil(String date) {
+    return 'EM USO ATÉ: $date';
+  }
+
+  @override
+  String get loanButtonOverdue => 'DEVOLUÇÃO EXCEDIDA';
+
+  @override
+  String loanButtonAvailableFrom(String date) {
+    return 'DISPONÍVEL A PARTIR DE: $date';
+  }
+
+  @override
+  String get loanButtonUnavailable => 'INDISPONÍVEL NO MOMENTO';
+
+  @override
+  String get loansTabInProgress => 'Em Andamento';
+
+  @override
+  String get loansTabHistory => 'Histórico';
+
+  @override
+  String get loansHistoryEmpty => 'Nenhum histórico encontrado.';
+
+  @override
+  String get loansActiveEmpty => 'Nenhum empréstimo ou solicitação ativa.';
+
+  @override
+  String get loanStatusRejected => 'Solicitação Recusada';
+
+  @override
+  String get loanStatusPending => 'Aguardando Aprovação';
+
+  @override
+  String get loanStatusReturned => 'Devolvido';
+
+  @override
+  String loanStatusOverdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Atrasado ($count dias)',
+      one: 'Atrasado (1 dia)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loanStatusDueToday => 'Vence Hoje!';
+
+  @override
+  String loanStatusDueInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Devolve em $count dias',
+      one: 'Devolve em 1 dia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loanRequestedOn(String date) {
+    return 'Solicitado em: $date';
+  }
+
+  @override
+  String loanBorrowedOn(String date) {
+    return 'Emprestado em: $date';
+  }
+
+  @override
+  String get likesEmptyMessage => 'Você ainda não curtiu nenhum livro.';
+
+  @override
+  String profileSubtitleWithRank(String registration, String rank) {
+    return '$registration - Ranking: $rank';
+  }
+
+  @override
+  String get offlineBannerMessage =>
+      'Você está offline. Exibindo dados salvos.';
 }

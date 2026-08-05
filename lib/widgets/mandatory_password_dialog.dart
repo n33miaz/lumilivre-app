@@ -16,6 +16,9 @@ class MandatoryPasswordDialog extends StatefulWidget {
 }
 
 class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
+  /// Mesmo motivo do diálogo de troca comum: o número é regra, não texto.
+  static const int _minPasswordLength = 6;
+
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -76,10 +79,12 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        title: const Text('Alterar Primeira Senha'),
+        title: Text(l10n.mandatoryPasswordTitle),
         content: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -87,7 +92,7 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Para sua segurança, altere sua senha atual de login antes de continuar.',
+                  l10n.mandatoryPasswordMessage,
                   style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -96,11 +101,13 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _currentPasswordController,
-                  decoration: const InputDecoration(labelText: 'Senha Atual'),
+                  decoration: InputDecoration(
+                    labelText: l10n.currentPasswordLabel,
+                  ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Informe a senha atual';
+                      return l10n.currentPasswordRequired;
                     }
                     return null;
                   },
@@ -108,26 +115,28 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _newPasswordController,
-                  decoration: const InputDecoration(labelText: 'Nova Senha'),
+                  decoration: InputDecoration(labelText: l10n.newPasswordLabel),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Informe a nova senha';
+                      return l10n.newPasswordRequired;
                     }
-                    if (value.length < 6) return 'Mínimo de 6 caracteres';
+                    if (value.length < _minPasswordLength) {
+                      return l10n.passwordMinLength(_minPasswordLength);
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _confirmPasswordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar Nova Senha',
+                  decoration: InputDecoration(
+                    labelText: l10n.confirmNewPasswordLabel,
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value != _newPasswordController.text) {
-                      return 'As senhas não conferem';
+                      return l10n.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -150,7 +159,7 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
                         strokeWidth: 2,
                       ),
                     )
-                  : const Text('SALVAR'),
+                  : Text(l10n.saveAction),
             ),
           ),
         ],

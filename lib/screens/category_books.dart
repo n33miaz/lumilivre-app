@@ -10,9 +10,19 @@ import 'package:lumilivre/widgets/book_card.dart';
 import 'package:provider/provider.dart';
 
 class CategoryBooksScreen extends StatefulWidget {
-  final String categoryName;
+  /// Gênero como a API o conhece. Vai cru na rota
+  /// `/api/books/genres/{genero}`, então é chave de consulta e **não** texto de
+  /// tela: traduzir aqui devolveria lista vazia em todo idioma novo.
+  final String genre;
 
-  const CategoryBooksScreen({super.key, required this.categoryName});
+  /// O mesmo gênero no idioma da tela, para o título e o estado vazio.
+  final String title;
+
+  const CategoryBooksScreen({
+    super.key,
+    required this.genre,
+    required this.title,
+  });
 
   @override
   State<CategoryBooksScreen> createState() => _CategoryBooksScreenState();
@@ -40,11 +50,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
       listen: false,
     ).sessionToken;
 
-    return _apiService.getBooksByGenre(
-      widget.categoryName,
-      page: page,
-      token: token,
-    );
+    return _apiService.getBooksByGenre(widget.genre, page: page, token: token);
   }
 
   void _onScroll() {
@@ -96,7 +102,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
     // Cor e elevação da barra vêm do `appBarTheme`: cada tela empilhada
     // escolhia as suas e nenhuma combinava com a vizinha.
     return Scaffold(
-      appBar: AppBar(title: Text(widget.categoryName), centerTitle: true),
+      appBar: AppBar(title: Text(widget.title), centerTitle: true),
       body: _buildBody(),
     );
   }
@@ -150,6 +156,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
@@ -177,7 +184,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Nenhum livro encontrado',
+              l10n.categoryEmptyTitle,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -186,7 +193,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Ainda não há livros cadastrados em "${widget.categoryName}".\nVolte em breve para novas adições!',
+              l10n.categoryEmptyMessage(widget.title),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -197,7 +204,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
             const SizedBox(height: 32),
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(),
-              label: const Text('EXPLORAR OUTROS'),
+              label: Text(l10n.categoryExploreOthers),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,

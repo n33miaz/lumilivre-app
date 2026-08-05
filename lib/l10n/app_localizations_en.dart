@@ -45,6 +45,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageEnglish => 'English (US)';
 
   @override
+  String get languageSpanish => 'Spanish (Spain)';
+
+  @override
+  String get languageChinese => 'Chinese (Simplified)';
+
+  @override
+  String get languageHindi => 'Hindi (India)';
+
+  @override
   String get biometricAccess => 'Biometric access';
 
   @override
@@ -333,4 +342,282 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tourStep4Body =>
       'In your Profile you can track loans, change your photo and adjust your preferences.';
+
+  @override
+  String get cancelAction => 'CANCEL';
+
+  @override
+  String get saveAction => 'SAVE';
+
+  @override
+  String get refreshAction => 'Refresh';
+
+  @override
+  String get logoSemanticLabel => 'LumiLivre logo';
+
+  @override
+  String get loginSubmit => 'SIGN IN';
+
+  @override
+  String get loginAsGuest => 'CONTINUE AS GUEST';
+
+  @override
+  String get loginUserFieldLabel => 'ID number or email';
+
+  @override
+  String get loginUserFieldRequired => 'Enter your username';
+
+  @override
+  String get loginPasswordRequired => 'Enter your password';
+
+  @override
+  String get forgotPassword => 'Forgot your password?';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get changePasswordTitle => 'Change Password';
+
+  @override
+  String get mandatoryPasswordTitle => 'Change Your First Password';
+
+  @override
+  String get mandatoryPasswordMessage =>
+      'For your security, change your current login password before continuing.';
+
+  @override
+  String get currentPasswordLabel => 'Current Password';
+
+  @override
+  String get currentPasswordRequired => 'Enter your current password';
+
+  @override
+  String get newPasswordLabel => 'New Password';
+
+  @override
+  String get newPasswordRequired => 'Enter the new password';
+
+  @override
+  String get confirmNewPasswordLabel => 'Confirm New Password';
+
+  @override
+  String get passwordsDoNotMatch => 'The passwords don\'t match';
+
+  @override
+  String passwordMinLength(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'At least $count characters',
+      one: 'At least 1 character',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get awaitingPasswordChange => 'Waiting for the password change...';
+
+  @override
+  String get navCategories => 'Categories';
+
+  @override
+  String get navCatalog => 'Catalog';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get searchHint => 'Search for a book or author';
+
+  @override
+  String searchResultsTitle(String query) {
+    return 'Results for \"$query\"';
+  }
+
+  @override
+  String get searchNoResults => 'No books found.';
+
+  @override
+  String get browseAllTitle => 'Browse all';
+
+  @override
+  String get genreThesis => 'Theses';
+
+  @override
+  String get genreAdventure => 'Adventure';
+
+  @override
+  String get genreRomance => 'Romance';
+
+  @override
+  String get genreEducational => 'Educational';
+
+  @override
+  String get genreThriller => 'Thriller';
+
+  @override
+  String get genreBiography => 'Biography';
+
+  @override
+  String get genreFiction => 'Fiction';
+
+  @override
+  String get genreHistory => 'History';
+
+  @override
+  String get genreSelfHelp => 'Self-help';
+
+  @override
+  String get genreFantasy => 'Fantasy';
+
+  @override
+  String get genreHorror => 'Horror';
+
+  @override
+  String get genrePoetry => 'Poetry';
+
+  @override
+  String get genreScienceTechnology => 'Science and Technology';
+
+  @override
+  String get genreChildrenAndTeens => 'Children and Teens';
+
+  @override
+  String get categoryEmptyTitle => 'No books found';
+
+  @override
+  String categoryEmptyMessage(String category) {
+    return 'There are no books in \"$category\" yet.\nCheck back soon for new additions!';
+  }
+
+  @override
+  String get categoryExploreOthers => 'EXPLORE OTHERS';
+
+  @override
+  String get bookDetailsTitle => 'Details';
+
+  @override
+  String get bookCoverMissing => 'No Cover';
+
+  @override
+  String bookReleasedOn(String date) {
+    return 'Released on $date';
+  }
+
+  @override
+  String get bookRatingsLabel => 'Ratings';
+
+  @override
+  String get bookCoverTypeLabel => 'Cover Type';
+
+  @override
+  String get bookAgeRatingLabel => 'Age Rating';
+
+  @override
+  String get bookPublisherLabel => 'Publisher';
+
+  @override
+  String get bookGenresLabel => 'Genres';
+
+  @override
+  String get bookSynopsisLabel => 'Synopsis';
+
+  @override
+  String get loanButtonGuest => 'SIGN IN TO REQUEST';
+
+  @override
+  String get loanButtonNoCopies => 'NO COPIES REGISTERED';
+
+  @override
+  String get loanButtonLimitReached => 'LOAN LIMIT REACHED';
+
+  @override
+  String get loanButtonRequest => 'REQUEST LOAN';
+
+  @override
+  String get loanButtonPending => 'AWAITING APPROVAL';
+
+  @override
+  String loanButtonActiveUntil(String date) {
+    return 'IN USE UNTIL: $date';
+  }
+
+  @override
+  String get loanButtonOverdue => 'RETURN OVERDUE';
+
+  @override
+  String loanButtonAvailableFrom(String date) {
+    return 'AVAILABLE FROM: $date';
+  }
+
+  @override
+  String get loanButtonUnavailable => 'CURRENTLY UNAVAILABLE';
+
+  @override
+  String get loansTabInProgress => 'In Progress';
+
+  @override
+  String get loansTabHistory => 'History';
+
+  @override
+  String get loansHistoryEmpty => 'No history found.';
+
+  @override
+  String get loansActiveEmpty => 'No active loans or requests.';
+
+  @override
+  String get loanStatusRejected => 'Request Declined';
+
+  @override
+  String get loanStatusPending => 'Awaiting Approval';
+
+  @override
+  String get loanStatusReturned => 'Returned';
+
+  @override
+  String loanStatusOverdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Overdue ($count days)',
+      one: 'Overdue (1 day)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loanStatusDueToday => 'Due Today!';
+
+  @override
+  String loanStatusDueInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Due in $count days',
+      one: 'Due in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String loanRequestedOn(String date) {
+    return 'Requested on: $date';
+  }
+
+  @override
+  String loanBorrowedOn(String date) {
+    return 'Borrowed on: $date';
+  }
+
+  @override
+  String get likesEmptyMessage => 'You haven\'t liked any books yet.';
+
+  @override
+  String profileSubtitleWithRank(String registration, String rank) {
+    return '$registration - Ranking: $rank';
+  }
+
+  @override
+  String get offlineBannerMessage => 'You\'re offline. Showing saved data.';
 }

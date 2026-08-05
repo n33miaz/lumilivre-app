@@ -54,11 +54,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Resultados para "${widget.query}"'),
+        title: Text(l10n.searchResultsTitle(widget.query)),
         centerTitle: true,
       ),
       body: _isLoading
@@ -75,7 +76,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Nenhum livro encontrado.',
+                    l10n.searchNoResults,
                     style: TextStyle(color: theme.hintColor),
                   ),
                 ],

@@ -24,6 +24,34 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+/// Idiomas oferecidos na tela, por etiqueta BCP-47.
+///
+/// A etiqueta é o que vai no `Accept-Language` das requisições (ver
+/// `RequestContext`) e o que fica gravado na preferência, então o país importa:
+/// `AppLocalizations` resolve `es-ES` para o `es` do ARB sozinho.
+const Map<String, Locale> _offeredLocales = {
+  'pt-BR': Locale('pt', 'BR'),
+  'en-US': Locale('en', 'US'),
+  'es-ES': Locale('es', 'ES'),
+  'zh-CN': Locale('zh', 'CN'),
+  'hi-IN': Locale('hi', 'IN'),
+};
+
+String _languageName(AppLocalizations l10n, String tag) {
+  switch (tag) {
+    case 'en-US':
+      return l10n.languageEnglish;
+    case 'es-ES':
+      return l10n.languageSpanish;
+    case 'zh-CN':
+      return l10n.languageChinese;
+    case 'hi-IN':
+      return l10n.languageHindi;
+    default:
+      return l10n.languagePortuguese;
+  }
+}
+
 class _SettingsScreenState extends State<SettingsScreen> {
   final BiometricAuth _biometrics = BiometricAuth();
 
@@ -104,25 +132,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             clipBehavior: Clip.antiAlias,
             child: RadioGroup<String>(
               groupValue: localeTag,
+              // A etiqueta escolhida é a chave: cinco `if` encadeados era o que
+              // fazia um idioma novo entrar na lista e não trocar nada ao ser
+              // tocado, porque o `onChanged` ficava para trás.
               onChanged: (value) {
-                if (value == 'pt-BR') {
-                  localeProvider.setLocale(const Locale('pt', 'BR'));
-                } else if (value == 'en-US') {
-                  localeProvider.setLocale(const Locale('en', 'US'));
+                final locale = _offeredLocales[value];
+                if (locale != null) {
+                  localeProvider.setLocale(locale);
                 }
               },
               child: Column(
                 children: [
-                  RadioListTile<String>(
-                    value: 'pt-BR',
-                    title: Text(l10n.languagePortuguese),
-                    selected: localeTag == 'pt-BR',
-                  ),
-                  RadioListTile<String>(
-                    value: 'en-US',
-                    title: Text(l10n.languageEnglish),
-                    selected: localeTag == 'en-US',
-                  ),
+                  for (final tag in _offeredLocales.keys)
+                    RadioListTile<String>(
+                      value: tag,
+                      title: Text(_languageName(l10n, tag)),
+                      selected: localeTag == tag,
+                    ),
                 ],
               ),
             ),

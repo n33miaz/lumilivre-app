@@ -12,6 +12,8 @@ import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 
+const _testLocale = Locale('pt', 'BR');
+
 /// App mínimo com a mesma vizinhança de providers que a tela de login espera,
 /// e uma primeira rota qualquer para o login poder ser **empilhado** sobre ela —
 /// que é o caso do convidado tocando em "Entrar" dentro do app.
@@ -23,6 +25,10 @@ Widget _appWith(AuthProvider auth) {
       ChangeNotifierProvider(create: (_) => ThemeProvider()),
     ],
     child: MaterialApp(
+      // Idioma fixo: sem isto o teste roda no locale da máquina e o botão que
+      // ele procura muda de língua junto. O texto vem do próprio ARB abaixo,
+      // então mudar a copy não derruba o teste — mudar o comportamento, sim.
+      locale: _testLocale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -48,6 +54,12 @@ Widget _appWith(AuthProvider auth) {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  late AppLocalizations l10n;
+
+  setUpAll(() async {
+    l10n = await AppLocalizations.delegate.load(_testLocale);
+  });
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
@@ -76,7 +88,7 @@ void main() {
     await tester.tap(find.text('abrir login'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('ENTRAR COMO CONVIDADO'));
+    await tester.tap(find.text(l10n.loginAsGuest));
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsNothing);
@@ -102,6 +114,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ],
         child: MaterialApp(
+          locale: _testLocale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -115,6 +128,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('ENTRAR COMO CONVIDADO'), findsNothing);
+    expect(find.text(l10n.loginAsGuest), findsNothing);
   });
 }

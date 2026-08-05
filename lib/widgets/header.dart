@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/screens/search_results.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/app_motion.dart';
@@ -187,7 +188,7 @@ class _SearchFieldState extends State<_SearchField> {
                       ),
                       decoration: InputDecoration(
                         isCollapsed: true,
-                        hintText: 'Procure por um livro ou autor',
+                        hintText: AppLocalizations.of(context)!.searchHint,
                         hintStyle: TextStyle(
                           fontSize: 16,
                           color: theme.hintColor,
