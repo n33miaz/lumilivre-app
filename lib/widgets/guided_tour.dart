@@ -4,16 +4,18 @@ import 'package:provider/provider.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 
 /// Exibe o tour guiado de boas-vindas.
 ///
 /// Retorna quando o usuário conclui ou pula. Em ambos os casos o tour é
 /// marcado como concluído (backend + sessão local) para nunca reaparecer.
 Future<void> showGuidedTour(BuildContext context) {
-  return showDialog<void>(
+  return showAppDialog<void>(
     context: context,
-    barrierDismissible: false,
+    dismissible: false,
     builder: (_) => const _GuidedTourDialog(),
   );
 }
@@ -91,21 +93,24 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
       return;
     }
     _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: AppMotion.of(context, AppMotion.page),
+      curve: AppMotion.inOut,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
     final steps = _steps(l10n);
     final isLast = _index == steps.length - 1;
 
     return PopScope(
       canPop: false,
+      // Forma e cor vêm do `dialogTheme`: o tour desenhava um raio de 16 e os
+      // diálogos de senha ficavam com o 28 padrão do Material 3, lado a lado no
+      // mesmo fluxo de primeiro acesso.
       child: Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Column(
@@ -126,14 +131,14 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
                 children: List.generate(
                   steps.length,
                   (i) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: AppMotion.of(context, AppMotion.quick),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: i == _index ? 20 : 8,
                     height: 8,
                     decoration: BoxDecoration(
                       color: i == _index
-                          ? LumiLivreTheme.primary
-                          : Colors.grey.shade400,
+                          ? scheme.primary
+                          : scheme.outlineVariant,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -144,16 +149,15 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
                 children: [
                   TextButton(
                     onPressed: _finishing ? null : _finish,
-                    child: Text(
-                      l10n.tourSkip,
-                      style: const TextStyle(color: Colors.grey),
+                    style: TextButton.styleFrom(
+                      foregroundColor: scheme.onSurfaceVariant,
                     ),
+                    child: Text(l10n.tourSkip),
                   ),
                   const Spacer(),
                   ElevatedButton(
                     onPressed: _finishing ? null : () => _next(steps.length),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: LumiLivreTheme.primary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -164,7 +168,7 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: LumiLivreTheme.onBrand,
                               strokeWidth: 2,
                             ),
                           )
@@ -180,6 +184,8 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
   }
 
   Widget _buildStep(_TourStep step) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -187,8 +193,8 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: LumiLivreTheme.primary.withValues(alpha: 0.1),
-            child: Icon(step.icon, size: 40, color: LumiLivreTheme.primary),
+            backgroundColor: scheme.primary.withValues(alpha: 0.1),
+            child: Icon(step.icon, size: 40, color: scheme.primary),
           ),
           const SizedBox(height: 20),
           Text(
@@ -200,7 +206,7 @@ class _GuidedTourDialogState extends State<_GuidedTourDialog> {
           Text(
             step.body,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: Colors.grey),
+            style: TextStyle(fontSize: 15, color: scheme.onSurfaceVariant),
           ),
         ],
       ),

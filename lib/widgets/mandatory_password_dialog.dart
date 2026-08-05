@@ -79,19 +79,19 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        title: const Text(
-          'Alterar Primeira Senha',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Alterar Primeira Senha'),
         content: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'Para sua segurança, altere sua senha atual de login antes de continuar.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -141,15 +141,12 @@ class _MandatoryPasswordDialogState extends State<MandatoryPasswordDialog> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: LumiLivreTheme.primary,
-              ),
               child: _isLoading
                   ? const SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: LumiLivreTheme.onBrand,
                         strokeWidth: 2,
                       ),
                     )

@@ -9,6 +9,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/content_provider.dart';
 import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 
 class ContentsScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _ContentsScreenState extends State<ContentsScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: LumiLivreTheme.onBrand,
         elevation: 0,
         centerTitle: false,
         title: Text(
@@ -94,7 +95,7 @@ class _ContentsScreenState extends State<ContentsScreen>
 
     return RefreshIndicator(
       onRefresh: _handleRefresh,
-      color: LumiLivreTheme.primary,
+      color: Theme.of(context).colorScheme.primary,
       child: provider.items.isEmpty
           ? _buildEmptyState(context, l10n)
           : ListView.builder(
@@ -176,13 +177,8 @@ class _ContentsScreenState extends State<ContentsScreen>
     AppLocalizations l10n,
     AppContent content,
   ) {
-    showModalBottomSheet(
+    showAppSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (ctx) => _ContentDetailSheet(content: content, l10n: l10n),
     );
   }
@@ -196,10 +192,22 @@ String _typeLabel(AppLocalizations l10n, AppContent content) {
   return content.contentType;
 }
 
-Color _typeColor(AppContent content) {
-  if (content.isAttachment) return const Color(0xFF1E3264);
-  if (content.isWork) return LumiLivreTheme.label;
-  return LumiLivreTheme.primary;
+/// Cor de identidade do tipo, já ajustada para se ler sobre a superfície.
+///
+/// As três cores cruas (roxo da marca, rosa da marca e o azul do catálogo) só
+/// funcionavam no tema claro: no escuro o selo ficava roxo sobre grafite. O azul
+/// vem da paleta de categorias em vez de um hex repetido aqui.
+Color _typeColor(BuildContext context, AppContent content) {
+  if (content.isAttachment) {
+    return LumiLivreTheme.readableInk(
+      context,
+      LumiLivreTheme.genreCardColors[3],
+    );
+  }
+  if (content.isWork) {
+    return LumiLivreTheme.readableInk(context, LumiLivreTheme.label);
+  }
+  return LumiLivreTheme.readableInk(context, LumiLivreTheme.primary);
 }
 
 Future<void> _openUrl(
@@ -236,7 +244,7 @@ class _TypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final color = _typeColor(content);
+    final color = _typeColor(context, content);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -275,13 +283,11 @@ class _ContentCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final snippet = _snippet(l10n);
 
+    // Cor, elevação e raio saíram daqui: são os do `cardTheme`.
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 1.5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      color: Theme.of(context).cardColor,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -334,7 +340,7 @@ class _ContentCard extends StatelessWidget {
                           Icon(
                             Icons.push_pin,
                             size: 16,
-                            color: LumiLivreTheme.primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                       ],
                     ),
@@ -394,17 +400,7 @@ class _ContentDetailSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+              const AppSheetHandle(),
               Row(
                 children: [
                   _TypeBadge(content: content),
@@ -413,18 +409,12 @@ class _ContentDetailSheet extends StatelessWidget {
                     Icon(
                       Icons.push_pin,
                       size: 18,
-                      color: LumiLivreTheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                content.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              AppSheetTitle(content.title),
               const SizedBox(height: 16),
               ..._buildTypeBody(context),
             ],

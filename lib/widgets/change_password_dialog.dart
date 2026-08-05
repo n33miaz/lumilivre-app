@@ -75,11 +75,11 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // Cor, raio, elevação e tipografia do título vêm do `dialogTheme`: os dois
+    // diálogos de senha repetiam essas decisões e chegavam a resultados
+    // diferentes entre si e do resto do app.
     return AlertDialog(
-      title: const Text(
-        'Alterar Senha',
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
+      title: const Text('Alterar Senha'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -131,19 +131,19 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          child: const Text('CANCELAR', style: TextStyle(color: Colors.grey)),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          child: const Text('CANCELAR'),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _submit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: LumiLivreTheme.primary,
-          ),
           child: _isLoading
               ? const SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: LumiLivreTheme.onBrand,
                     strokeWidth: 2,
                   ),
                 )

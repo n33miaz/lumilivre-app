@@ -7,6 +7,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/ranking_podium.dart';
 
 class RankingScreen extends StatefulWidget {
@@ -141,27 +142,21 @@ class _RankingScreenState extends State<RankingScreen> {
 
     final l10n = AppLocalizations.of(context)!;
 
-    showModalBottomSheet(
+    // Antes este sheet não passava cor de fundo nenhuma: herdava o tom que o
+    // Material 3 calcula, diferente da carta que o sheet do mural usava ao lado.
+    // Agora os dois vêm do `bottomSheetTheme`, com alça e título compartilhados.
+    showAppSheet(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           return Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.filterRanking,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const AppSheetHandle(),
+                AppSheetTitle(l10n.filterRanking),
                 const SizedBox(height: 20),
 
                 _buildDropdown(l10n.courseLabel, _cursos, _selectedCursoId, (
@@ -203,10 +198,12 @@ class _RankingScreenState extends State<RankingScreen> {
                         _selectedTurnoId = null;
                       });
                     },
-                    child: Text(
-                      l10n.clearFilters,
-                      style: const TextStyle(color: Colors.grey),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
                     ),
+                    child: Text(l10n.clearFilters),
                   ),
                 ),
               ],
@@ -273,11 +270,14 @@ class _RankingScreenState extends State<RankingScreen> {
     bool amIInTop3 = myRankIndex != -1 && myRankIndex < 3;
 
     return Scaffold(
+      // O rosa da marca com ícone branco dava 2,9:1 de contraste — o botão
+      // flutuante passa a ser superfície de marca como os outros.
       floatingActionButton: _academicFiltersEnabled
           ? FloatingActionButton(
               onPressed: _showFilterModal,
-              backgroundColor: LumiLivreTheme.label,
-              child: const Icon(Icons.filter_list, color: Colors.white),
+              backgroundColor: LumiLivreTheme.primary,
+              foregroundColor: LumiLivreTheme.onBrand,
+              child: const Icon(Icons.filter_list),
             )
           : null,
       body: RefreshIndicator(
@@ -318,7 +318,9 @@ class _RankingScreenState extends State<RankingScreen> {
                 color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withValues(alpha: 0.12),
                     blurRadius: 10,
                     offset: const Offset(0, -2),
                   ),
@@ -354,18 +356,20 @@ class _RankingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       elevation: elevation,
       color:
           backgroundColor ??
           (isMe
-              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
+              ? scheme.primary.withValues(alpha: 0.1)
               : Theme.of(context).cardColor),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
         side: isMe
-            ? const BorderSide(color: LumiLivreTheme.primary, width: 1.5)
+            ? BorderSide(color: scheme.primary, width: 1.5)
             : BorderSide.none,
       ),
       child: Padding(
@@ -378,14 +382,14 @@ class _RankingCard extends StatelessWidget {
               height: 32,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: scheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Text(
                 '#$position',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade700,
+                  color: scheme.onSurfaceVariant,
                   fontSize: 12,
                 ),
               ),
@@ -415,7 +419,7 @@ class _RankingCard extends StatelessWidget {
               child: Text(
                 '${item.loanCount}',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: LumiLivreTheme.onBrand,
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
