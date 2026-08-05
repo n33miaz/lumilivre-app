@@ -21,8 +21,17 @@ class BookDetails {
   final String tipoCapa;
   final String? imagem;
   final List<String> generos;
-  final int exemplaresDisponiveis;
-  final int totalExemplares;
+
+  /// Contagem de exemplares, quando a API informa.
+  ///
+  /// `null` significa **não sei**, e é o que acontece hoje: `GET /api/books/{id}`
+  /// (`BookResponse`) não devolve contagem nenhuma. Enquanto isso era `int` com
+  /// `safeParseInt`, a ausência do campo virava `0` e o app concluía que todo
+  /// livro do acervo estava sem exemplar cadastrado — o botão de solicitar ficava
+  /// morto em todas as fichas, para todos os leitores. Ver relatório da tarefa.
+  final int? exemplaresDisponiveis;
+  final int? totalExemplares;
+
   final double rating;
 
   BookDetails({
@@ -41,8 +50,8 @@ class BookDetails {
     required this.tipoCapa,
     this.imagem,
     required this.generos,
-    required this.exemplaresDisponiveis,
-    required this.totalExemplares,
+    this.exemplaresDisponiveis,
+    this.totalExemplares,
     required this.rating,
   });
 
@@ -83,9 +92,21 @@ class BookDetails {
                 .where((e) => e.isNotEmpty)
                 .toList()
           : [],
-      exemplaresDisponiveis: safeParseInt(json['exemplaresDisponiveis']),
-      totalExemplares: safeParseInt(json['totalExemplares']),
+      exemplaresDisponiveis: _optionalCount(json['exemplaresDisponiveis']),
+      totalExemplares: _optionalCount(json['totalExemplares']),
       rating: safeParseDouble(json['avaliacao'] ?? json['rating'] ?? 4.6),
     );
+  }
+
+  /// Contagem ausente continua ausente. `safeParseInt` devolveria `0`, que aqui
+  /// não é "zero exemplares" e sim "a API não disse".
+  static int? _optionalCount(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is int) {
+      return value;
+    }
+    return int.tryParse(value.toString());
   }
 }

@@ -19,14 +19,24 @@ void main() {
           LoanStatus.active,
           LoanStatus.overdue,
           LoanStatus.guest,
-          LoanStatus.blockedPenalty,
           LoanStatus.limitReached,
         ]),
       );
     });
 
-    test('deve ter exatamente 10 estados', () {
-      expect(LoanStatus.values, hasLength(10));
+    test('deve ter exatamente 9 estados', () {
+      expect(LoanStatus.values, hasLength(9));
+    });
+
+    /// Guarda de regressão do T17: penalidade não é estado de botão. Ela era
+    /// avaliada no cliente a partir do cadastro do leitor, desabilitava o botão
+    /// sem dizer por quê e discordava do servidor quando a restrição vencia.
+    /// Agora quem recusa é a API, e a recusa vira toast.
+    test('não deve existir estado de penalidade', () {
+      expect(
+        LoanStatus.values.map((status) => status.name),
+        isNot(contains('blockedPenalty')),
+      );
     });
 
     test('loading deve ser o estado inicial', () {
@@ -41,10 +51,6 @@ void main() {
     group('regras de negócio', () {
       test('guest deve existir para modo convidado', () {
         expect(LoanStatus.guest, isNotNull);
-      });
-
-      test('blockedPenalty deve existir para leitores com penalidade', () {
-        expect(LoanStatus.blockedPenalty, isNotNull);
       });
 
       test('limitReached deve existir para limite de 3 empréstimos', () {

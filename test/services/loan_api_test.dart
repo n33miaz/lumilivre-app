@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:lumilivre/services/api_error.dart';
 import 'package:lumilivre/services/loan_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -43,10 +44,79 @@ void main() {
         client: MockClient((request) async => http.Response('', 201)),
       );
 
-      final success = await api.requestLoanByBookId('12345', '10', 'jwt-token');
-
-      expect(success, isTrue);
+      await expectLater(
+        api.requestLoanByBookId('12345', '10', 'jwt-token'),
+        completes,
+      );
     });
+
+    test(
+      'requestLoanByBookId deve preservar a mensagem de recusa da API',
+      () async {
+        // 422 é o que `RequestApprovalPolicy` devolve, com a frase de
+        // `request.policy.active-penalty` — a única coisa que explica ao leitor
+        // por que o pedido não passou. Corpo copiado da resposta real da API.
+        final body = jsonEncode({
+          'status': 422,
+          'error': 'Violação de Política de Negócio',
+          'message': 'Leitor bloqueado por penalidade ativa até 2026-08-11.',
+        });
+        final api = LoanApi(
+          client: MockClient(
+            (request) async => http.Response.bytes(utf8.encode(body), 422),
+          ),
+        );
+
+        await expectLater(
+          api.requestLoanByBookId('12345', '10', 'jwt-token'),
+          throwsA(
+            isA<ApiException>()
+                .having((e) => e.failure, 'failure', ApiFailure.businessRule)
+                .having(
+                  (e) => e.apiMessage,
+                  'apiMessage',
+                  contains('penalidade ativa'),
+                ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'requestLoanByBookId deve marcar senha inicial pendente sem vazar o texto tecnico',
+      () async {
+        final api = LoanApi(
+          client: MockClient(
+            (request) async => http.Response.bytes(
+              utf8.encode(
+                jsonEncode({
+                  'status': 403,
+                  'error': 'Forbidden',
+                  'message':
+                      'Password change required before performing this action.',
+                  'code': 'PASSWORD_CHANGE_REQUIRED',
+                }),
+              ),
+              403,
+            ),
+          ),
+        );
+
+        await expectLater(
+          api.requestLoanByBookId('12345', '10', 'jwt-token'),
+          throwsA(
+            isA<ApiException>()
+                .having(
+                  (e) => e.requiresPasswordChange,
+                  'requiresPasswordChange',
+                  isTrue,
+                )
+                .having((e) => e.needsAuthentication, 'nao desloga', isFalse)
+                .having((e) => e.apiMessage, 'apiMessage', isNull),
+          ),
+        );
+      },
+    );
 
     test('getMyRequests deve parsear solicitacoes em loans', () async {
       final api = LoanApi(

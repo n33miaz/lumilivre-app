@@ -17,10 +17,16 @@ class LoanStatusResult {
 ///   1. Empréstimo ativo do livro → [active] ou [overdue]
 ///   2. Solicitação pendente → [pending]
 ///   3. Sem exemplares cadastrados → [noCopies]
-///   4. Penalidade → [blockedPenalty]
-///   5. Limite de empréstimos (>= 3) → [limitReached]
-///   6. Sem exemplares disponíveis → [unavailable]
-///   7. Tudo ok → [available]
+///   4. Limite de empréstimos (>= 3) → [limitReached]
+///   5. Sem exemplares disponíveis → [unavailable]
+///   6. Tudo ok → [available]
+///
+/// Penalidade **não** está nesta lista de propósito. Ela era avaliada aqui a
+/// partir do cadastro do leitor e desabilitava o botão sem dizer por quê — a
+/// informação no lugar errado e sem explicação. Quem decide se a penalidade
+/// impede o empréstimo é o servidor (`RequestApprovalPolicy`), no momento do
+/// pedido, e é a resposta dele que o app mostra. O estado da conta agora aparece
+/// no perfil, onde pertence.
 class LoanStatusCalculator {
   const LoanStatusCalculator._();
 
@@ -28,9 +34,8 @@ class LoanStatusCalculator {
   static LoanStatusResult calculate({
     required BookDetails details,
     required List<Loan> loans,
-    required List<dynamic> requests,
+    required List<Loan> requests,
     required String targetBookId,
-    Map<String, dynamic>? readerData,
   }) {
     // Verifica empréstimo ativo para este livro
     final activeLoan = _findActiveLoan(loans, targetBookId);
@@ -47,22 +52,21 @@ class LoanStatusCalculator {
       return const LoanStatusResult(status: LoanStatus.pending);
     }
 
-    // Regras de disponibilidade
-    if (details.totalExemplares == 0) {
+    // Regras de disponibilidade. Contagem `null` é "a API não informou" — e é o
+    // caso hoje, porque `BookResponse` não traz exemplar nenhum. Tratar isso como
+    // zero deixava o botão morto ("sem exemplares cadastrados") em toda ficha de
+    // livro; sem a contagem, quem decide é o servidor na hora do pedido.
+    final total = details.totalExemplares;
+    if (total != null && total == 0) {
       return const LoanStatusResult(status: LoanStatus.noCopies);
-    }
-
-    final penalidade = readerData?['penalidade'];
-    final hasPenalty = penalidade != null && penalidade != 'null';
-    if (hasPenalty) {
-      return const LoanStatusResult(status: LoanStatus.blockedPenalty);
     }
 
     if (loans.length >= 3) {
       return const LoanStatusResult(status: LoanStatus.limitReached);
     }
 
-    if (details.exemplaresDisponiveis <= 0) {
+    final available = details.exemplaresDisponiveis;
+    if (available != null && available <= 0) {
       return const LoanStatusResult(status: LoanStatus.unavailable);
     }
 
@@ -78,18 +82,30 @@ class LoanStatusCalculator {
     return null;
   }
 
-  static bool _hasPendingRequest(List<dynamic> requests, String targetBookId) {
-    return requests.any((r) {
-      if (r == null || r is! Map) {
-        return false;
-      }
-      final reqLivroId =
-          r['livroId']?.toString() ?? r['bookId']?.toString() ?? '';
-      final rawStatus = r['status'];
-      final reqStatus = rawStatus is Map
-          ? rawStatus['code']?.toString() ?? ''
-          : rawStatus?.toString() ?? '';
-      return reqLivroId == targetBookId && reqStatus == 'PENDENTE';
-    });
+  /// Solicitação pendente deste livro, esperando a biblioteca aprovar.
+  ///
+  /// Duas coisas faziam esta checagem nunca dar positivo, e o efeito era o botão
+  /// continuar convidando a solicitar um livro já solicitado — logo depois de o
+  /// app avisar que a solicitação foi enviada:
+  ///
+  /// 1. A lista que chega em produção é de [Loan] (`getMyRequests` mapeia a
+  ///    resposta), mas aqui só `Map` era inspecionado — todo item caía fora. O
+  ///    parâmetro era `List<dynamic>`, então nem o compilador nem os testes (que
+  ///    passavam mapas) percebiam.
+  /// 2. A comparação era com `PENDENTE`, o código pt-BR do enum. A API responde
+  ///    `status: {code: "PENDING", label: "Pendente"}` — o nome do enum.
+  static bool _hasPendingRequest(List<Loan> requests, String targetBookId) {
+    return requests.any(
+      (request) =>
+          request.livroId == targetBookId && _isPending(request.status),
+    );
+  }
+
+  /// Aceita as duas grafias porque as duas circulam: o `code` do enum
+  /// (`PENDING`) e o código pt-BR histórico (`PENDENTE`), que ainda aparece em
+  /// dado antigo e em fixture de teste.
+  static bool _isPending(String status) {
+    final normalized = status.toUpperCase();
+    return normalized == 'PENDING' || normalized == 'PENDENTE';
   }
 }

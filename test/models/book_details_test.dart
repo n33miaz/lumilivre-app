@@ -66,9 +66,15 @@ void main() {
       test('deve usar fallbacks para campos numéricos nulos', () {
         expect(details.numeroPaginas, 0);
         expect(details.volume, isNull);
-        expect(details.exemplaresDisponiveis, 0);
-        expect(details.totalExemplares, 0);
         expect(details.rating, 4.6);
+      });
+
+      /// `GET /api/books/{id}` não devolve contagem de exemplares. Enquanto isso
+      /// virava `0`, o app concluía "sem exemplares cadastrados" para todo livro
+      /// do acervo e o botão de solicitar ficava morto em qualquer ficha.
+      test('contagem de exemplares ausente deve ficar nula, nao zero', () {
+        expect(details.exemplaresDisponiveis, isNull);
+        expect(details.totalExemplares, isNull);
       });
 
       test('deve usar data fallback (1900-01-01) para data nula', () {

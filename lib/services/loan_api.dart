@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/loan.dart';
 import '../utils/constants.dart';
+import 'api_error.dart';
 import 'request_context.dart';
 
 class LoanApi {
@@ -82,7 +83,16 @@ class LoanApi {
     }
   }
 
-  Future<bool> requestLoanByBookId(
+  /// Solicita empréstimo do livro. Volta em silêncio quando dá certo e joga
+  /// [ApiException] quando não — com [ApiException.apiMessage] preenchido sempre
+  /// que o servidor explicou a recusa.
+  ///
+  /// Antes devolvia `bool` e a tela improvisava "Erro ao solicitar. Verifique se
+  /// há exemplares." para qualquer coisa: penalidade ativa, limite de três
+  /// empréstimos, exemplar que outro leitor pegou primeiro. As três recusas vêm
+  /// do `RequestApprovalPolicy` com frase própria e traduzida — descartá-las era
+  /// jogar fora a única informação útil.
+  Future<void> requestLoanByBookId(
     String readerRegistrationNumber,
     String livroId,
     String token,
@@ -95,10 +105,15 @@ class LoanApi {
       final response = await _client
           .post(url, headers: await RequestContext.headers(token: token))
           .timeout(const Duration(seconds: 10));
-      return response.statusCode == 200 || response.statusCode == 201;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+      throw ApiException.fromResponse(response);
     } catch (e) {
-      if (kDebugMode) debugPrint('Erro ao solicitar: $e');
-      return false;
+      final failure = ApiException.fromError(e);
+      if (kDebugMode) debugPrint('Erro ao solicitar: $failure');
+      throw failure;
     }
   }
 

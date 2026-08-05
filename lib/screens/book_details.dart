@@ -15,7 +15,13 @@ import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/services/loan_status_calculator.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/utils/parsers.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
+/// Estados que o botão de empréstimo sabe mostrar.
+///
+/// Não existe mais estado de penalidade aqui: ele desabilitava o botão sem
+/// explicar nada e obrigava o app a decidir, com o cadastro do leitor na mão,
+/// algo que só o servidor decide. Ver `LoanStatusCalculator`.
 enum LoanStatus {
   loading,
   available,
@@ -25,7 +31,6 @@ enum LoanStatus {
   active,
   overdue,
   guest,
-  blockedPenalty,
   limitReached,
 }
 
@@ -95,18 +100,19 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       final registrationNumber = user.readerRegistrationNumber!;
       final token = user.token;
 
+      // O cadastro do leitor era buscado aqui só para checar penalidade. Saiu
+      // junto com o estado do botão: uma requisição menos por ficha de livro, e
+      // a penalidade passa a ser assunto do perfil e da resposta ao pedido.
       final results = await Future.wait([
         _apiService.getMyLoans(registrationNumber, token),
         _apiService.getMyRequests(registrationNumber, token),
-        _apiService.getReaderData(registrationNumber, token),
       ]);
 
-      final loans = results[0] as List<Loan>;
-      final requests = results[1] as List<dynamic>;
-      final readerData = results[2] as Map<String, dynamic>?;
+      final loans = results[0];
+      final requests = results[1];
 
       if (mounted) {
-        _calculateStatus(details, loans, requests, readerData);
+        _calculateStatus(details, loans, requests);
       }
     } catch (e) {
       if (mounted) {
@@ -134,15 +140,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   void _calculateStatus(
     BookDetails details,
     List<Loan> loans,
-    List<dynamic> requests,
-    Map<String, dynamic>? readerData,
+    List<Loan> requests,
   ) {
     final result = LoanStatusCalculator.calculate(
       details: details,
       loans: loans,
       requests: requests,
       targetBookId: widget.book.id,
-      readerData: readerData,
     );
 
     setState(() {
@@ -152,36 +156,49 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     });
   }
 
+  /// Pede o empréstimo e conta o resultado num toast.
+  ///
+  /// A recusa por penalidade, por limite de três empréstimos ou por exemplar já
+  /// tomado vem do `RequestApprovalPolicy` da API, cada uma com a própria frase
+  /// traduzida — é ela que aparece, em vez do antigo "Erro ao solicitar.
+  /// Verifique se há exemplares." que servia de resposta para tudo. Toast, e não
+  /// dialog: é resultado de ação, o usuário não precisa confirmar nada.
   Future<void> _handleLoanRequest() async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final toast = AppToast.of(context);
+
+    final previousStatus = _status;
     setState(() => _status = LoanStatus.loading);
 
-    bool success = await _apiService.requestLoanByBookId(
-      auth.user!.readerRegistrationNumber!,
-      widget.book.id,
-      auth.user!.token,
-    );
+    try {
+      await _apiService.requestLoanByBookId(
+        auth.user!.readerRegistrationNumber!,
+        widget.book.id,
+        auth.user!.token,
+      );
 
-    if (success) {
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Solicitação enviada com sucesso!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        toast.success(l10n.loanRequestSent);
       }
-    } else {
-      if (mounted) {
-        setState(() => _status = LoanStatus.available);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erro ao solicitar. Verifique se há exemplares.'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => _status = previousStatus);
+      final failure = ApiException.fromError(e);
+
+      // A senha inicial pendente é o único 403 que não é falta de sessão: a saída
+      // é trocar a senha, então o aviso diz isso em vez de sugerir novo login.
+      if (failure.requiresPasswordChange) {
+        toast.error(l10n.passwordChangeRequiredMessage);
+        return;
       }
+      if (failure.failure == ApiFailure.network) {
+        toast.error(l10n.connectionErrorMessage);
+        return;
+      }
+      toast.error(failure.apiMessage ?? l10n.loanRequestFailed);
     }
   }
 
@@ -621,11 +638,6 @@ class _BorrowButton extends StatelessWidget {
         backgroundColor = Colors.grey.shade400;
         text = 'SEM EXEMPLARES CADASTRADOS';
         iconPath = 'assets/icons/cancel.svg';
-        break;
-
-      case LoanStatus.blockedPenalty:
-        backgroundColor = Colors.redAccent;
-        text = 'CONTA COM PENALIDADE';
         break;
 
       case LoanStatus.limitReached:
