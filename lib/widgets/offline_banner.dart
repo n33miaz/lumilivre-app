@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -35,7 +36,7 @@ class _OfflineBannerState extends State<OfflineBanner> {
       final result = await Connectivity().checkConnectivity();
       _updateStatus(result);
     } catch (e) {
-      debugPrint('Erro ao verificar conectividade: $e');
+      if (kDebugMode) debugPrint('Erro ao verificar conectividade: $e');
     }
   }
 

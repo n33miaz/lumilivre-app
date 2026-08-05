@@ -39,7 +39,7 @@ class RankingApi {
       }
       throw Exception('Erro ao buscar ranking');
     } catch (e) {
-      debugPrint('Erro getRanking: $e');
+      if (kDebugMode) debugPrint('Erro getRanking: $e');
       return [];
     }
   }
@@ -69,7 +69,7 @@ class RankingApi {
       }
       return [];
     } catch (e) {
-      debugPrint('Erro ao buscar $endpoint: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar $endpoint: $e');
       return [];
     }
   }
@@ -93,7 +93,7 @@ class RankingApi {
       }
       return [];
     } catch (e) {
-      debugPrint('Erro ao buscar cursos: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar cursos: $e');
       return [];
     }
   }

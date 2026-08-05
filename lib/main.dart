@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +23,14 @@ void main() {
 
   usePathUrlStrategy();
 
+  // `presentError` já é o canal padrão do Flutter (e em release resume o erro
+  // sem detalhe). O log extra abaixo é ferramenta de desenvolvimento: a exceção
+  // pode carregar corpo de resposta, então fica fora do release.
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    debugPrint("Erro de Flutter capturado: ${details.exception}");
+    if (kDebugMode) {
+      debugPrint('Erro de Flutter capturado: ${details.exception}');
+    }
   };
 
   runZonedGuarded(
@@ -67,7 +73,9 @@ void main() {
       );
     },
     (error, stack) {
-      debugPrint("Erro Assíncrono Global: $error");
+      if (kDebugMode) {
+        debugPrint('Erro assíncrono global: $error');
+      }
     },
   );
 }

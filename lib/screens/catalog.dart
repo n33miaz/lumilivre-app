@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
@@ -107,7 +108,7 @@ class _CatalogScreenState extends State<CatalogScreen>
         }
       }
     } catch (e) {
-      debugPrint('Erro ao ler cache local: $e');
+      if (kDebugMode) debugPrint('Erro ao ler cache local: $e');
     }
 
     // --- TENTATIVA REMOTA ---
@@ -127,7 +128,7 @@ class _CatalogScreenState extends State<CatalogScreen>
         });
       }
     } catch (e) {
-      debugPrint('Erro na UI ao buscar catálogo remoto: $e');
+      if (kDebugMode) debugPrint('Erro na UI ao buscar catálogo remoto: $e');
 
       if (mounted) {
         setState(() {

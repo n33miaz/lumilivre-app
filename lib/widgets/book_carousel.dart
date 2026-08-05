@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/screens/category_books.dart';
@@ -73,7 +74,9 @@ class _BookCarouselState extends State<BookCarousel> {
         }
       });
     } catch (e) {
-      debugPrint('BookCarousel: erro ao buscar mais livros — $e');
+      if (kDebugMode) {
+        debugPrint('BookCarousel: erro ao buscar mais livros — $e');
+      }
       if (mounted) setState(() => _isLoading = false);
     }
   }

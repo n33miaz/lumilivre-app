@@ -31,7 +31,10 @@ class AuthApi {
       final errorData = jsonDecode(response.body);
       throw Exception(errorData['message']?.toString() ?? 'Falha no login');
     } catch (e) {
-      debugPrint('Erro na chamada de login: $e');
+      // Só o tipo do erro. Este é o caminho que carrega credencial: uma
+      // FormatException de `jsonDecode` traz um trecho do corpo da resposta
+      // junto na mensagem, e é isso que não pode acabar no log.
+      if (kDebugMode) debugPrint('Erro na chamada de login: ${e.runtimeType}');
       throw Exception(
         'Nao foi possivel conectar ao servidor. Tente novamente.',
       );
@@ -66,7 +69,8 @@ class AuthApi {
       final errorData = jsonDecode(utf8.decode(response.bodyBytes));
       throw Exception(errorData['message'] ?? 'Erro ao alterar senha');
     } catch (e) {
-      debugPrint('Erro changePassword: $e');
+      // Idem login: a requisição leva senha atual e nova.
+      if (kDebugMode) debugPrint('Erro changePassword: ${e.runtimeType}');
       rethrow;
     }
   }
@@ -81,7 +85,7 @@ class AuthApi {
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 204 || response.statusCode == 200;
     } catch (e) {
-      debugPrint('Erro completeTour: $e');
+      if (kDebugMode) debugPrint('Erro completeTour: $e');
       return false;
     }
   }

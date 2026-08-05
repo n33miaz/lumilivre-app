@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -74,7 +75,7 @@ class _LoansTabState extends State<LoansTab> {
           _isLoading = false;
         });
       } catch (e) {
-        debugPrint("Erro ao carregar empréstimos: $e");
+        if (kDebugMode) debugPrint("Erro ao carregar empréstimos: $e");
         if (mounted) setState(() => _isLoading = false);
       }
     }

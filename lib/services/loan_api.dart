@@ -30,7 +30,7 @@ class LoanApi {
       }
       throw Exception('Falha ao carregar emprestimos: ${response.statusCode}');
     } catch (e) {
-      debugPrint('Erro em getMyLoans: $e');
+      if (kDebugMode) debugPrint('Erro em getMyLoans: $e');
       return [];
     }
   }
@@ -57,7 +57,7 @@ class LoanApi {
       }
       return [];
     } catch (e) {
-      debugPrint('Erro ao buscar solicitacoes: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar solicitacoes: $e');
       return [];
     }
   }
@@ -77,7 +77,7 @@ class LoanApi {
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      debugPrint('Erro ao solicitar: $e');
+      if (kDebugMode) debugPrint('Erro ao solicitar: $e');
       return false;
     }
   }
@@ -97,7 +97,7 @@ class LoanApi {
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      debugPrint('Erro ao solicitar: $e');
+      if (kDebugMode) debugPrint('Erro ao solicitar: $e');
       return false;
     }
   }
@@ -120,7 +120,7 @@ class LoanApi {
       }
       throw Exception('Falha ao carregar historico: ${response.statusCode}');
     } catch (e) {
-      debugPrint('Erro em getMyLoansHistory: $e');
+      if (kDebugMode) debugPrint('Erro em getMyLoansHistory: $e');
       return [];
     }
   }

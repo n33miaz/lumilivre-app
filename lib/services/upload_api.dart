@@ -46,10 +46,13 @@ class UploadApi {
       if (response.statusCode == 204) {
         return true;
       }
-      debugPrint('Erro upload: ${response.body}');
+      // Só o status: o corpo da resposta da API carrega dado do aluno e nunca
+      // deve ir para o log (que no Android é legível por qualquer ferramenta de
+      // captura ligada ao aparelho).
+      if (kDebugMode) debugPrint('Erro upload: status ${response.statusCode}');
       return false;
     } catch (e) {
-      debugPrint('Erro ao enviar foto: $e');
+      if (kDebugMode) debugPrint('Erro ao enviar foto: $e');
       return false;
     }
   }

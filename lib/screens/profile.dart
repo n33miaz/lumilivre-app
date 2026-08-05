@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         });
       }
     } catch (e) {
-      debugPrint('Erro ao buscar ranking: $e');
+      if (kDebugMode) debugPrint('Erro ao buscar ranking: $e');
     }
   }
 
