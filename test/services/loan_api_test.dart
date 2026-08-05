@@ -158,5 +158,33 @@ void main() {
 
       expect(loans, isEmpty);
     });
+
+    /// Engolir a falha do histórico transformava "não deu para buscar" em "você
+    /// nunca pegou um livro": a aba mostrava o estado vazio depois de uma queda
+    /// de rede, sem saber que havia algo a tentar de novo.
+    test('getMyLoansHistory deve jogar quando a API falha', () async {
+      final api = LoanApi(
+        client: MockClient((request) async => http.Response('', 500)),
+      );
+
+      await expectLater(
+        api.getMyLoansHistory('12345', 'jwt-token'),
+        throwsA(
+          isA<ApiException>().having(
+            (e) => e.failure,
+            'failure',
+            ApiFailure.server,
+          ),
+        ),
+      );
+    });
+
+    test('getMyLoansHistory deve tratar 204 como historico vazio', () async {
+      final api = LoanApi(
+        client: MockClient((request) async => http.Response('', 204)),
+      );
+
+      expect(await api.getMyLoansHistory('12345', 'jwt-token'), isEmpty);
+    });
   });
 }

@@ -117,6 +117,12 @@ class LoanApi {
     }
   }
 
+  /// Histórico de empréstimos devolvidos do leitor.
+  ///
+  /// Joga [ApiException] em vez de devolver lista vazia. Engolir a falha
+  /// transformava "não deu para buscar" em "você nunca pegou um livro": a tela
+  /// mostrava o estado vazio do histórico depois de uma queda de rede, e não
+  /// tinha como oferecer nova tentativa porque não sabia que algo falhou.
   Future<List<Loan>> getMyLoansHistory(
     String readerRegistrationNumber,
     String token,
@@ -133,10 +139,16 @@ class LoanApi {
       if (response.statusCode == 200) {
         return loanFromJson(utf8.decode(response.bodyBytes));
       }
-      throw Exception('Falha ao carregar historico: ${response.statusCode}');
+      if (response.statusCode == 204) {
+        return [];
+      }
+      throw ApiException.fromResponse(response);
     } catch (e) {
-      if (kDebugMode) debugPrint('Erro em getMyLoansHistory: $e');
-      return [];
+      final failure = ApiException.fromError(e);
+      if (kDebugMode) {
+        debugPrint('Erro em getMyLoansHistory: $failure');
+      }
+      throw failure;
     }
   }
 }

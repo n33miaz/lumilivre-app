@@ -2,8 +2,12 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/loan.dart';
+import 'package:lumilivre/models/loan_status_code.dart';
+import 'package:lumilivre/models/paged_result.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/loan_card.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/utils/constants.dart';
@@ -16,11 +20,20 @@ class LoansTab extends StatefulWidget {
 }
 
 class _LoansTabState extends State<LoansTab> {
+  /// Distância do fim da lista em que a próxima página é pedida — cerca de três
+  /// cartões. Antecipar é o que evita o rodapé de carregando aparecer no meio da
+  /// leitura; o pager cuida de não pedir duas vezes a mesma página.
+  static const double _historyPrefetch = 420.0;
+
   final ApiService _apiService = ApiService();
 
-  bool _isLoading = true;
-  List<Loan> _activeList = [];
-  List<Loan> _historyList = [];
+  bool _isLoadingActive = true;
+  List<Loan> _inProgress = [];
+  List<Loan> _closedRequests = [];
+
+  /// Só existe depois de a aba "Histórico" aparecer pela primeira vez.
+  IncrementalPager<Loan>? _historyPager;
+  final ScrollController _historyController = ScrollController();
 
   late PageController _pageController;
   int _currentIndex = 0;
@@ -29,67 +42,173 @@ class _LoansTabState extends State<LoansTab> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+    _historyController.addListener(_onHistoryScroll);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAllLoans();
+      _loadActive();
     });
   }
 
   @override
   void dispose() {
+    _historyController.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
-  void _loadAllLoans() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (authProvider.isAuthenticated &&
-        authProvider.user?.readerRegistrationNumber != null) {
-      final matricula = authProvider.user!.readerRegistrationNumber!;
-      final token = authProvider.user!.token;
+  /// Matrícula e token da sessão, ou `null` quando não há leitor identificado.
+  ({String matricula, String token})? _session() {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final matricula = auth.user?.readerRegistrationNumber;
+    final token = auth.sessionToken;
 
-      setState(() => _isLoading = true);
+    if (matricula == null || token == null || token.isEmpty) {
+      return null;
+    }
+    return (matricula: matricula, token: token);
+  }
 
-      try {
-        final results = await Future.wait([
-          _apiService.getMyLoans(matricula, token),
-          _apiService.getMyLoansHistory(matricula, token),
-          _apiService.getMyRequests(matricula, token),
-        ]);
+  /// Carrega "Em Andamento": empréstimos ativos + solicitações.
+  ///
+  /// O histórico saiu daqui. Ele era buscado no mesmo `Future.wait`, ou seja:
+  /// todo leitor pagava o histórico completo ao abrir o perfil, inclusive quem
+  /// nunca toca na segunda aba.
+  Future<void> _loadActive() async {
+    final session = _session();
+    if (session == null) {
+      if (mounted) {
+        setState(() => _isLoadingActive = false);
+      }
+      return;
+    }
 
-        final activeLoans = results[0];
-        final historyLoans = results[1];
-        final allRequests = results[2];
+    setState(() => _isLoadingActive = true);
 
-        final pendingRequests = allRequests
-            .where((r) => r.status == 'PENDENTE')
-            .toList();
-        final rejectedRequests = allRequests
-            .where((r) => r.status == 'REJEITADA' || r.status == 'CANCELADA')
-            .toList();
+    try {
+      final results = await Future.wait([
+        _apiService.getMyLoans(session.matricula, session.token),
+        _apiService.getMyRequests(session.matricula, session.token),
+      ]);
 
-        setState(() {
-          _activeList = [...pendingRequests, ...activeLoans];
-          _historyList = [...historyLoans, ...rejectedRequests];
+      // A separação em si mora no `LoanBuckets`: era aqui que o filtro comparava
+      // o status com `PENDENTE` e, como a API manda `PENDING`, a solicitação
+      // recém-enviada não entrava em nenhuma das duas listas.
+      final buckets = LoanBuckets.split(
+        activeLoans: results[0],
+        requests: results[1],
+      );
 
-          _isLoading = false;
-        });
-      } catch (e) {
-        if (kDebugMode) debugPrint("Erro ao carregar empréstimos: $e");
-        if (mounted) setState(() => _isLoading = false);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _inProgress = buckets.inProgress;
+        _closedRequests = buckets.closedRequests;
+        _isLoadingActive = false;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Erro ao carregar empréstimos: $e');
+      }
+      if (mounted) {
+        setState(() => _isLoadingActive = false);
       }
     }
   }
 
-  void _onTabChanged(int index) {
-    setState(() {
-      _currentIndex = index;
+  /// Monta o pager do histórico na primeira vez que a aba aparece.
+  Future<void> _ensureHistory() {
+    if (_historyPager != null) {
+      return Future<void>.value();
+    }
+
+    final session = _session();
+    if (session == null) {
+      return Future<void>.value();
+    }
+
+    final pages = _HistoryPages(
+      load: () =>
+          _apiService.getMyLoansHistory(session.matricula, session.token),
+    );
+    _historyPager = IncrementalPager<Loan>(
+      fetchPage: pages.page,
+      keyOf: (loan) => loan.id,
+    );
+
+    return _loadMoreHistory();
+  }
+
+  Future<void> _loadMoreHistory() {
+    final pager = _historyPager;
+    if (pager == null || !pager.canLoadMore) {
+      return Future<void>.value();
+    }
+    return _track(pager.loadMore());
+  }
+
+  Future<void> _retryHistory() {
+    final pager = _historyPager;
+    if (pager == null) {
+      return Future<void>.value();
+    }
+    return _track(pager.retry());
+  }
+
+  /// Redesenha ao começar e ao terminar. O estado da paginação vive no pager; o
+  /// `setState` só avisa o rodapé da lista que algo mudou.
+  Future<void> _track(Future<void> loading) async {
+    setState(() {});
+    await loading;
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+    // Uma página curta pode deixar o fim da lista ainda dentro do limiar. Sem
+    // reavaliar depois do layout, a paginação só continuaria no próximo gesto.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _onHistoryScroll();
+      }
     });
+  }
+
+  /// Recarrega as duas abas. As solicitações recusadas aparecem no histórico mas
+  /// vêm da chamada da primeira aba, então atualizar uma exige atualizar a outra.
+  Future<void> _refreshAll() async {
+    setState(() => _historyPager = null);
+    await _loadActive();
+    if (mounted && _currentIndex == 1) {
+      await _ensureHistory();
+    }
+  }
+
+  void _onHistoryScroll() {
+    if (!_historyController.hasClients) {
+      return;
+    }
+    final position = _historyController.position;
+    if (position.maxScrollExtent - position.pixels <= _historyPrefetch) {
+      _loadMoreHistory();
+    }
+  }
+
+  void _onTabChanged(int index) {
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+    _handleIndex(index);
+  }
+
+  void _handleIndex(int index) {
+    if (_currentIndex != index) {
+      setState(() => _currentIndex = index);
+    }
+    if (index == 1) {
+      _ensureHistory();
+    }
   }
 
   @override
@@ -156,31 +275,216 @@ class _LoansTabState extends State<LoansTab> {
         ),
         const SizedBox(height: 8),
 
+        // Cada aba cuida do próprio carregamento: antes um só indicador cobria as
+        // duas, então a segunda aba não podia nem existir antes da primeira.
         Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                  children: [
-                    _LoansListSimple(
-                      loans: _activeList,
-                      isHistory: false,
-                      onRetry: _loadAllLoans,
-                    ),
-                    _LoansListSimple(
-                      loans: _historyList,
-                      isHistory: true,
-                      onRetry: _loadAllLoans,
-                    ),
-                  ],
-                ),
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: _handleIndex,
+            children: [_buildInProgress(), _buildHistory()],
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildInProgress() {
+    if (_isLoadingActive) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return _LoansListSimple(
+      loans: _inProgress,
+      isHistory: false,
+      onRetry: _loadActive,
+    );
+  }
+
+  Widget _buildHistory() {
+    final pager = _historyPager;
+    final closed = _closedRequests;
+
+    // Sem pager a aba ainda não foi aberta (nada foi buscado, que é o ponto) ou
+    // não há sessão. O indicador só vale enquanto a sessão está sendo resolvida.
+    if (pager == null) {
+      return _isLoadingActive
+          ? const Center(child: CircularProgressIndicator())
+          : _LoansListSimple(
+              loans: const [],
+              isHistory: true,
+              onRetry: _refreshAll,
+            );
+    }
+
+    final loaded = pager.items;
+    final isEmpty = closed.isEmpty && loaded.isEmpty;
+
+    if (isEmpty && pager.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    // Lista vazia por falha é diferente de lista vazia por não ter histórico, e a
+    // grade de categoria já mostrava as duas com o mesmo texto.
+    if (isEmpty && pager.failed) {
+      return _HistoryFailure(onRetry: _retryHistory);
+    }
+    if (isEmpty) {
+      return _LoansListSimple(
+        loans: const [],
+        isHistory: true,
+        onRetry: _refreshAll,
+      );
+    }
+
+    final footerSlots = pager.hasFooter ? 1 : 0;
+
+    return RefreshIndicator(
+      onRefresh: _refreshAll,
+      child: ListView.builder(
+        controller: _historyController,
+        padding: const EdgeInsets.only(bottom: 20, top: 8),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: closed.length + loaded.length + footerSlots,
+        itemBuilder: (context, index) {
+          if (index < closed.length) {
+            return LoanCard(loan: closed[index], isRequest: true);
+          }
+
+          final loanIndex = index - closed.length;
+          if (loanIndex < loaded.length) {
+            return LoanCard(loan: loaded[loanIndex]);
+          }
+
+          return _HistoryFooter(failed: pager.failed, onRetry: _retryHistory);
+        },
+      ),
+    );
+  }
+}
+
+/// Fonte de páginas do histórico.
+///
+/// `GET /api/loans/reader/{matricula}/history` devolve `List<LoanResponse>` sem
+/// `Pageable`, e não há rota paginada de histórico para o leitor: a única de
+/// empréstimo que aceita `Pageable` é `GET /api/loans/advanced`, restrita a
+/// ADMIN/LIBRARIAN. Logo a rede é chamada **uma** vez e as páginas seguintes são
+/// cortes do que já veio — o que a API oferece hoje.
+///
+/// O ganho que sobra é o que a tela sofria de fato: o histórico não é mais
+/// buscado junto com "Em Andamento", e entra em blocos conforme rola em vez de
+/// virar um `ListView` dimensionado sobre anos de empréstimo de uma vez.
+class _HistoryPages {
+  _HistoryPages({required this.load});
+
+  /// Cartões por bloco. Quinze cobre com folga a altura de qualquer tela sem
+  /// mandar a lista inteira para o `ListView` de uma vez.
+  static const int _pageSize = 15;
+
+  final Future<List<Loan>> Function() load;
+
+  /// Resposta única da API. Fica `null` quando a busca falha, para a nova
+  /// tentativa realmente ir à rede em vez de repetir uma lista que não existe.
+  List<Loan>? _all;
+
+  Future<PagedResult<Loan>> page(int page) async {
+    final all = _all ??= await load();
+
+    final start = page * _pageSize;
+    if (start >= all.length) {
+      return PagedResult<Loan>.empty(page: page);
+    }
+
+    final end = start + _pageSize < all.length ? start + _pageSize : all.length;
+    return PagedResult<Loan>(
+      items: all.sublist(start, end),
+      page: page,
+      isLast: end >= all.length,
+    );
+  }
+}
+
+/// Rodapé da lista paginada: carregando, ou falhou e oferece nova tentativa.
+class _HistoryFooter extends StatelessWidget {
+  const _HistoryFooter({required this.failed, required this.onRetry});
+
+  final bool failed;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!failed) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+
+    // Falhar a próxima página não apaga as anteriores: o aviso é um rodapé, não
+    // um estado de tela.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      child: Column(
+        children: [
+          Text(
+            l10n.loadMoreError,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Theme.of(context).hintColor),
+          ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh, size: 18),
+            label: Text(l10n.retryAction),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Histórico que não conseguiu carregar nem a primeira página.
+class _HistoryFailure extends StatelessWidget {
+  const _HistoryFailure({required this.onRetry});
+
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wifi_off_outlined,
+              size: 56,
+              color: theme.hintColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.connectionErrorMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: theme.hintColor),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.retryAction),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -188,7 +492,7 @@ class _LoansTabState extends State<LoansTab> {
 class _LoansListSimple extends StatelessWidget {
   final List<Loan> loans;
   final bool isHistory;
-  final VoidCallback onRetry;
+  final Future<void> Function() onRetry;
 
   const _LoansListSimple({
     required this.loans,
@@ -222,16 +526,14 @@ class _LoansListSimple extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      onRefresh: () async => onRetry(),
+      onRefresh: onRetry,
       child: ListView.builder(
         padding: const EdgeInsets.only(bottom: 20, top: 8),
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: loans.length,
         itemBuilder: (context, index) {
           final loan = loans[index];
-          return LoanCard(
-            loan: loan,
-            isRequest: loan.isRequest, // Passa a flag corretamente
-          );
+          return LoanCard(loan: loan, isRequest: loan.isRequest);
         },
       ),
     );

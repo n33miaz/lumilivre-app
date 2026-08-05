@@ -2,6 +2,7 @@
 import 'package:intl/intl.dart';
 
 import '../models/loan.dart';
+import '../models/loan_status_code.dart';
 import '../utils/constants.dart';
 
 enum LoanCardStatus { active, dueToday, overdue, pending, rejected, returned }
@@ -12,9 +13,18 @@ class LoanCard extends StatelessWidget {
 
   const LoanCard({super.key, required this.loan, this.isRequest = false});
 
+  /// Cor, texto e ícone do selo de status.
+  ///
+  /// As comparações eram com o código pt-BR do enum (`REJEITADA`, `CONCLUIDO`) e
+  /// a API manda o nome do enum em inglês, então nenhuma casava. Não era detalhe
+  /// cosmético: sem reconhecer `COMPLETED`, todo empréstimo do histórico caía no
+  /// cálculo de prazo abaixo e aparecia em vermelho como "Atrasado (N dias)" —
+  /// justamente porque já foi devolvido e a data de devolução ficou no passado.
   (LoanCardStatus, Color, String, IconData) _getStatusAttributes() {
+    final code = loan.statusCode;
+
     if (isRequest) {
-      if (loan.status == 'REJEITADA') {
+      if (code.isClosedRequest) {
         return (
           LoanCardStatus.rejected,
           Colors.grey.shade600,
@@ -30,7 +40,7 @@ class LoanCard extends StatelessWidget {
       );
     }
 
-    if (loan.status == 'CONCLUIDO') {
+    if (code.isReturnedLoan) {
       return (
         LoanCardStatus.returned,
         Colors.grey,

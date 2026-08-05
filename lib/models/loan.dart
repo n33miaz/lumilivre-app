@@ -65,7 +65,10 @@ class Loan {
         fallback: DateTime.now,
       ),
       dataDevolucao: DateTime(2100),
-      status: _codeOrString(json['status']) ?? 'PENDENTE',
+      // `PENDING` e não `PENDENTE`: o padrão precisa falar o mesmo vocabulário
+      // que a API manda no `code`, senão o fallback recria o bug que o
+      // `LoanStatusCode` existe para fechar.
+      status: _codeOrString(json['status']) ?? 'PENDING',
       livroId: json['livroId']?.toString() ?? json['bookId']?.toString() ?? '',
       livroTitulo:
           json['livroNome']?.toString() ??

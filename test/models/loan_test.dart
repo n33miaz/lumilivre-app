@@ -88,7 +88,10 @@ void main() {
           'livroNome': null,
         });
         expect(loan.id, '');
-        expect(loan.status, 'PENDENTE');
+        // O padrão fala o vocabulário da API (`code` = nome do enum, em inglês).
+        // Era `PENDENTE`, o código pt-BR, que é justamente a grafia com que
+        // nenhuma comparação de status do app casava.
+        expect(loan.status, 'PENDING');
         expect(loan.livroId, '');
         expect(loan.livroTitulo, 'Solicitação');
         expect(loan.isRequest, isTrue);

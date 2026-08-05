@@ -1,5 +1,6 @@
 import 'package:lumilivre/models/book_details.dart';
 import 'package:lumilivre/models/loan.dart';
+import 'package:lumilivre/models/loan_status_code.dart';
 import 'package:lumilivre/screens/book_details.dart';
 
 /// Resultado do cálculo de status contendo o status e a data de devolução.
@@ -94,18 +95,14 @@ class LoanStatusCalculator {
   ///    passavam mapas) percebiam.
   /// 2. A comparação era com `PENDENTE`, o código pt-BR do enum. A API responde
   ///    `status: {code: "PENDING", label: "Pendente"}` — o nome do enum.
+  ///
+  /// A tradução do código saiu daqui e virou [LoanStatusCode]: era a segunda
+  /// cópia da mesma regra no app, e a terceira (na aba de empréstimos) estava
+  /// errada.
   static bool _hasPendingRequest(List<Loan> requests, String targetBookId) {
     return requests.any(
       (request) =>
-          request.livroId == targetBookId && _isPending(request.status),
+          request.livroId == targetBookId && request.statusCode.isOpenRequest,
     );
-  }
-
-  /// Aceita as duas grafias porque as duas circulam: o `code` do enum
-  /// (`PENDING`) e o código pt-BR histórico (`PENDENTE`), que ainda aparece em
-  /// dado antigo e em fixture de teste.
-  static bool _isPending(String status) {
-    final normalized = status.toUpperCase();
-    return normalized == 'PENDING' || normalized == 'PENDENTE';
   }
 }
