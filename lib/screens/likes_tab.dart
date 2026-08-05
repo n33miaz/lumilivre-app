@@ -9,11 +9,15 @@ class LikesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
         final books = favoritesProvider.favoriteBooks;
 
         if (books.isEmpty) {
+          // `grey.shade300` sobre `grey.shade600`: no tema escuro era o caso
+          // clássico de cinza sobre cinza. Mesmo par dos outros estados vazios.
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -21,12 +25,12 @@ class LikesTab extends StatelessWidget {
                 Icon(
                   Icons.favorite_border,
                   size: 64,
-                  color: Colors.grey.shade300,
+                  color: theme.hintColor.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Você ainda não curtiu nenhum livro.',
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: TextStyle(color: theme.hintColor),
                 ),
               ],
             ),

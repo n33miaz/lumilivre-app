@@ -4,7 +4,6 @@ import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
-import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
 import 'package:provider/provider.dart';
@@ -233,7 +232,7 @@ class _CatalogScreenState extends State<CatalogScreen>
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _handleRefresh,
-              color: LumiLivreTheme.primary,
+              color: Theme.of(context).colorScheme.primary,
               child: _allCategories.isEmpty
                   ? ListView(
                       // ...

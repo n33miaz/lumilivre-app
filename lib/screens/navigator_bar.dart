@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/guest_access.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/guided_tour.dart';
 import 'package:lumilivre/widgets/header.dart';
 import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
@@ -25,6 +27,11 @@ class MainNavigator extends StatefulWidget {
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
+  /// Item inativo da barra inferior: a tinta da marca a 60%.
+  static final Color _inactiveBrandInk = LumiLivreTheme.onBrand.withValues(
+    alpha: 0.6,
+  );
+
   int _selectedIndex = 1;
   late PageController _pageController;
   String? _onboardedToken;
@@ -73,9 +80,9 @@ class _MainNavigatorState extends State<MainNavigator> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
 
     if (auth.isAuthenticated && auth.isInitialPassword) {
-      await showDialog(
+      await showAppDialog(
         context: context,
-        barrierDismissible: false,
+        dismissible: false,
         builder: (_) => const MandatoryPasswordDialog(),
       );
     }
@@ -97,17 +104,19 @@ class _MainNavigatorState extends State<MainNavigator> {
 
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: AppMotion.of(context, AppMotion.page),
+      curve: AppMotion.inOut,
     );
   }
 
   Widget _buildIcon(String name, int index, {bool isLogo = false}) {
     final isActive = _selectedIndex == index;
 
+    // A barra é sempre roxa, nos dois temas: o item inativo é a mesma tinta com
+    // menos opacidade, e não um cinza que ninguém escolheu para cima de roxo.
     final color = isLogo
-        ? (isActive ? LumiLivreTheme.label : Colors.grey.shade400)
-        : (isActive ? Colors.white : Colors.grey.shade400);
+        ? (isActive ? LumiLivreTheme.label : _inactiveBrandInk)
+        : (isActive ? LumiLivreTheme.onBrand : _inactiveBrandInk);
 
     final iconPath = isLogo
         ? 'assets/icons/logo.svg'
@@ -136,7 +145,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     return Icon(
       isActive ? Icons.campaign : Icons.campaign_outlined,
       size: 24,
-      color: isActive ? Colors.white : Colors.grey.shade400,
+      color: isActive ? LumiLivreTheme.onBrand : _inactiveBrandInk,
     );
   }
 
@@ -154,8 +163,8 @@ class _MainNavigatorState extends State<MainNavigator> {
               SvgPicture.asset(
                 'assets/icons/logo.svg',
                 height: 100,
-                colorFilter: const ColorFilter.mode(
-                  LumiLivreTheme.primary,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.primary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -210,7 +219,7 @@ class _MainNavigatorState extends State<MainNavigator> {
       ),
       child: Theme(
         data: Theme.of(context).copyWith(
-          splashColor: Colors.white.withValues(alpha: 0.1),
+          splashColor: LumiLivreTheme.onBrand.withValues(alpha: 0.1),
           highlightColor: Colors.transparent,
         ),
 
@@ -229,8 +238,8 @@ class _MainNavigatorState extends State<MainNavigator> {
                 ),
 
                 AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+                  duration: AppMotion.of(context, AppMotion.page),
+                  curve: AppMotion.inOut,
                   top: showHeader ? 0 : -160,
                   left: 0,
                   right: 0,
@@ -242,8 +251,8 @@ class _MainNavigatorState extends State<MainNavigator> {
             bottomNavigationBar: BottomNavigationBar(
               items: navItems,
               currentIndex: _selectedIndex.clamp(0, screens.length - 1),
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.grey.shade400,
+              selectedItemColor: LumiLivreTheme.onBrand,
+              unselectedItemColor: _inactiveBrandInk,
               onTap: _onItemTapped,
               backgroundColor: LumiLivreTheme.primary,
               type: BottomNavigationBarType.fixed,

@@ -13,6 +13,7 @@ import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/services/loan_status_calculator.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/utils/parsers.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
@@ -129,9 +130,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   /// Abre o login empilhado e recarrega ao voltar: entrar aqui tem que revelar a
   /// ficha do livro que estava na tela, sem o usuário precisar navegar de novo.
   Future<void> _openLogin() async {
-    await Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    await Navigator.of(context).push(
+      AppPageRoute<void>(context: context, builder: (_) => const LoginScreen()),
+    );
     if (mounted) {
       await _load();
     }
@@ -262,7 +263,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               needsLogin ? Icons.lock_outline : Icons.wifi_off_outlined,
               size: 64,
               color: needsLogin
-                  ? LumiLivreTheme.primary
+                  ? theme.colorScheme.primary
                   : theme.hintColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 20),
@@ -307,10 +308,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   SliverAppBar _buildSliverAppBar(BuildContext context) {
+    // Cor, elevação e sombra ao rolar vêm do `appBarTheme`.
     return SliverAppBar(
       pinned: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () => Navigator.of(context).pop(),
@@ -367,16 +367,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   ),
                 ),
                 errorWidget: (context, url, error) {
+                  final scheme = Theme.of(context).colorScheme;
                   return Container(
-                    color: Colors.grey[300],
-                    child: const Column(
+                    color: scheme.surfaceContainerHighest,
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.image_not_supported, color: Colors.grey),
-                        SizedBox(height: 4),
+                        Icon(
+                          Icons.image_not_supported,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 4),
                         Text(
                           'Sem Capa',
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: scheme.onSurfaceVariant,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -404,7 +411,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 Text(
                   details.autor,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: LumiLivreTheme.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -412,9 +419,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Lançado em ${details.dataLancamento.day}/${details.dataLancamento.month}/${details.dataLancamento.year}',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).hintColor,
+                  ),
                 ),
               ],
             ),
@@ -458,7 +465,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                     return Icon(
                       Icons.info_outline,
                       size: 24,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).hintColor,
                     );
                   },
                 ),
@@ -466,7 +473,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               const SizedBox(height: 4),
               Text(
                 'Faixa Etária',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -515,7 +525,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const Divider(height: 32),
           Row(
             children: [
-              Text('Gêneros', style: TextStyle(color: Colors.grey[600])),
+              Text(
+                'Gêneros',
+                style: TextStyle(color: Theme.of(context).hintColor),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -538,9 +551,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const SizedBox(height: 8),
           Text(
             details.sinopse,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).hintColor,
+            ),
           ),
         ],
       ),
@@ -567,7 +580,10 @@ class _InfoItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(bottom, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+        Text(
+          bottom,
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
+        ),
       ],
     );
   }
@@ -582,22 +598,23 @@ class _LikeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoritesProvider>(context);
     final isLiked = favoritesProvider.isFavorite(book.id);
+    final scheme = Theme.of(context).colorScheme;
 
     return Material(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
+        side: BorderSide(color: scheme.outlineVariant),
       ),
       elevation: 2,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
         onTap: () => favoritesProvider.toggleFavorite(book),
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: Icon(
             isLiked ? Icons.favorite : Icons.favorite_border,
-            color: isLiked ? Colors.redAccent : LumiLivreTheme.primary,
+            color: isLiked ? LumiLivreTheme.like : scheme.primary,
             size: 28,
           ),
         ),
@@ -615,8 +632,10 @@ class _BorrowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     Color backgroundColor;
-    Color textColor = Colors.white;
+    Color textColor = LumiStatusColors.onFill;
     String text;
     String iconPath = 'assets/icons/loans.svg';
     bool isClickable = false;
@@ -629,19 +648,23 @@ class _BorrowButton extends StatelessWidget {
         );
 
       case LoanStatus.guest:
-        backgroundColor = Colors.grey;
+        // Este botão **é** clicável: leva ao login. O cinza de indisponível
+        // dizia o contrário, então ele fica em tom de marca, sem preenchimento.
+        backgroundColor = scheme.primary.withValues(alpha: 0.12);
+        textColor = scheme.primary;
         text = 'FAÇA LOGIN PARA SOLICITAR';
         iconPath = '';
         break;
 
       case LoanStatus.noCopies:
-        backgroundColor = Colors.grey.shade400;
+        backgroundColor = scheme.surfaceContainerHighest;
+        textColor = scheme.onSurfaceVariant;
         text = 'SEM EXEMPLARES CADASTRADOS';
         iconPath = 'assets/icons/cancel.svg';
         break;
 
       case LoanStatus.limitReached:
-        backgroundColor = Colors.orange.shade800;
+        backgroundColor = LumiStatusColors.warningFill;
         text = 'LIMITE DE EMPRÉSTIMOS ATINGIDO';
         break;
 
@@ -652,13 +675,15 @@ class _BorrowButton extends StatelessWidget {
         break;
 
       case LoanStatus.pending:
-        backgroundColor = Colors.amber;
+        // Era `Colors.amber` com texto branco: 1,7:1 de contraste, ou seja, a
+        // frase mais importante do fluxo de solicitação ilegível ao sol.
+        backgroundColor = LumiStatusColors.warningFill;
         text = 'AGUARDANDO APROVAÇÃO';
         iconPath = 'assets/icons/loans-active.svg';
         break;
 
       case LoanStatus.active:
-        backgroundColor = Colors.green;
+        backgroundColor = LumiStatusColors.successFill;
         String dateStr = dueDate != null
             ? '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}'
             : '?';
@@ -666,12 +691,13 @@ class _BorrowButton extends StatelessWidget {
         break;
 
       case LoanStatus.overdue:
-        backgroundColor = Colors.redAccent;
+        backgroundColor = LumiStatusColors.dangerFill;
         text = 'DEVOLUÇÃO EXCEDIDA';
         break;
 
       case LoanStatus.unavailable:
-        backgroundColor = Colors.grey;
+        backgroundColor = scheme.surfaceContainerHighest;
+        textColor = scheme.onSurfaceVariant;
         if (dueDate != null && dueDate!.isAfter(DateTime.now())) {
           String dateStr = '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}';
           text = 'DISPONÍVEL A PARTIR DE: $dateStr';
@@ -688,11 +714,11 @@ class _BorrowButton extends StatelessWidget {
           ? onPressed
           : (isClickable ? onPressed : null),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: AppMotion.of(context, AppMotion.quick),
         height: 56,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
           boxShadow: isClickable
               ? [
                   BoxShadow(
@@ -740,7 +766,7 @@ class _InfoRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: Colors.grey[600])),
+        Text(label, style: TextStyle(color: Theme.of(context).hintColor)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre/screens/search_results.dart';
 import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 
 class CustomHeader extends StatelessWidget {
@@ -39,7 +40,7 @@ class CustomHeader extends StatelessWidget {
                 children: [
                   // botão tema
                   Material(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: LumiLivreTheme.onBrand.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(50),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(50),
@@ -57,7 +58,7 @@ class CustomHeader extends StatelessWidget {
                               : 'assets/icons/moon.svg',
                           height: 20,
                           colorFilter: const ColorFilter.mode(
-                            Colors.white,
+                            LumiLivreTheme.onBrand,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -71,7 +72,7 @@ class CustomHeader extends StatelessWidget {
                       title,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: LumiLivreTheme.onBrand,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -127,8 +128,9 @@ class _SearchFieldState extends State<_SearchField> {
 
     if (texto.isNotEmpty) {
       Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => SearchResultsScreen(query: texto),
+        AppPageRoute<void>(
+          context: context,
+          builder: (_) => SearchResultsScreen(query: texto),
         ),
       );
       _controller.clear();
@@ -137,25 +139,27 @@ class _SearchFieldState extends State<_SearchField> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    const double borderRadiusValue = 12;
+    final theme = Theme.of(context);
+    const double borderRadiusValue = LumiLivreTheme.radiusControl;
     const double buttonWidth = 56;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
+      duration: AppMotion.of(context, AppMotion.quick),
+      curve: AppMotion.enter,
       height: 54,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadiusValue),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
+            color: theme.colorScheme.shadow.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
+        // Anel de foco é tinta sobre a superfície do campo, não superfície de
+        // marca: com o roxo cravado ele não aparecia no tema escuro.
         border: Border.all(
-          color: _isFocused ? LumiLivreTheme.primary : Colors.transparent,
+          color: _isFocused ? theme.colorScheme.primary : Colors.transparent,
           width: 2.0,
         ),
       ),
@@ -164,7 +168,7 @@ class _SearchFieldState extends State<_SearchField> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Container(color: Theme.of(context).cardColor),
+            Container(color: theme.cardColor),
 
             Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -178,21 +182,28 @@ class _SearchFieldState extends State<_SearchField> {
                       textAlignVertical: TextAlignVertical.center,
                       textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
+                        color: theme.colorScheme.onSurface,
                         fontSize: 16,
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isCollapsed: true,
                         hintText: 'Procure por um livro ou autor',
-                        hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        hintStyle: TextStyle(
+                          fontSize: 16,
+                          color: theme.hintColor,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
                         filled: true,
                         fillColor: Colors.transparent,
-                        border: OutlineInputBorder(borderSide: BorderSide.none),
-                        enabledBorder: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -212,8 +223,8 @@ class _SearchFieldState extends State<_SearchField> {
                     },
                     onTapCancel: () => setState(() => _isPressed = false),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
+                      duration: AppMotion.of(context, AppMotion.quick),
+                      curve: AppMotion.enter,
                       decoration: BoxDecoration(
                         color: _isPressed
                             ? LumiLivreTheme.primary.withValues(alpha: 0.85)
@@ -232,11 +243,11 @@ class _SearchFieldState extends State<_SearchField> {
                       ),
                       child: AnimatedScale(
                         scale: _isPressed ? 0.92 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut,
+                        duration: AppMotion.of(context, AppMotion.quick),
+                        curve: AppMotion.enter,
                         child: Center(
                           child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
+                            duration: AppMotion.of(context, AppMotion.quick),
                             child: SvgPicture.asset(
                               'assets/icons/search.svg',
                               key: ValueKey(_isPressed),
@@ -244,8 +255,10 @@ class _SearchFieldState extends State<_SearchField> {
                               height: 22,
                               colorFilter: ColorFilter.mode(
                                 _isPressed
-                                    ? Colors.white.withValues(alpha: 0.5)
-                                    : Colors.white,
+                                    ? LumiLivreTheme.onBrand.withValues(
+                                        alpha: 0.5,
+                                      )
+                                    : LumiLivreTheme.onBrand,
                                 BlendMode.srcIn,
                               ),
                             ),

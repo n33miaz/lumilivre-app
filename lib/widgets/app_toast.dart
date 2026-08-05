@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:lumilivre/utils/constants.dart';
+
 /// Tom do aviso. Só três, porque só existem três coisas a dizer: deu certo,
 /// não deu, e "estou fazendo".
 enum ToastTone { neutral, success, error }
@@ -61,20 +63,29 @@ class AppToast {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(message, style: TextStyle(color: _inkFor(tone))),
           backgroundColor: _backgroundFor(tone),
           duration: _readingTime(message),
         ),
       );
   }
 
-  /// Cores como já estavam nas chamadas espalhadas — trazidas para um lugar só
-  /// para que trocar a paleta seja uma edição, não doze.
+  /// Fundo do aviso, agora vindo da paleta de status do tema — a mesma que
+  /// pinta o selo do empréstimo, para "erro" ser um vermelho só no app inteiro.
   static Color? _backgroundFor(ToastTone tone) => switch (tone) {
     ToastTone.neutral => null,
-    ToastTone.success => Colors.green.shade700,
-    ToastTone.error => Colors.redAccent,
+    ToastTone.success => LumiStatusColors.successFill,
+    ToastTone.error => LumiStatusColors.dangerFill,
   };
+
+  /// Tinta do texto quando o fundo é nosso.
+  ///
+  /// O `SnackBar` pinta o conteúdo com `onInverseSurface`, que no tema escuro é
+  /// **escuro**: o aviso de erro saía com texto quase preto sobre o vermelho.
+  /// Quem escolhe o fundo tem de escolher a tinta; no tom neutro o padrão do
+  /// Material continua valendo (`null` não sobrescreve nada).
+  static Color? _inkFor(ToastTone tone) =>
+      tone == ToastTone.neutral ? null : LumiStatusColors.onFill;
 
   /// ~4 s para frase curta, até 10 s para a mais longa (teto do Material), e mais
   /// folga quando há leitor de tela, que gasta o tempo falando.

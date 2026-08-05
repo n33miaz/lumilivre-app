@@ -9,7 +9,9 @@ import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/services/biometric_auth.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 
 import '../widgets/change_password_dialog.dart';
@@ -83,8 +85,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final access = GuestAccess.of(context);
     final localeProvider = Provider.of<LocaleProvider>(context);
     final localeTag = localeProvider.locale.toLanguageTag();
+    // O raio agora vem do `cardTheme`; esta forma sobra só para o `ListTile`,
+    // que precisa dela para recortar o próprio realce de toque.
     final roundedShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
     );
 
     return Scaffold(
@@ -97,7 +101,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           _SectionTitle(l10n.languageSection),
           Card(
-            shape: roundedShape,
             clipBehavior: Clip.antiAlias,
             child: RadioGroup<String>(
               groupValue: localeTag,
@@ -138,11 +141,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     RoundedRectangleBorder roundedShape,
     AppLocalizations l10n,
   ) {
+    final danger = LumiStatusColors.of(context).danger;
+
     return [
       _SectionTitle(l10n.securitySection),
       if (!kIsWeb) ...[
         Card(
-          shape: roundedShape,
           clipBehavior: Clip.antiAlias,
           child: SwitchListTile(
             contentPadding: const EdgeInsets.symmetric(
@@ -193,7 +197,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ],
       _SectionTitle(l10n.accountSection),
       Card(
-        shape: roundedShape,
         clipBehavior: Clip.antiAlias,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
@@ -204,14 +207,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           leading: const Icon(Icons.lock_outline),
           title: Text(l10n.changePassword),
           trailing: const Icon(Icons.arrow_forward_ios, size: 20),
-          onTap: () => showDialog(
+          onTap: () => showAppDialog(
             context: context,
             builder: (_) => const ChangePasswordDialog(),
           ),
         ),
       ),
       Card(
-        shape: roundedShape,
         clipBehavior: Clip.antiAlias,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
@@ -219,11 +221,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             vertical: 8,
           ),
           shape: roundedShape,
-          leading: Icon(Icons.logout, color: Colors.red.shade400),
-          title: Text(
-            l10n.logout,
-            style: TextStyle(color: Colors.red.shade400),
-          ),
+          // Sair é a ação de risco da tela: o vermelho é o mesmo da paleta de
+          // status, não um `red.shade400` só desta lista.
+          leading: Icon(Icons.logout, color: danger),
+          title: Text(l10n.logout, style: TextStyle(color: danger)),
           onTap: () {
             // Provider lido antes do pop: depois dele este `context` já saiu da
             // árvore, e o logout agora também revoga a sessão no servidor.
@@ -291,7 +292,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         _SectionTitle(l10n.accountSection),
         Card(
-          shape: roundedShape,
           clipBehavior: Clip.antiAlias,
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -300,12 +300,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Icon(
                   Icons.person_outline,
                   size: 48,
-                  color: Colors.grey.shade400,
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   l10n.guestSettingsPrompt,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 14,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -314,16 +317,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        AppPageRoute<void>(
+                          context: context,
+                          builder: (_) => const LoginScreen(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.login, size: 18),
                     label: Text(l10n.loginAction),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
                     ),
                   ),
                 ),
@@ -342,10 +345,12 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // `primaryColor` é superfície de marca (roxo escuro); como tinta sobre a
+    // tela ele sumia no tema escuro. Título de seção usa a tinta da marca.
     return Text(
       title,
       style: TextStyle(
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).colorScheme.primary,
         fontWeight: FontWeight.bold,
         fontSize: 16,
       ),
@@ -369,23 +374,24 @@ class _ThemeOptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final scheme = Theme.of(context).colorScheme;
     final isSelected = themeProvider.themeOption == option;
     final color = isSelected
-        ? LumiLivreTheme.primary
-        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+        ? scheme.primary
+        : scheme.onSurface.withValues(alpha: 0.6);
 
     return GestureDetector(
       onTap: () => themeProvider.setTheme(option),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppMotion.of(context, AppMotion.quick),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? LumiLivreTheme.primary.withValues(alpha: 0.1)
+              ? scheme.primary.withValues(alpha: 0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
           border: Border.all(
-            color: isSelected ? LumiLivreTheme.primary : Colors.transparent,
+            color: isSelected ? scheme.primary : Colors.transparent,
             width: 1.5,
           ),
         ),

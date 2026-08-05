@@ -20,21 +20,28 @@ class LoanCard extends StatelessWidget {
   /// cosmético: sem reconhecer `COMPLETED`, todo empréstimo do histórico caía no
   /// cálculo de prazo abaixo e aparecia em vermelho como "Atrasado (N dias)" —
   /// justamente porque já foi devolvido e a data de devolução ficou no passado.
-  (LoanCardStatus, Color, String, IconData) _getStatusAttributes() {
+  ///
+  /// As cores vêm da paleta de status e do esquema do tema, não de `Colors.*`: o
+  /// selo é tinta sobre a carta, e `Colors.green`/`Colors.grey` cravados eram
+  /// escuros sobre a carta escura.
+  (LoanCardStatus, Color, String, IconData) _getStatusAttributes(
+    LumiStatusColors statusColors,
+    ColorScheme scheme,
+  ) {
     final code = loan.statusCode;
 
     if (isRequest) {
       if (code.isClosedRequest) {
         return (
           LoanCardStatus.rejected,
-          Colors.grey.shade600,
+          scheme.onSurfaceVariant,
           'Solicitação Recusada',
           Icons.cancel_outlined,
         );
       }
       return (
         LoanCardStatus.pending,
-        LumiLivreTheme.primary,
+        scheme.primary,
         'Aguardando Aprovação',
         Icons.hourglass_empty,
       );
@@ -43,7 +50,7 @@ class LoanCard extends StatelessWidget {
     if (code.isReturnedLoan) {
       return (
         LoanCardStatus.returned,
-        Colors.grey,
+        scheme.onSurfaceVariant,
         'Devolvido',
         Icons.check_circle_outline,
       );
@@ -62,21 +69,21 @@ class LoanCard extends StatelessWidget {
     if (difference < 0) {
       return (
         LoanCardStatus.overdue,
-        Colors.redAccent,
+        statusColors.danger,
         'Atrasado (${difference.abs()} dias)',
         Icons.warning_amber_rounded,
       );
     } else if (difference == 0) {
       return (
         LoanCardStatus.dueToday,
-        Colors.orange,
+        statusColors.warning,
         'Vence Hoje!',
         Icons.access_time,
       );
     } else {
       return (
         LoanCardStatus.active,
-        Colors.green,
+        statusColors.success,
         'Devolve em $difference dias',
         Icons.calendar_today,
       );
@@ -85,19 +92,19 @@ class LoanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (statusEnum, statusColor, statusText, statusIcon) =
-        _getStatusAttributes();
     final theme = Theme.of(context);
+    final (statusEnum, statusColor, statusText, statusIcon) =
+        _getStatusAttributes(LumiStatusColors.of(context), theme.colorScheme);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       height: 130,
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -108,8 +115,8 @@ class LoanCard extends StatelessWidget {
           // --- CAPA ---
           ClipRRect(
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
+              topLeft: Radius.circular(LumiLivreTheme.radiusCard),
+              bottomLeft: Radius.circular(LumiLivreTheme.radiusCard),
             ),
             child: _buildCover(loan.imagemUrl),
           ),
@@ -141,7 +148,7 @@ class LoanCard extends StatelessWidget {
                             ? 'Solicitado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}'
                             : 'Emprestado em: ${DateFormat('dd/MM/yyyy').format(loan.dataEmprestimo)}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey,
+                          color: theme.hintColor,
                         ),
                       ),
                     ],

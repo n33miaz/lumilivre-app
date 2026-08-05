@@ -54,13 +54,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Resultados para "${widget.query}"'),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -69,11 +68,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.search_off, size: 64, color: Colors.grey),
+                  Icon(
+                    Icons.search_off,
+                    size: 64,
+                    color: theme.hintColor.withValues(alpha: 0.5),
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Nenhum livro encontrado.',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: theme.hintColor),
                   ),
                 ],
               ),

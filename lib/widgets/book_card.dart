@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/screens/book_details.dart';
+import 'package:lumilivre/utils/app_motion.dart';
+import 'package:lumilivre/utils/constants.dart';
 
 class BookCard extends StatelessWidget {
   final Book book;
@@ -33,44 +35,26 @@ class BookCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                BookDetailsScreen(book: book),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(0.0, 0.1);
-                  const end = Offset.zero;
-                  const curve = Curves.easeOutCubic;
-                  final tween = Tween(
-                    begin: begin,
-                    end: end,
-                  ).chain(CurveTween(curve: curve));
-
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    ),
-                  );
-                },
+          AppPageRoute<void>(
+            context: context,
+            builder: (_) => BookDetailsScreen(book: book),
           ),
         );
       },
       child: Container(
         width: width,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
           child: Container(
             color: Theme.of(context).cardColor,
             child: Column(
@@ -96,10 +80,10 @@ class BookCard extends StatelessWidget {
                                 ),
                               ),
                               errorWidget: (context, url, error) =>
-                                  _buildPlaceholder(),
+                                  _buildPlaceholder(colorScheme),
                               memCacheWidth: 420,
                             )
-                          : _buildPlaceholder(),
+                          : _buildPlaceholder(colorScheme),
                     ),
 
                     // Rating na Direita Fixo
@@ -113,13 +97,16 @@ class BookCard extends StatelessWidget {
                             horizontal: 6,
                             vertical: 4,
                           ),
-                          color: Colors.black.withValues(alpha: 0.6),
+                          // Véu sobre a capa: `scrim` é o preto do tema, e a
+                          // pastilha fica igual nos dois temas porque o que está
+                          // atrás dela é a imagem, não a superfície.
+                          color: colorScheme.scrim.withValues(alpha: 0.6),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(
                                 Icons.star_rounded,
-                                color: Colors.amber,
+                                color: LumiLivreTheme.rating,
                                 size: 14,
                               ),
                               const SizedBox(width: 2),
@@ -128,7 +115,7 @@ class BookCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: LumiLivreTheme.onBrand,
                                 ),
                               ),
                             ],
@@ -198,9 +185,9 @@ class BookCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(ColorScheme colorScheme) {
     return Container(
-      color: Colors.grey[200],
+      color: colorScheme.surfaceContainerHighest,
       child: Image.asset('assets/images/capa-padrao.png', fit: BoxFit.cover),
     );
   }

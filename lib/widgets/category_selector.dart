@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 
 class CategorySelector extends StatelessWidget {
@@ -16,6 +17,8 @@ class CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 40,
       child: ListView.builder(
@@ -29,7 +32,7 @@ class CategorySelector extends StatelessWidget {
           return GestureDetector(
             onTap: () => onCategorySelected(category),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
+              duration: AppMotion.of(context, AppMotion.quick),
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -38,14 +41,16 @@ class CategorySelector extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? LumiLivreTheme.primary
-                      : Colors.grey.shade400,
+                      : scheme.outlineVariant,
                 ),
               ),
               alignment: Alignment.center,
               child: Text(
                 category,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.grey.shade600,
+                  color: isSelected
+                      ? LumiLivreTheme.onBrand
+                      : scheme.onSurfaceVariant,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

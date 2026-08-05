@@ -6,6 +6,7 @@ import 'package:lumilivre/models/paged_result.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/screens/category_books.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 import 'package:provider/provider.dart';
@@ -127,7 +128,8 @@ class _BookCarouselState extends State<BookCarousel> {
 
   void _navigateToCategory(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      AppPageRoute<void>(
+        context: context,
         builder: (_) => CategoryBooksScreen(categoryName: widget.title),
       ),
     );

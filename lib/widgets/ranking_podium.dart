@@ -50,9 +50,8 @@ class _PodiumBar extends StatelessWidget {
 
     final double height = isFirst ? 220 : (isSecond ? 160 : 120);
 
-    final Color color = isFirst
-        ? const Color(0xFFFFD700)
-        : (isSecond ? const Color(0xFFC0C0C0) : const Color(0xFFCD7F32));
+    // Ouro, prata e bronze vêm da paleta: eram três hex soltos aqui.
+    final Color color = LumiLivreTheme.podiumColors[position - 1];
 
     final String medalIcon = isFirst
         ? 'assets/icons/medal1.svg'
@@ -85,15 +84,17 @@ class _PodiumBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
           ),
           child: Text(
             '${item.loanCount}',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: LumiLivreTheme.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),

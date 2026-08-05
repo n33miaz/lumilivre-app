@@ -4,7 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/app_version_info.dart';
-import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 
 /// Tela de bloqueio exibida quando a versão instalada não é mais
@@ -41,6 +40,7 @@ class ForceUpdateScreen extends StatelessWidget {
         ? info!.updateMessage!.trim()
         : l10n.forceUpdateMessage;
     final storeUrl = info?.storeUrl;
+    final theme = Theme.of(context);
 
     return PopScope(
       canPop: false,
@@ -53,20 +53,22 @@ class ForceUpdateScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // A marca aqui é tinta sobre a tela, não superfície: no tema
+                  // escuro o roxo cravado deixava o logo quase invisível.
                   SvgPicture.asset(
                     'assets/icons/logo.svg',
                     height: 120,
                     semanticsLabel: 'Logo LumiLivre',
-                    colorFilter: const ColorFilter.mode(
-                      LumiLivreTheme.primary,
+                    colorFilter: ColorFilter.mode(
+                      theme.colorScheme.primary,
                       BlendMode.srcIn,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Icon(
+                  Icon(
                     Icons.system_update,
                     size: 48,
-                    color: LumiLivreTheme.primary,
+                    color: theme.colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -81,7 +83,7 @@ class ForceUpdateScreen extends StatelessWidget {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(fontSize: 16, color: theme.hintColor),
                   ),
                   const SizedBox(height: 32),
                   if (storeUrl != null && storeUrl.isNotEmpty)

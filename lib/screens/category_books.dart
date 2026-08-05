@@ -4,7 +4,6 @@ import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/models/paged_result.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
-import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_card.dart';
@@ -94,13 +93,10 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Cor e elevação da barra vêm do `appBarTheme`: cada tela empilhada
+    // escolhia as suas e nenhuma combinava com a vizinha.
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.categoryName),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 1,
-      ),
+      appBar: AppBar(title: Text(widget.categoryName), centerTitle: true),
       body: _buildBody(),
     );
   }
@@ -154,8 +150,12 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
   }
 
   Widget _buildEmptyState() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
+    // O `isDark ? ... : ...` escrito à mão sobrava: os papéis do esquema já
+    // trocam de tom sozinhos, e é isso que faz o estado vazio ler nos dois
+    // temas sem ninguém repetir a condição em cada `Text`.
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -166,13 +166,13 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: LumiLivreTheme.primary.withValues(alpha: 0.1),
+                color: scheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.auto_stories_outlined,
                 size: 48,
-                color: LumiLivreTheme.primary.withValues(alpha: 0.6),
+                color: scheme.primary.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 24),
@@ -181,7 +181,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.grey.shade800,
+                color: scheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -190,7 +190,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                color: theme.hintColor,
                 height: 1.5,
               ),
             ),
@@ -199,13 +199,9 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
               onPressed: () => Navigator.of(context).pop(),
               label: const Text('EXPLORAR OUTROS'),
               style: FilledButton.styleFrom(
-                backgroundColor: LumiLivreTheme.primary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),

@@ -17,6 +17,7 @@ import 'package:lumilivre/screens/loans_tab.dart';
 import 'package:lumilivre/screens/ranking_tab.dart';
 import 'package:lumilivre/screens/settings.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:provider/provider.dart';
@@ -310,7 +311,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   /// Aba com ícone **e** legenda: o rótulo é o que diz em que aba o usuário
   /// está e é o que o leitor de tela anuncia (ícone sozinho não anuncia nada).
   Tab _buildTab(_ProfileTab tab, {required bool isActive}) {
-    final iconColor = Colors.white.withValues(alpha: isActive ? 1 : 0.75);
+    final iconColor = LumiLivreTheme.onBrand.withValues(
+      alpha: isActive ? 1 : 0.75,
+    );
 
     return Tab(
       height: 62,
@@ -353,9 +356,9 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildGuestTabBody(_ProfileTab tab, int index) {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      switchInCurve: Curves.easeOut,
-      switchOutCurve: Curves.easeIn,
+      duration: AppMotion.of(context, AppMotion.normal),
+      switchInCurve: AppMotion.enter,
+      switchOutCurve: AppMotion.inOut,
       transitionBuilder: (child, animation) {
         return FadeTransition(opacity: animation, child: child);
       },
@@ -372,9 +375,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   /// Login empilhado sobre o perfil. Ao voltar autenticado, o próprio
   /// `didChangeDependencies` recarrega o cabeçalho.
   Future<void> _openLogin() {
-    return Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    return Navigator.of(context).push(
+      AppPageRoute<void>(context: context, builder: (_) => const LoginScreen()),
+    );
   }
 
   Widget _buildProfileHeader(
@@ -407,23 +410,24 @@ class _ProfileScreenState extends State<ProfileScreen>
         Stack(
           clipBehavior: Clip.none,
           children: [
+            // Aqui havia um `TweenAnimationBuilder` de 1.0 para 1.0: uma
+            // animação que nunca animou, só um `Transform.scale` a mais por
+            // quadro em volta do avatar.
             GestureDetector(
               onTap: canEditAvatar ? _pickAndUploadImage : null,
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 300),
-                tween: Tween(begin: 1.0, end: 1.0),
-                builder: (context, value, child) =>
-                    Transform.scale(scale: value, child: child),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  backgroundImage: hasPhoto
-                      ? CachedNetworkImageProvider(_profileImageUrl!)
-                      : null,
-                  child: !hasPhoto
-                      ? const Icon(Icons.person, size: 40, color: Colors.white)
-                      : null,
-                ),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: LumiLivreTheme.onBrand.withValues(alpha: 0.3),
+                backgroundImage: hasPhoto
+                    ? CachedNetworkImageProvider(_profileImageUrl!)
+                    : null,
+                child: !hasPhoto
+                    ? const Icon(
+                        Icons.person,
+                        size: 40,
+                        color: LumiLivreTheme.onBrand,
+                      )
+                    : null,
               ),
             ),
             if (canEditAvatar)
@@ -437,12 +441,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                     decoration: BoxDecoration(
                       color: theme.primaryColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
+                      border: Border.all(
+                        color: LumiLivreTheme.onBrand,
+                        width: 1.5,
+                      ),
                     ),
                     child: const Icon(
                       Icons.edit,
                       size: 10,
-                      color: Colors.white,
+                      color: LumiLivreTheme.onBrand,
                     ),
                   ),
                 ),
@@ -459,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               Text(
                 displayName,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
+                  color: LumiLivreTheme.onBrand,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -470,7 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               Text(
                 subtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white70,
+                  color: LumiLivreTheme.onBrand.withValues(alpha: 0.75),
                 ),
               ),
             ],
@@ -492,13 +499,13 @@ class _ProfileScreenState extends State<ProfileScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
+            color: LumiLivreTheme.onBrand.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           padding: const EdgeInsets.all(10),
           child: const Icon(
             Icons.person_outline,
-            color: Colors.white,
+            color: LumiLivreTheme.onBrand,
             size: 30,
           ),
         ),
@@ -511,7 +518,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               Text(
                 l10n.guestName,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: LumiLivreTheme.onBrand,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -539,23 +546,9 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Future<void> _openSettings() {
     return Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const SettingsScreen(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeOutCubic;
-          final tween = Tween(
-            begin: begin,
-            end: end,
-          ).chain(CurveTween(curve: curve));
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: FadeTransition(opacity: animation, child: child),
-          );
-        },
+      AppPageRoute<void>(
+        context: context,
+        builder: (_) => const SettingsScreen(),
       ),
     );
   }
@@ -579,8 +572,10 @@ class _PenaltyNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    // Cor de aviso, não de erro: nada quebrou, há uma restrição temporária.
-    const accent = Color(0xFFB26A00);
+    // Cor de aviso, não de erro: nada quebrou, há uma restrição temporária. Era
+    // um âmbar cravado que não clareava no tema escuro; agora é o mesmo tom de
+    // "atenção" do selo "Vence Hoje" do cartão de empréstimo.
+    final accent = LumiStatusColors.of(context).warning;
     final until = DateFormat.yMMMMd(
       Localizations.localeOf(context).toLanguageTag(),
     ).format(penalty.expiresAt!);
@@ -593,13 +588,13 @@ class _PenaltyNotice extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: accent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
           border: Border.all(color: accent.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.schedule_outlined, color: accent, size: 22),
+            Icon(Icons.schedule_outlined, color: accent, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -661,8 +656,8 @@ class _HeaderAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(8),
+        color: LumiLivreTheme.onBrand.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
       ),
       margin: const EdgeInsets.only(left: 8),
       width: 40,
@@ -670,7 +665,7 @@ class _HeaderAction extends StatelessWidget {
       child: IconButton(
         padding: EdgeInsets.zero,
         tooltip: tooltip,
-        icon: Icon(icon, color: Colors.white, size: 22),
+        icon: Icon(icon, color: LumiLivreTheme.onBrand, size: 22),
         onPressed: onPressed,
       ),
     );
@@ -723,25 +718,34 @@ class _GuestEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // A escala entrava com `easeOutBack`, que passa do ponto e volta —
+            // o sobrepasso é o que se vê como tremida em aparelho lento. Agora
+            // é o mesmo par de duração e curva das outras entradas.
             TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 600),
-              tween: Tween(begin: 0.8, end: 1.0),
-              curve: Curves.easeOutBack,
+              duration: AppMotion.of(context, AppMotion.page),
+              tween: Tween(begin: 0.9, end: 1.0),
+              curve: AppMotion.enter,
               builder: (context, value, child) =>
                   Transform.scale(scale: value, child: child),
-              child: Icon(icon, size: 72, color: Colors.grey.shade300),
+              child: Icon(
+                icon,
+                size: 72,
+                color: theme.hintColor.withValues(alpha: 0.5),
+              ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
               style: TextStyle(
-                color: Colors.grey.shade700,
+                color: theme.colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -750,7 +754,7 @@ class _GuestEmptyState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+              style: TextStyle(color: theme.hintColor, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -762,9 +766,6 @@ class _GuestEmptyState extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),

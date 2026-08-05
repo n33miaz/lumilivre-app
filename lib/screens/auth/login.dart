@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/guest_access.dart';
@@ -33,13 +34,17 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
+    // Eram 800 ms para o formulário aparecer — quase um segundo antes de a tela
+    // ficar utilizável. O `AnimationController` já encurta sozinho para 5% da
+    // duração quando o sistema pede menos animação, então aqui não há consulta
+    // ao `MediaQuery` (que em `initState` ainda não está disponível).
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: AppMotion.page,
     );
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeIn,
+      curve: AppMotion.enter,
     );
     _animationController.forward();
   }
@@ -149,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final guestAccess = GuestAccess.of(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -170,12 +176,14 @@ class _LoginScreenState extends State<LoginScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
+                        // Tinta sobre a tela, não superfície de marca: o roxo
+                        // cravado quase desaparecia no tema escuro.
                         SvgPicture.asset(
                           'assets/icons/logo.svg',
                           height: 200,
                           semanticsLabel: 'Logo LumiLivre',
-                          colorFilter: const ColorFilter.mode(
-                            LumiLivreTheme.primary,
+                          colorFilter: ColorFilter.mode(
+                            theme.colorScheme.primary,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -219,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   height: 24,
                                   width: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: LumiLivreTheme.onBrand,
                                     strokeWidth: 3,
                                   ),
                                 )
@@ -245,11 +253,15 @@ class _LoginScreenState extends State<LoginScreen>
                               _dismissIfPushed();
                             },
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.grey[600],
-                              side: BorderSide(color: Colors.grey.shade400),
+                              foregroundColor: theme.colorScheme.onSurface,
+                              side: BorderSide(
+                                color: theme.colorScheme.outlineVariant,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(
+                                  LumiLivreTheme.radiusControl,
+                                ),
                               ),
                             ),
                             child: const Text('ENTRAR COMO CONVIDADO'),
@@ -260,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen>
                             child: Text(
                               AppLocalizations.of(context)!.guestAccessDisabled,
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey.shade600),
+                              style: TextStyle(color: theme.hintColor),
                             ),
                           ),
                         const SizedBox(height: 4),
@@ -272,10 +284,10 @@ class _LoginScreenState extends State<LoginScreen>
                                 'https://lumilivre.com.br/esqueci-a-senha',
                               );
                             },
-                            child: const Text(
-                              'Esqueceu sua senha?',
-                              style: TextStyle(color: Colors.grey),
+                            style: TextButton.styleFrom(
+                              foregroundColor: theme.hintColor,
                             ),
+                            child: const Text('Esqueceu sua senha?'),
                           ),
                         ),
                       ],
@@ -288,9 +300,11 @@ class _LoginScreenState extends State<LoginScreen>
 
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
-              final buttonBackgroundColor = themeProvider.isDarkMode
-                  ? Colors.grey.shade800
-                  : Colors.grey.shade300;
+              // O `isDarkMode ? shade800 : shade300` escrito à mão era o próprio
+              // papel de "superfície um degrau acima da tela", que o esquema já
+              // resolve nos dois temas.
+              final buttonBackgroundColor =
+                  theme.colorScheme.surfaceContainerHighest;
 
               return Positioned(
                 left: 20,
@@ -310,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen>
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
+                          duration: AppMotion.of(context, AppMotion.normal),
                           transitionBuilder: (child, animation) {
                             return FadeTransition(
                               opacity: animation,

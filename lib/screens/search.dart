@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lumilivre/screens/category_books.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/genre_card.dart';
 
@@ -70,23 +71,12 @@ class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
 
   void _navigateToCategory(BuildContext context, String categoryName) {
+    // A categoria subia a tela inteira de baixo enquanto o resto do app usava
+    // outras três transições. Empilhar tela é sempre a mesma ação.
     Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            CategoryBooksScreen(categoryName: categoryName),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 1.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-          final tween = Tween(
-            begin: begin,
-            end: end,
-          ).chain(CurveTween(curve: curve));
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        },
+      AppPageRoute<void>(
+        context: context,
+        builder: (_) => CategoryBooksScreen(categoryName: categoryName),
       ),
     );
   }

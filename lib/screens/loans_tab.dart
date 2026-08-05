@@ -7,6 +7,7 @@ import 'package:lumilivre/models/loan.dart';
 import 'package:lumilivre/models/loan_status_code.dart';
 import 'package:lumilivre/models/paged_result.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/loan_card.dart';
 import 'package:lumilivre/providers/auth.dart';
@@ -196,8 +197,8 @@ class _LoansTabState extends State<LoansTab> {
   void _onTabChanged(int index) {
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: AppMotion.of(context, AppMotion.page),
+      curve: AppMotion.inOut,
     );
     _handleIndex(index);
   }
@@ -213,40 +214,53 @@ class _LoansTabState extends State<LoansTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
             final tabWidth = (constraints.maxWidth - 32) / 2;
+            // O trilho era `grey.shade200` com a pastilha branca por cima: no
+            // tema escuro, uma faixa clara no meio da tela escura.
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(
+                  LumiLivreTheme.radiusControl,
+                ),
               ),
               child: Stack(
                 children: [
                   AnimatedAlign(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
+                    duration: AppMotion.of(context, AppMotion.normal),
+                    curve: AppMotion.inOut,
                     alignment: _currentIndex == 0
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
+                    // Pastilha em tom de marca, e não uma carta branca com
+                    // sombra: no tema escuro a carta era mais escura que o
+                    // trilho e o item selecionado parecia afundado, além de a
+                    // sombra não existir sobre fundo escuro. É o mesmo desenho
+                    // de "selecionado" do seletor de tema e do meu lugar no
+                    // ranking — um só idioma para o mesmo estado.
                     child: Container(
                       width: tabWidth,
                       margin: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.12,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          LumiLivreTheme.radiusControl - 4,
+                        ),
+                        border: Border.all(
+                          color: theme.colorScheme.primary,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
@@ -502,7 +516,11 @@ class _LoansListSimple extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (loans.isEmpty) {
+      // Mesmo par de tons dos outros estados vazios do app (mural, categoria):
+      // ícone em 50% do texto secundário, frase no texto secundário.
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -510,14 +528,14 @@ class _LoansListSimple extends StatelessWidget {
             Icon(
               isHistory ? Icons.history : Icons.book_outlined,
               size: 64,
-              color: Colors.grey.shade300,
+              color: theme.hintColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
               isHistory
                   ? 'Nenhum histórico encontrado.'
                   : 'Nenhum empréstimo ou solicitação ativa.',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: theme.hintColor),
             ),
             TextButton(onPressed: onRetry, child: const Text('Atualizar')),
           ],
@@ -553,6 +571,8 @@ class _FilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -562,7 +582,7 @@ class _FilterButton extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: isSelected ? LumiLivreTheme.primary : Colors.grey.shade600,
+            color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
           ),
         ),
       ),

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import 'package:lumilivre/utils/app_motion.dart';
+
 class OfflineBanner extends StatefulWidget {
   final Widget child;
   const OfflineBanner({super.key, required this.child});
@@ -58,21 +60,33 @@ class _OfflineBannerState extends State<OfflineBanner> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
+        // Faixa de aviso do sistema: `inverseSurface` é justamente a superfície
+        // que contrasta com a tela nos dois temas — era um preto cravado, que no
+        // tema escuro virava faixa preta sobre fundo quase preto.
         AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: AppMotion.of(context, AppMotion.page),
           height: _isOffline ? 32 : 0,
-          color: Colors.black87,
+          color: scheme.inverseSurface,
           child: _isOffline
-              ? const Row(
+              ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.wifi_off, color: Colors.white, size: 16),
-                    SizedBox(width: 8),
+                    Icon(
+                      Icons.wifi_off,
+                      color: scheme.onInverseSurface,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       'Você está offline. Exibindo dados salvos.',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                        color: scheme.onInverseSurface,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 )
