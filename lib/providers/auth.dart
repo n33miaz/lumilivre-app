@@ -3,17 +3,23 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_storage.dart';
 import '../services/api.dart';
+import '../services/biometric_auth.dart';
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
+  AuthProvider({BiometricAuth? biometrics})
+    : _biometrics = biometrics ?? BiometricAuth();
+
   final ApiService _apiService = ApiService();
   final AuthStorage _authStorage = AuthStorage();
+  final BiometricAuth _biometrics;
 
   LoginResponse? _user;
   bool _isGuest = false;
   bool _authAttempted = false;
   bool _isInitialPassword = false;
   bool _guidedTourCompleted = true;
+  bool _biometricLocked = false;
 
   LoginResponse? get user => _user;
   bool get isAuthenticated => _user != null;
@@ -22,12 +28,19 @@ class AuthProvider with ChangeNotifier {
   bool get isInitialPassword => _isInitialPassword;
   bool get guidedTourCompleted => _guidedTourCompleted;
 
+  /// Existe sessão salva, mas a biometria não foi confirmada nesta abertura.
+  ///
+  /// A sessão continua no armazenamento seguro (o usuário pode reabrir o app e
+  /// tentar de novo), só não é exposta.
+  bool get biometricLocked => _biometricLocked;
+
   Future<void> login(String username, String password) async {
     final response = await _apiService.login(username, password);
     _user = response;
     _isGuest = false;
     _isInitialPassword = response.isInitialPassword;
     _guidedTourCompleted = response.guidedTourCompleted;
+    _biometricLocked = false;
 
     await _authStorage.saveSession(
       token: response.token,
@@ -42,6 +55,7 @@ class AuthProvider with ChangeNotifier {
     _isGuest = true;
     _isInitialPassword = false;
     _guidedTourCompleted = true;
+    _biometricLocked = false;
 
     notifyListeners();
   }
@@ -100,6 +114,19 @@ class AuthProvider with ChangeNotifier {
         return;
       }
 
+      // Gate biométrico antes de expor a sessão: com a preferência ligada, sem
+      // biometria confirmada não há sessão restaurada — cai na tela de login,
+      // onde a senha continua funcionando. Falhar aberto aqui tornaria o toggle
+      // decorativo de novo.
+      if (await _biometrics.isEnabled() &&
+          !await _biometrics.confirmToUnlock()) {
+        _biometricLocked = true;
+        _user = null;
+        _authAttempted = true;
+        notifyListeners();
+        return;
+      }
+
       final userData = jsonDecode(userDataString) as Map<String, dynamic>;
       _user = LoginResponse.fromJson({...userData, 'token': token});
       _isInitialPassword = _user?.isInitialPassword ?? false;
@@ -120,6 +147,7 @@ class AuthProvider with ChangeNotifier {
     _isGuest = false;
     _isInitialPassword = false;
     _guidedTourCompleted = true;
+    _biometricLocked = false;
     await _authStorage.clearSession();
 
     notifyListeners();

@@ -188,6 +188,30 @@ abstract class AppLocalizations {
   /// **'Biometria não disponível neste dispositivo.'**
   String get biometricUnavailable;
 
+  /// No description provided for @biometricEnablePrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme sua identidade para ativar o acesso com biometria.'**
+  String get biometricEnablePrompt;
+
+  /// No description provided for @biometricUnlockPrompt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme sua identidade para continuar no LumiLivre.'**
+  String get biometricUnlockPrompt;
+
+  /// No description provided for @biometricEnableFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível confirmar sua identidade. A biometria continua desligada.'**
+  String get biometricEnableFailed;
+
+  /// No description provided for @biometricEnabledConfirmation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Biometria ativada. Ela será pedida na próxima abertura do app.'**
+  String get biometricEnabledConfirmation;
+
   /// No description provided for @changePassword.
   ///
   /// In pt, this message translates to:

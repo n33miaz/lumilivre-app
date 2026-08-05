@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/services/biometric_auth.dart';
 import 'package:lumilivre/utils/constants.dart';
 
 import '../widgets/change_password_dialog.dart';
@@ -22,50 +21,60 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final BiometricAuth _biometrics = BiometricAuth();
+
   bool _isBiometricsEnabled = false;
-  final LocalAuthentication _localAuth = LocalAuthentication();
+  bool _isBiometricsSupported = false;
+  bool _isBiometricsBusy = false;
 
   @override
   void initState() {
     super.initState();
-    _loadBiometricsPreference();
+    _loadBiometricsState();
   }
 
-  Future<void> _loadBiometricsPreference() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _loadBiometricsState() async {
+    final enabled = await _biometrics.isEnabled();
+    final supported = await _biometrics.isSupported();
     if (!mounted) return;
-    setState(
-      () => _isBiometricsEnabled = prefs.getBool('biometricsEnabled') ?? false,
-    );
-  }
-
-  Future<void> _saveBiometricsPreference(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('biometricsEnabled', value);
+    setState(() {
+      _isBiometricsEnabled = enabled;
+      _isBiometricsSupported = supported;
+    });
   }
 
   Future<void> _toggleBiometrics(bool value) async {
+    final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
+
+    // Ligar exige autenticar de verdade primeiro: gravar a preferência sem
+    // passar pelo sensor é o que fazia o toggle prometer proteção que não
+    // existia. Desligar não exige, para o usuário não ficar preso ao gate se o
+    // sensor parar de funcionar.
     if (value) {
-      try {
-        final canAuthenticate =
-            await _localAuth.canCheckBiometrics ||
-            await _localAuth.isDeviceSupported();
-        if (canAuthenticate) {
-          setState(() => _isBiometricsEnabled = true);
-          await _saveBiometricsPreference(true);
-        } else if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(l10n.biometricUnavailable)));
-        }
-      } catch (e) {
-        debugPrint('$e');
+      setState(() => _isBiometricsBusy = true);
+      final confirmed = await _biometrics.confirmToEnable();
+      if (!mounted) return;
+      setState(() => _isBiometricsBusy = false);
+
+      if (!confirmed) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.biometricEnableFailed)),
+        );
+        return;
       }
-    } else {
-      setState(() => _isBiometricsEnabled = false);
-      await _saveBiometricsPreference(false);
+      await _biometrics.setEnabled(true);
+      if (!mounted) return;
+      setState(() => _isBiometricsEnabled = true);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.biometricEnabledConfirmation)),
+      );
+      return;
     }
+
+    await _biometrics.setEnabled(false);
+    if (!mounted) return;
+    setState(() => _isBiometricsEnabled = false);
   }
 
   @override
@@ -140,20 +149,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
               vertical: 8,
             ),
             title: Text(l10n.biometricAccess),
-            subtitle: Text(l10n.biometricSubtitle),
+            // Aparelho sem sensor ou sem biometria cadastrada: o toggle fica
+            // desabilitado e diz o motivo, em vez de aceitar e falhar depois.
+            subtitle: Text(
+              _isBiometricsSupported
+                  ? l10n.biometricSubtitle
+                  : l10n.biometricUnavailable,
+            ),
             value: _isBiometricsEnabled,
-            onChanged: _toggleBiometrics,
+            // Quem já tinha a preferência ligada (ou perdeu o cadastro de
+            // digital depois) precisa poder desligar: o gate falha fechado, e
+            // sem esta saída o auto-login ficaria travado para sempre.
+            onChanged:
+                _isBiometricsBusy ||
+                    (!_isBiometricsSupported && !_isBiometricsEnabled)
+                ? null
+                : _toggleBiometrics,
             secondary: SizedBox(
               width: 40,
               child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/biometric.svg',
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                child: _isBiometricsBusy
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : SvgPicture.asset(
+                        'assets/icons/biometric.svg',
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.onSurface.withValues(
+                            alpha: _isBiometricsSupported ? 1.0 : 0.4,
+                          ),
+                          BlendMode.srcIn,
+                        ),
+                      ),
               ),
             ),
           ),

@@ -55,6 +55,22 @@ class AppLocalizationsPt extends AppLocalizations {
       'Biometria não disponível neste dispositivo.';
 
   @override
+  String get biometricEnablePrompt =>
+      'Confirme sua identidade para ativar o acesso com biometria.';
+
+  @override
+  String get biometricUnlockPrompt =>
+      'Confirme sua identidade para continuar no LumiLivre.';
+
+  @override
+  String get biometricEnableFailed =>
+      'Não foi possível confirmar sua identidade. A biometria continua desligada.';
+
+  @override
+  String get biometricEnabledConfirmation =>
+      'Biometria ativada. Ela será pedida na próxima abertura do app.';
+
+  @override
   String get changePassword => 'Mudar senha';
 
   @override
