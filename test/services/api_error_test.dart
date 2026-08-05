@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -67,6 +68,82 @@ void main() {
     });
   });
 
+  group('ApiException.fromResponse', () {
+    http.Response jsonResponse(int status, Map<String, dynamic> body) =>
+        http.Response.bytes(utf8.encode(jsonEncode(body)), status);
+
+    test('deve preservar a mensagem que a API ja traduziu', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(401, {'message': 'Credenciais inválidas.'}),
+      );
+      expect(failure.failure, ApiFailure.unauthorized);
+      expect(failure.apiMessage, 'Credenciais inválidas.');
+    });
+
+    test('422 deve virar recusa de regra de negocio', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(422, {
+          'message': 'Limite de empréstimos ativos atingido.',
+        }),
+      );
+      expect(failure.failure, ApiFailure.businessRule);
+      expect(failure.isRetryable, isFalse);
+      expect(failure.needsAuthentication, isFalse);
+    });
+
+    /// A senha inicial pendente é 403 como qualquer negativa, mas tratá-la como
+    /// falta de sessão levaria a deslogar — e a saída é justamente o formulário de
+    /// troca de senha, que só existe dentro da sessão.
+    test('403 de senha inicial nao deve virar falta de autenticacao', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(403, {
+          'message': 'Password change required before performing this action.',
+          'code': 'PASSWORD_CHANGE_REQUIRED',
+        }),
+      );
+      expect(failure.failure, ApiFailure.passwordChangeRequired);
+      expect(failure.requiresPasswordChange, isTrue);
+      expect(failure.needsAuthentication, isFalse);
+    });
+
+    test('403 de senha inicial nao deve expor o texto tecnico em ingles', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(403, {
+          'message': 'Password change required before performing this action.',
+          'code': 'PASSWORD_CHANGE_REQUIRED',
+        }),
+      );
+      expect(failure.apiMessage, isNull);
+    });
+
+    test('403 comum deve continuar sendo falta de autorizacao', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(403, {'message': 'Acesso negado.'}),
+      );
+      expect(failure.failure, ApiFailure.unauthorized);
+      expect(failure.requiresPasswordChange, isFalse);
+    });
+
+    test('corpo vazio ou fora de JSON nao deve quebrar a classificacao', () {
+      expect(
+        ApiException.fromResponse(http.Response('', 500)).failure,
+        ApiFailure.server,
+      );
+      final html = ApiException.fromResponse(
+        http.Response('<html>502 Bad Gateway</html>', 502),
+      );
+      expect(html.failure, ApiFailure.server);
+      expect(html.apiMessage, isNull);
+    });
+
+    test('mensagem em branco deve ser tratada como ausente', () {
+      final failure = ApiException.fromResponse(
+        jsonResponse(500, {'message': '   '}),
+      );
+      expect(failure.apiMessage, isNull);
+    });
+  });
+
   group('mensagem do erro', () {
     test('nao deve carregar corpo de resposta nem credencial', () {
       expect(
@@ -77,6 +154,17 @@ void main() {
         const ApiException(ApiFailure.network).toString(),
         'ApiException(network)',
       );
+    });
+
+    /// A frase da API é para a tela mostrar, não para o log guardar: ela pode
+    /// citar matrícula, nome ou data de penalidade de um aluno.
+    test('nao deve levar a mensagem da API para o toString', () {
+      const failure = ApiException(
+        ApiFailure.businessRule,
+        statusCode: 422,
+        apiMessage: 'Leitor 2024008 bloqueado por penalidade ativa.',
+      );
+      expect(failure.toString(), 'ApiException(businessRule, 422)');
     });
   });
 }

@@ -57,12 +57,14 @@ class ApiService {
   Future<LoginResponse> login(String user, String password) =>
       _auth.login(user, password);
 
-  Future<bool> changePassword(
+  Future<String?> changePassword(
     String matricula,
     String currentPassword,
     String newPassword,
     String token,
   ) => _auth.changePassword(matricula, currentPassword, newPassword, token);
+
+  Future<bool> logout(String token) => _auth.logout(token);
 
   Future<bool> completeTour(String token) => _auth.completeTour(token);
 
@@ -117,7 +119,7 @@ class ApiService {
     String token,
   ) => _loan.requestLoan(readerRegistrationNumber, tombo, token);
 
-  Future<bool> requestLoanByBookId(
+  Future<void> requestLoanByBookId(
     String readerRegistrationNumber,
     String livroId,
     String token,

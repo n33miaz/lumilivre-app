@@ -83,16 +83,16 @@ void main() {
       });
     });
 
-    group('completeInitialPasswordChange', () {
+    group('completePasswordChange', () {
       test('deve desativar flag de senha inicial', () async {
-        await authProvider.completeInitialPasswordChange();
+        await authProvider.completePasswordChange();
         expect(authProvider.isInitialPassword, isFalse);
       });
 
       test('deve notificar listeners', () async {
         int notifyCount = 0;
         authProvider.addListener(() => notifyCount++);
-        await authProvider.completeInitialPasswordChange();
+        await authProvider.completePasswordChange();
         expect(notifyCount, 1);
       });
 
@@ -105,12 +105,42 @@ void main() {
         final provider = AuthProvider();
         await provider.tryAutoLogin();
 
-        await provider.completeInitialPasswordChange();
+        await provider.completePasswordChange();
 
         final storage = AuthStorage();
         final savedUserData = jsonDecode(await storage.getUserData() ?? '{}');
         expect(provider.isInitialPassword, isFalse);
         expect(savedUserData['initialPasswordChange'], isFalse);
+      });
+
+      test('deve adotar o token novo emitido pela troca de senha', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-antigo',
+          AuthStorage.userDataKey:
+              '{"id":1,"email":"leitor@escola.com","role":"READER","readerRegistrationNumber":"2025001","token":"jwt-antigo","isInitialPassword":true}',
+        });
+        final provider = AuthProvider();
+        await provider.tryAutoLogin();
+
+        await provider.completePasswordChange(newToken: 'jwt-novo');
+
+        expect(provider.user?.token, 'jwt-novo');
+        final storage = AuthStorage();
+        expect(await storage.getToken(), 'jwt-novo');
+      });
+
+      test('deve manter o token atual quando a API nao devolve outro', () async {
+        FlutterSecureStorage.setMockInitialValues({
+          AuthStorage.authTokenKey: 'jwt-antigo',
+          AuthStorage.userDataKey:
+              '{"id":1,"email":"leitor@escola.com","role":"READER","readerRegistrationNumber":"2025001","token":"jwt-antigo","isInitialPassword":true}',
+        });
+        final provider = AuthProvider();
+        await provider.tryAutoLogin();
+
+        await provider.completePasswordChange();
+
+        expect(provider.user?.token, 'jwt-antigo');
       });
     });
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -16,8 +17,20 @@ enum ApiFailure {
   /// 401/403: falta sessão (convidado) ou a sessão não vale mais.
   unauthorized,
 
+  /// 403 com `code: PASSWORD_CHANGE_REQUIRED`: a sessão é válida, mas a API
+  /// segura tudo até a senha inicial ser trocada.
+  ///
+  /// Separado de [unauthorized] de propósito: aqui deslogar seria o pior
+  /// caminho, porque a saída é justamente o formulário de troca de senha — que
+  /// só existe dentro da sessão.
+  passwordChangeRequired,
+
   /// 404: recurso não existe mais.
   notFound,
+
+  /// 422/409/4xx de regra de negócio: o servidor entendeu e recusou. A frase do
+  /// motivo vem em [ApiException.apiMessage].
+  businessRule,
 
   /// 5xx e demais respostas inesperadas do servidor.
   server,
@@ -27,12 +40,24 @@ enum ApiFailure {
 }
 
 class ApiException implements Exception {
-  const ApiException(this.failure, {this.statusCode});
+  const ApiException(this.failure, {this.statusCode, this.apiMessage});
 
   final ApiFailure failure;
   final int? statusCode;
 
+  /// Frase que a API mandou no campo `message` do erro, já traduzida pelo
+  /// servidor (ele responde no idioma do `Accept-Language` que o app envia).
+  ///
+  /// Existe para a tela não adivinhar em português o que a API já sabe dizer:
+  /// "conta desativada" e "senha incorreta" chegam por aqui e são frases
+  /// diferentes que antes viravam a mesma copy de falha de conexão. Fica fora do
+  /// [toString] porque texto de resposta não entra em log.
+  final String? apiMessage;
+
   bool get needsAuthentication => failure == ApiFailure.unauthorized;
+
+  bool get requiresPasswordChange =>
+      failure == ApiFailure.passwordChangeRequired;
 
   /// Falha em que repetir a mesma chamada pode dar certo.
   bool get isRetryable =>
@@ -49,6 +74,62 @@ class ApiException implements Exception {
       return ApiException(ApiFailure.notFound, statusCode: statusCode);
     }
     return ApiException(ApiFailure.server, statusCode: statusCode);
+  }
+
+  /// Classifica a resposta olhando também o corpo do erro.
+  ///
+  /// Só o status não basta em dois casos que chegam como o mesmo 4xx: o 403 de
+  /// senha inicial pendente (que não é falta de sessão) e as recusas de regra de
+  /// negócio, cuja frase é a única informação útil para o usuário.
+  factory ApiException.fromResponse(http.Response response) {
+    final body = _decodeErrorBody(response);
+    final code = body?['code']?.toString();
+    final status = response.statusCode;
+
+    if (status == 403 && code == 'PASSWORD_CHANGE_REQUIRED') {
+      // A `message` deste caso é texto técnico em inglês, escrito para quem
+      // depura a API — nunca para a tela. O app usa a própria copy.
+      return ApiException(
+        ApiFailure.passwordChangeRequired,
+        statusCode: status,
+      );
+    }
+
+    final rawMessage = body?['message']?.toString().trim();
+    final message = (rawMessage == null || rawMessage.isEmpty)
+        ? null
+        : rawMessage;
+
+    // 422 é o que as políticas de empréstimo/solicitação usam, 409 é conflito de
+    // estado: nos dois o servidor já explica o motivo em pt-BR ou en-US.
+    if (status == 422 || status == 409) {
+      return ApiException(
+        ApiFailure.businessRule,
+        statusCode: status,
+        apiMessage: message,
+      );
+    }
+
+    return ApiException(
+      ApiException.fromStatus(status).failure,
+      statusCode: status,
+      apiMessage: message,
+    );
+  }
+
+  /// Corpo de erro da API como mapa, ou `null` quando não é o `ErrorResponse`
+  /// esperado (204, HTML de proxy, texto solto). Nunca joga: um corpo estranho
+  /// não pode transformar "recusado" em "erro inesperado".
+  static Map<String, dynamic>? _decodeErrorBody(http.Response response) {
+    if (response.bodyBytes.isEmpty) {
+      return null;
+    }
+    try {
+      final decoded = json.decode(utf8.decode(response.bodyBytes));
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Classifica o erro que veio do cliente HTTP.

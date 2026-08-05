@@ -60,7 +60,15 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> completeInitialPasswordChange() async {
+  /// Fecha o ciclo da troca de senha: baixa a flag de senha inicial e adota o
+  /// token novo emitido pela API.
+  ///
+  /// O token novo não é detalhe: `PUT /api/auth/change-password` revoga no
+  /// servidor tudo que foi emitido antes da troca, o token em uso incluído. Sem
+  /// adotar o da resposta, a requisição seguinte sai com credencial revogada e a
+  /// sessão cai logo depois de a senha ter sido trocada com sucesso. [newToken]
+  /// aceita `null` porque a API antiga respondia 204, sem token.
+  Future<void> completePasswordChange({String? newToken}) async {
     _isInitialPassword = false;
     if (_user != null) {
       _user = LoginResponse(
@@ -68,7 +76,9 @@ class AuthProvider with ChangeNotifier {
         email: _user!.email,
         role: _user!.role,
         readerRegistrationNumber: _user!.readerRegistrationNumber,
-        token: _user!.token,
+        token: (newToken != null && newToken.isNotEmpty)
+            ? newToken
+            : _user!.token,
         isInitialPassword: false,
         guidedTourCompleted: _user!.guidedTourCompleted,
       );
@@ -142,7 +152,15 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sai da conta aqui e no servidor.
+  ///
+  /// A sessão local sai primeiro e a revogação no servidor vem depois, em melhor
+  /// esforço: sair da conta no próprio aparelho não pode depender de conexão, e
+  /// se o app morrer no meio do caminho o pior cenário é um token que expira
+  /// sozinho — não uma sessão que volta no próximo abrir.
   Future<void> logout() async {
+    final token = _user?.token;
+
     _user = null;
     _isGuest = false;
     _isInitialPassword = false;
@@ -151,5 +169,9 @@ class AuthProvider with ChangeNotifier {
     await _authStorage.clearSession();
 
     notifyListeners();
+
+    if (token != null && token.isNotEmpty) {
+      await _apiService.logout(token);
+    }
   }
 }
