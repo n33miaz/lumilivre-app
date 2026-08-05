@@ -27,6 +27,39 @@
   "guestAccessDisabled": "Guest access is turned off for this library.",
   "retryAction": "Try again",
   "sessionExpiredMessage": "Your session expired. Sign in again to continue.",
+  "connectionErrorMessage": "Couldn't reach the server. Check your connection and try again.",
+  "loginFailedMessage": "Couldn't sign you in. Check your ID number and password.",
+  "linkOpenError": "Couldn't open the link on this device.",
+  "offlineCachedDataMessage": "Offline: showing saved data.",
+  "catalogRefreshError": "Couldn't refresh the catalog.",
+  "bookListLoadError": "Couldn't load the books. Check your connection.",
+  "searchError": "Couldn't search for books right now.",
+  "passwordChangedMessage": "Password changed.",
+  "passwordChangeFailedMessage": "Couldn't change the password. Please try again.",
+  "passwordChangeRequiredMessage": "Change your initial password to use this feature.",
+  "avatarUploading": "Uploading photo...",
+  "avatarUploadSuccess": "Photo updated.",
+  "avatarUploadError": "Couldn't update the photo.",
+  "loanRequestSent": "Request sent. The library will review it shortly.",
+  "loanRequestFailed": "Couldn't request this book right now.",
+  "penaltyNoticeTitle": "Loans paused for now",
+  "penaltyNoticeUntil": "You can request books again on {date}.",
+  "@penaltyNoticeUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeKind": "Recorded as: {kind}",
+  "@penaltyNoticeKind": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeHint": "Until then you can still browse the catalog and like books. If anything looks wrong, talk to the library.",
   "bookDetailsLoadError": "Couldn't load the book details.",
   "guestBookTitle": "Sign in to see this book",
   "guestBookMessage": "Full details, availability and loans are for library readers.",

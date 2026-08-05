@@ -27,6 +27,39 @@
   "guestAccessDisabled": "O acesso de convidado está desativado nesta biblioteca.",
   "retryAction": "Tentar novamente",
   "sessionExpiredMessage": "Sua sessão expirou. Entre novamente para continuar.",
+  "connectionErrorMessage": "Não foi possível falar com o servidor. Verifique sua conexão e tente de novo.",
+  "loginFailedMessage": "Não foi possível entrar. Confira a matrícula e a senha.",
+  "linkOpenError": "Não foi possível abrir o link neste aparelho.",
+  "offlineCachedDataMessage": "Sem conexão: mostrando os dados salvos.",
+  "catalogRefreshError": "Não foi possível atualizar o catálogo.",
+  "bookListLoadError": "Não foi possível carregar os livros. Verifique sua conexão.",
+  "searchError": "Não foi possível buscar livros agora.",
+  "passwordChangedMessage": "Senha alterada.",
+  "passwordChangeFailedMessage": "Não foi possível alterar a senha. Tente novamente.",
+  "passwordChangeRequiredMessage": "Troque sua senha inicial para usar esta função.",
+  "avatarUploading": "Enviando foto...",
+  "avatarUploadSuccess": "Foto atualizada.",
+  "avatarUploadError": "Não foi possível atualizar a foto.",
+  "loanRequestSent": "Solicitação enviada. Aguarde a aprovação da biblioteca.",
+  "loanRequestFailed": "Não foi possível solicitar este livro agora.",
+  "penaltyNoticeTitle": "Empréstimos pausados por enquanto",
+  "penaltyNoticeUntil": "Você volta a solicitar livros em {date}.",
+  "@penaltyNoticeUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeKind": "Registrado como: {kind}",
+  "@penaltyNoticeKind": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "penaltyNoticeHint": "Até lá você continua explorando o catálogo e curtindo livros. Se tiver alguma dúvida, fale com a biblioteca.",
   "bookDetailsLoadError": "Não foi possível carregar os detalhes do livro.",
   "guestBookTitle": "Faça login para ver este livro",
   "guestBookMessage": "A ficha completa, a disponibilidade e o empréstimo são para leitores da biblioteca.",

@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 
 class CategoryBooksScreen extends StatefulWidget {
@@ -68,11 +70,8 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
           _isLoading = false;
           _hasMore = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erro ao carregar livros. Verifique a conexão.'),
-          ),
-        );
+        final l10n = AppLocalizations.of(context)!;
+        AppToast.of(context).error(l10n.bookListLoadError);
       }
     }
   }

@@ -97,6 +97,74 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your session expired. Sign in again to continue.';
 
   @override
+  String get connectionErrorMessage =>
+      'Couldn\'t reach the server. Check your connection and try again.';
+
+  @override
+  String get loginFailedMessage =>
+      'Couldn\'t sign you in. Check your ID number and password.';
+
+  @override
+  String get linkOpenError => 'Couldn\'t open the link on this device.';
+
+  @override
+  String get offlineCachedDataMessage => 'Offline: showing saved data.';
+
+  @override
+  String get catalogRefreshError => 'Couldn\'t refresh the catalog.';
+
+  @override
+  String get bookListLoadError =>
+      'Couldn\'t load the books. Check your connection.';
+
+  @override
+  String get searchError => 'Couldn\'t search for books right now.';
+
+  @override
+  String get passwordChangedMessage => 'Password changed.';
+
+  @override
+  String get passwordChangeFailedMessage =>
+      'Couldn\'t change the password. Please try again.';
+
+  @override
+  String get passwordChangeRequiredMessage =>
+      'Change your initial password to use this feature.';
+
+  @override
+  String get avatarUploading => 'Uploading photo...';
+
+  @override
+  String get avatarUploadSuccess => 'Photo updated.';
+
+  @override
+  String get avatarUploadError => 'Couldn\'t update the photo.';
+
+  @override
+  String get loanRequestSent =>
+      'Request sent. The library will review it shortly.';
+
+  @override
+  String get loanRequestFailed => 'Couldn\'t request this book right now.';
+
+  @override
+  String get penaltyNoticeTitle => 'Loans paused for now';
+
+  @override
+  String penaltyNoticeUntil(String date) {
+    return 'You can request books again on $date.';
+  }
+
+  @override
+  String penaltyNoticeKind(String kind) {
+    return 'Recorded as: $kind';
+  }
+
+  @override
+  String get penaltyNoticeHint =>
+      'Until then you can still browse the catalog and like books. If anything looks wrong, talk to the library.';
+
+  @override
   String get bookDetailsLoadError => 'Couldn\'t load the book details.';
 
   @override

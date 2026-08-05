@@ -1,9 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
 class ChangePasswordDialog extends StatefulWidget {
   const ChangePasswordDialog({super.key});
@@ -35,31 +37,35 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     setState(() => _isLoading = true);
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final toast = AppToast.of(context);
 
     try {
-      await _apiService.changePassword(
+      final newToken = await _apiService.changePassword(
         auth.user!.readerRegistrationNumber ?? '',
         _currentPasswordController.text,
         _newPasswordController.text,
         auth.user!.token,
       );
 
+      // A troca revoga o token que fez esta requisição: sem adotar o novo, o
+      // usuário sairia da conta no request seguinte, sem entender por quê.
+      await auth.completePasswordChange(newToken: newToken);
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Senha alterada com sucesso!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        toast.success(l10n.passwordChangedMessage);
         Navigator.of(context).pop(); // Fecha o dialog
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
+        // Senha atual errada e senha nova fraca chegam da API com frase própria e
+        // traduzida — é ela que aparece.
+        final failure = ApiException.fromError(e);
+        toast.error(
+          failure.apiMessage ??
+              (failure.failure == ApiFailure.network
+                  ? l10n.connectionErrorMessage
+                  : l10n.passwordChangeFailedMessage),
         );
       }
     } finally {

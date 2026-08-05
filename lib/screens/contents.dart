@@ -9,6 +9,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/content_provider.dart';
 import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
 class ContentsScreen extends StatefulWidget {
   const ContentsScreen({super.key});
@@ -206,7 +207,7 @@ Future<void> _openUrl(
   AppLocalizations l10n,
   String url,
 ) async {
-  final messenger = ScaffoldMessenger.of(context);
+  final toast = AppToast.of(context);
   final uri = Uri.tryParse(url);
   // Só abre http/https. URLs vêm de conteúdo autorado por admin/biblio;
   // esquemas como intent://, tel:, market: ou custom são bloqueados.
@@ -221,9 +222,9 @@ Future<void> _openUrl(
     }
   }
   if (!opened) {
-    messenger.showSnackBar(
-      SnackBar(content: Text('${l10n.muralOpenDocument}: $url')),
-    );
+    // Antes o aviso repetia a URL inteira, que num toast estoura a linha e não
+    // diz o que fazer. A frase agora explica que o aparelho não tem com que abrir.
+    toast.error(l10n.linkOpenError);
   }
 }
 

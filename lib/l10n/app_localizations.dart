@@ -260,6 +260,120 @@ abstract class AppLocalizations {
   /// **'Sua sessão expirou. Entre novamente para continuar.'**
   String get sessionExpiredMessage;
 
+  /// No description provided for @connectionErrorMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível falar com o servidor. Verifique sua conexão e tente de novo.'**
+  String get connectionErrorMessage;
+
+  /// No description provided for @loginFailedMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível entrar. Confira a matrícula e a senha.'**
+  String get loginFailedMessage;
+
+  /// No description provided for @linkOpenError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o link neste aparelho.'**
+  String get linkOpenError;
+
+  /// No description provided for @offlineCachedDataMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem conexão: mostrando os dados salvos.'**
+  String get offlineCachedDataMessage;
+
+  /// No description provided for @catalogRefreshError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível atualizar o catálogo.'**
+  String get catalogRefreshError;
+
+  /// No description provided for @bookListLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os livros. Verifique sua conexão.'**
+  String get bookListLoadError;
+
+  /// No description provided for @searchError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível buscar livros agora.'**
+  String get searchError;
+
+  /// No description provided for @passwordChangedMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha alterada.'**
+  String get passwordChangedMessage;
+
+  /// No description provided for @passwordChangeFailedMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível alterar a senha. Tente novamente.'**
+  String get passwordChangeFailedMessage;
+
+  /// No description provided for @passwordChangeRequiredMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troque sua senha inicial para usar esta função.'**
+  String get passwordChangeRequiredMessage;
+
+  /// No description provided for @avatarUploading.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviando foto...'**
+  String get avatarUploading;
+
+  /// No description provided for @avatarUploadSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto atualizada.'**
+  String get avatarUploadSuccess;
+
+  /// No description provided for @avatarUploadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível atualizar a foto.'**
+  String get avatarUploadError;
+
+  /// No description provided for @loanRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação enviada. Aguarde a aprovação da biblioteca.'**
+  String get loanRequestSent;
+
+  /// No description provided for @loanRequestFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível solicitar este livro agora.'**
+  String get loanRequestFailed;
+
+  /// No description provided for @penaltyNoticeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empréstimos pausados por enquanto'**
+  String get penaltyNoticeTitle;
+
+  /// No description provided for @penaltyNoticeUntil.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você volta a solicitar livros em {date}.'**
+  String penaltyNoticeUntil(String date);
+
+  /// No description provided for @penaltyNoticeKind.
+  ///
+  /// In pt, this message translates to:
+  /// **'Registrado como: {kind}'**
+  String penaltyNoticeKind(String kind);
+
+  /// No description provided for @penaltyNoticeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Até lá você continua explorando o catálogo e curtindo livros. Se tiver alguma dúvida, fale com a biblioteca.'**
+  String get penaltyNoticeHint;
+
   /// No description provided for @bookDetailsLoadError.
   ///
   /// In pt, this message translates to:

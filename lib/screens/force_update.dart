@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/app_version_info.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
 /// Tela de bloqueio exibida quando a versão instalada não é mais
 /// suportada. Não é dispensável: precede a autenticação e o usuário só sai
@@ -15,7 +16,7 @@ class ForceUpdateScreen extends StatelessWidget {
   const ForceUpdateScreen({super.key, this.info});
 
   Future<void> _launchStore(BuildContext context, String url) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final toast = AppToast.of(context);
     final errorText = AppLocalizations.of(context)!.forceUpdateStoreError;
     // Só abre http/https (storeUrl vem da config de versão no banco).
     final uri = Uri.tryParse(url);
@@ -29,7 +30,7 @@ class ForceUpdateScreen extends StatelessWidget {
     }
     // Numa tela sem saída, falha silenciosa deixaria o usuário travado sem pista.
     if (!opened) {
-      messenger.showSnackBar(SnackBar(content: Text(errorText)));
+      toast.error(errorText);
     }
   }
 

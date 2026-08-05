@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_carousel.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -131,25 +133,25 @@ class _CatalogScreenState extends State<CatalogScreen>
       if (kDebugMode) debugPrint('Erro na UI ao buscar catálogo remoto: $e');
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        final toast = AppToast.of(context);
+        final hasCache = _allCategories.isNotEmpty;
+
         setState(() {
           _isLoading = false;
-          if (_allCategories.isEmpty) {
+          if (!hasCache) {
             _initialLoad = false;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Erro de conexão: Verifique sua internet.'),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 4),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Modo Offline: Exibindo dados salvos.'),
-              ),
-            );
           }
         });
+
+        // Sem cache é erro; com cache é só um aviso de que os dados são os
+        // salvos. Antes os dois avisos eram disparados dentro do `setState`, o
+        // que fazia o `ScaffoldMessenger` ser chamado durante a reconstrução.
+        if (hasCache) {
+          toast.info(l10n.offlineCachedDataMessage);
+        } else {
+          toast.error(l10n.connectionErrorMessage);
+        }
       }
     }
   }
@@ -199,12 +201,8 @@ class _CatalogScreenState extends State<CatalogScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Não foi possível atualizar o catálogo.'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+        final l10n = AppLocalizations.of(context)!;
+        AppToast.of(context).error(l10n.catalogRefreshError);
       }
     }
   }

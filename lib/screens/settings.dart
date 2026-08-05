@@ -10,6 +10,7 @@ import 'package:lumilivre/providers/locale.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/services/biometric_auth.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
 import '../widgets/change_password_dialog.dart';
 import 'auth/login.dart';
@@ -45,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _toggleBiometrics(bool value) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final toast = AppToast.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     // Ligar exige autenticar de verdade primeiro: gravar a preferência sem
@@ -59,17 +60,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _isBiometricsBusy = false);
 
       if (!confirmed) {
-        messenger.showSnackBar(
-          SnackBar(content: Text(l10n.biometricEnableFailed)),
-        );
+        toast.error(l10n.biometricEnableFailed);
         return;
       }
       await _biometrics.setEnabled(true);
       if (!mounted) return;
       setState(() => _isBiometricsEnabled = true);
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.biometricEnabledConfirmation)),
-      );
+      toast.success(l10n.biometricEnabledConfirmation);
       return;
     }
 
@@ -228,8 +225,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextStyle(color: Colors.red.shade400),
           ),
           onTap: () {
+            // Provider lido antes do pop: depois dele este `context` já saiu da
+            // árvore, e o logout agora também revoga a sessão no servidor.
+            final auth = Provider.of<AuthProvider>(context, listen: false);
             Navigator.of(context).pop();
-            Provider.of<AuthProvider>(context, listen: false).logout();
+            auth.logout();
           },
         ),
       ),

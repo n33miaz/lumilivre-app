@@ -8,6 +8,8 @@ import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/theme.dart';
+import 'package:lumilivre/services/api_error.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -70,6 +72,15 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
+      final l10n = AppLocalizations.of(context)!;
+      final toast = AppToast.of(context);
+
+      // Fecha o teclado antes de enviar. Esta tela usa
+      // `resizeToAvoidBottomInset: false`, então o Scaffold não encolhe com o
+      // teclado aberto e o aviso nasce embaixo dele — invisível justamente no
+      // momento em que o usuário mais precisa dele, que é o erro de login.
+      FocusScope.of(context).unfocus();
+
       setState(() {
         _isLoading = true;
       });
@@ -86,12 +97,7 @@ class _LoginScreenState extends State<LoginScreen>
         if (!mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+        toast.error(_loginErrorMessage(e, l10n));
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -100,10 +106,43 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  /// A frase da recusa é a da API, não a nossa.
+  ///
+  /// O servidor já distingue senha incorreta, conta desativada, conta bloqueada
+  /// e excesso de tentativas, e responde na língua que o app pediu. A copy local
+  /// só entra quando não há resposta nenhuma para mostrar — falha de rede — ou
+  /// quando a resposta veio sem mensagem.
+  String _loginErrorMessage(Object error, AppLocalizations l10n) {
+    final failure = ApiException.fromError(error);
+    final apiMessage = failure.apiMessage;
+    if (apiMessage != null) {
+      return apiMessage;
+    }
+    if (failure.failure == ApiFailure.network) {
+      return l10n.connectionErrorMessage;
+    }
+    return l10n.loginFailedMessage;
+  }
+
+  /// Aviso em toast, porque antes não havia aviso nenhum.
+  ///
+  /// Aqui morava um `throw` de String crua dentro de um callback assíncrono: ela
+  /// subia até o handler global de zona, virava um log em debug e nada em
+  /// release. Quem tocava em "Esqueceu sua senha?" sem navegador para abrir o
+  /// link ficava olhando a tela parada.
   Future<void> _launchURL(String url) async {
+    final l10n = AppLocalizations.of(context)!;
+    final toast = AppToast.of(context);
     final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Não foi possível abrir $url';
+
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      opened = false;
+    }
+    if (!opened) {
+      toast.error(l10n.linkOpenError);
     }
   }
 

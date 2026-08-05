@@ -98,6 +98,76 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sua sessão expirou. Entre novamente para continuar.';
 
   @override
+  String get connectionErrorMessage =>
+      'Não foi possível falar com o servidor. Verifique sua conexão e tente de novo.';
+
+  @override
+  String get loginFailedMessage =>
+      'Não foi possível entrar. Confira a matrícula e a senha.';
+
+  @override
+  String get linkOpenError => 'Não foi possível abrir o link neste aparelho.';
+
+  @override
+  String get offlineCachedDataMessage =>
+      'Sem conexão: mostrando os dados salvos.';
+
+  @override
+  String get catalogRefreshError => 'Não foi possível atualizar o catálogo.';
+
+  @override
+  String get bookListLoadError =>
+      'Não foi possível carregar os livros. Verifique sua conexão.';
+
+  @override
+  String get searchError => 'Não foi possível buscar livros agora.';
+
+  @override
+  String get passwordChangedMessage => 'Senha alterada.';
+
+  @override
+  String get passwordChangeFailedMessage =>
+      'Não foi possível alterar a senha. Tente novamente.';
+
+  @override
+  String get passwordChangeRequiredMessage =>
+      'Troque sua senha inicial para usar esta função.';
+
+  @override
+  String get avatarUploading => 'Enviando foto...';
+
+  @override
+  String get avatarUploadSuccess => 'Foto atualizada.';
+
+  @override
+  String get avatarUploadError => 'Não foi possível atualizar a foto.';
+
+  @override
+  String get loanRequestSent =>
+      'Solicitação enviada. Aguarde a aprovação da biblioteca.';
+
+  @override
+  String get loanRequestFailed =>
+      'Não foi possível solicitar este livro agora.';
+
+  @override
+  String get penaltyNoticeTitle => 'Empréstimos pausados por enquanto';
+
+  @override
+  String penaltyNoticeUntil(String date) {
+    return 'Você volta a solicitar livros em $date.';
+  }
+
+  @override
+  String penaltyNoticeKind(String kind) {
+    return 'Registrado como: $kind';
+  }
+
+  @override
+  String get penaltyNoticeHint =>
+      'Até lá você continua explorando o catálogo e curtindo livros. Se tiver alguma dúvida, fale com a biblioteca.';
+
+  @override
   String get bookDetailsLoadError =>
       'Não foi possível carregar os detalhes do livro.';
 

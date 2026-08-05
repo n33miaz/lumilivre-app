@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/models/book.dart';
 import 'package:lumilivre/services/api.dart';
+import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/book_card.dart';
 
 class SearchResultsScreen extends StatefulWidget {
@@ -36,9 +38,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Erro ao buscar livros.')));
+        AppToast.of(context).error(AppLocalizations.of(context)!.searchError);
       }
     }
   }
