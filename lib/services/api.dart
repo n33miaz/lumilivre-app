@@ -20,6 +20,7 @@ import 'ranking_api.dart';
 import 'settings_api.dart';
 import 'upload_api.dart';
 
+export 'api_error.dart';
 export 'app_version_api.dart';
 export 'auth_api.dart';
 export 'book_api.dart';
@@ -95,8 +96,8 @@ class ApiService {
 
   // --- Books ---
 
-  Future<BookDetails> getBookDetails(String bookId) =>
-      _book.getBookDetails(bookId);
+  Future<BookDetails> getBookDetails(String bookId, {String? token}) =>
+      _book.getBookDetails(bookId, token: token);
 
   // --- Loans ---
 
