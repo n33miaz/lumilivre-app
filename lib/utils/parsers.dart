@@ -103,6 +103,40 @@ String? secureMediaUrl(dynamic rawUrl) {
   }
 }
 
+/// A mesma URL de [secureMediaUrl], com uma marca de versão vinda do
+/// `updatedAt` do recurso.
+///
+/// Capa é guardada em cache **pela URL** (o `cached_network_image` grava no
+/// disco), e a URL não muda quando a bibliotecária troca a imagem do livro: o app
+/// mostrava a capa antiga até alguém desinstalar. O `updatedAt` que o card da API
+/// agora traz é a única coisa que muda junto com o livro, então ele vira o `v` da
+/// query. Era o dado que faltava para fechar isto.
+///
+/// Idempotente de propósito: reescrever a mesma marca devolve a mesma URL, e é
+/// isso que permite guardar o resultado no cache local e reparsear depois sem
+/// invalidar imagem nenhuma. Sem `updatedAt`, nada muda.
+String? versionedMediaUrl(dynamic rawUrl, dynamic updatedAt) {
+  final url = secureMediaUrl(rawUrl);
+  if (url == null) {
+    return null;
+  }
+
+  final stamp = DateTime.tryParse(updatedAt?.toString() ?? '');
+  if (stamp == null) {
+    return url;
+  }
+
+  final uri = Uri.parse(url);
+  return uri
+      .replace(
+        queryParameters: <String, String>{
+          ...uri.queryParameters,
+          'v': '${stamp.millisecondsSinceEpoch}',
+        },
+      )
+      .toString();
+}
+
 /// Host de loopback ou de faixa privada (RFC 1918), incluindo o `10.0.2.2` que
 /// o emulador Android usa para alcançar o host.
 bool _isPrivateHost(String host) {

@@ -15,6 +15,25 @@ void main() {
         expect(book.rating, 4.8);
       });
 
+      /// O card da API traz `updatedAt` desde o T05: é ele que faz a capa nova
+      /// aparecer no celular, porque a URL sozinha não muda quando a imagem muda.
+      test('deve versionar a capa pelo updatedAt do card', () {
+        final book = Book.fromMap({
+          'id': '00000000-0000-4000-8000-000000003001',
+          'title': 'Duna',
+          'author': 'Frank Herbert',
+          'coverUrl': 'https://example.com/duna.jpg',
+          'rating': 4.8,
+          'updatedAt': '2026-08-04T10:00:00Z',
+        });
+
+        expect(
+          book.imageUrl,
+          'https://example.com/duna.jpg?v='
+          '${DateTime.utc(2026, 8, 4, 10).millisecondsSinceEpoch}',
+        );
+      });
+
       test('deve criar Book com campos em inglês (fallback)', () {
         final book = Book.fromMap(BookFixtures.alternativeKeys);
         expect(book.id, '2');

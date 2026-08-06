@@ -43,8 +43,11 @@ class Book {
       author: (map['author'] ?? map['autor'] ?? 'Autor Desconhecido')
           .toString(),
       // URL recusada vira string vazia: o card já trata isso como "sem capa"
-      // e desenha a capa padrão local.
-      imageUrl: secureMediaUrl(rawImage) ?? '',
+      // e desenha a capa padrão local. O `updatedAt` do card entra como versão
+      // da imagem — sem ele, trocar a capa no painel não trocava a capa no
+      // celular. Cache local reparseado não tem o campo e mantém a URL que já
+      // veio versionada.
+      imageUrl: versionedMediaUrl(rawImage, map['updatedAt']) ?? '',
       rating: safeParseDouble(map['rating'] ?? map['avaliacao']),
     );
   }

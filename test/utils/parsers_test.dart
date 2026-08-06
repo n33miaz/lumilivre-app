@@ -159,4 +159,46 @@ void main() {
       );
     });
   });
+
+  group('versionedMediaUrl', () {
+    test('deve carimbar a versao vinda do updatedAt', () {
+      final url = versionedMediaUrl(
+        'https://example.com/capa.jpg',
+        '2026-08-04T10:00:00Z',
+      );
+
+      expect(
+        url,
+        'https://example.com/capa.jpg?v='
+        '${DateTime.utc(2026, 8, 4, 10).millisecondsSinceEpoch}',
+      );
+    });
+
+    test('deve preservar query que a URL ja tinha', () {
+      expect(
+        versionedMediaUrl(
+          'https://example.com/capa.jpg?size=L',
+          '2026-08-04T10:00:00Z',
+        ),
+        contains('size=L'),
+      );
+    });
+
+    /// Cache local guarda a URL ja carimbada e reparseia sem o `updatedAt`:
+    /// carimbar de novo nao pode invalidar a imagem que ja esta no disco.
+    test('deve ser idempotente e nao mexer na URL sem updatedAt', () {
+      final stamp = DateTime.utc(2026, 8, 4, 10).millisecondsSinceEpoch;
+      final stamped = 'https://example.com/capa.jpg?v=$stamp';
+
+      expect(versionedMediaUrl(stamped, null), stamped);
+      expect(versionedMediaUrl(stamped, '2026-08-04T10:00:00Z'), stamped);
+    });
+
+    test('deve continuar recusando esquema nao http(s)', () {
+      expect(
+        versionedMediaUrl('data:image/png;base64,AAA', '2026-08-04T10:00:00Z'),
+        isNull,
+      );
+    });
+  });
 }
