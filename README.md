@@ -41,10 +41,23 @@ disponível offline e um mural segmentado por curso, módulo ou turno.
   <h1>Screenshots</h1>
 </div>
 
+Capturas do emulador Android rodando contra o stack local com o seed de
+demonstração.
+
 <div align="center">
-  <img src="assets/images/prints/print_splash.jpg" width="200" alt="Splash" style="border-radius: 15px; margin: 10px;">
-  <img src="assets/images/prints/print_login.jpg" width="200" alt="Login" style="border-radius: 15px; margin: 10px;">
+  <img src="https://raw.githubusercontent.com/n33miaz/lumilivre-web/HEAD/docs/screenshots/app-book.png" width="200" alt="Ficha do livro: capa, avaliação, botão de interesse e solicitação de empréstimo" style="border-radius: 15px; margin: 10px;">
+  <img src="https://raw.githubusercontent.com/n33miaz/lumilivre-web/HEAD/docs/screenshots/app-book-dark.png" width="200" alt="A mesma ficha do livro no tema escuro" style="border-radius: 15px; margin: 10px;">
+  <img src="https://raw.githubusercontent.com/n33miaz/lumilivre-web/HEAD/docs/screenshots/app-profile.png" width="200" alt="Perfil do leitor com os empréstimos em andamento" style="border-radius: 15px; margin: 10px;">
 </div>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/n33miaz/lumilivre-web/HEAD/docs/screenshots/app-ranking.png" width="200" alt="Ranking de leitura com pódio e a posição do próprio leitor" style="border-radius: 15px; margin: 10px;">
+  <img src="https://raw.githubusercontent.com/n33miaz/lumilivre-web/HEAD/docs/screenshots/app-board.png" width="200" alt="Mural com comunicados, anexos e trabalhos publicados pela biblioteca" style="border-radius: 15px; margin: 10px;">
+</div>
+
+> As imagens são servidas do repositório
+> [`lumilivre-web`](https://github.com/n33miaz/lumilivre-web/tree/HEAD/docs/screenshots)
+> de propósito: binário de captura fica em um repositório só, e clonar o app
+> continua trazendo apenas código e os assets que o build empacota.
 
 ## Stack
 
