@@ -59,7 +59,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
       if (mounted) {
         toast.success(l10n.passwordChangedMessage);
-        Navigator.of(context).pop(); // Fecha o dialog
+        // Devolve `true` para quem abriu poder retomar o que a senha pendente
+        // barrou — é o caso do coração da ficha, que a API recusa até a troca.
+        // Cancelar e fechar pela barreira continuam devolvendo `null`.
+        Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {

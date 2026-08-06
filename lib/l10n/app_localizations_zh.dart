@@ -593,4 +593,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get offlineBannerMessage => '当前离线，显示已保存的数据。';
+
+  @override
+  String get likeAction => '收藏';
+
+  @override
+  String get unlikeAction => '取消收藏';
+
+  @override
+  String get interestOfflineError => '无网络连接：收藏未保存。';
+
+  @override
+  String get interestSaveError => '无法保存收藏，请重试。';
+
+  @override
+  String interestMigratedNotice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '本机收藏的 $count 本图书已保存到你的账号。',
+    );
+    return '$_temp0';
+  }
 }

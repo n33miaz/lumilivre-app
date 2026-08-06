@@ -620,4 +620,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get offlineBannerMessage => 'You\'re offline. Showing saved data.';
+
+  @override
+  String get likeAction => 'Like';
+
+  @override
+  String get unlikeAction => 'Remove from likes';
+
+  @override
+  String get interestOfflineError => 'No connection: your like wasn\'t saved.';
+
+  @override
+  String get interestSaveError => 'Couldn\'t save your like. Try again.';
+
+  @override
+  String interestMigratedNotice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count books liked on this device were saved to your account.',
+      one: '1 book liked on this device was saved to your account.',
+    );
+    return '$_temp0';
+  }
 }

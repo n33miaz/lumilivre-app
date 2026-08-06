@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,7 +18,9 @@ import 'package:lumilivre/services/loan_status_calculator.dart';
 import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/utils/parsers.dart';
+import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
+import 'package:lumilivre/widgets/change_password_dialog.dart';
 
 /// Estados que o botão de empréstimo sabe mostrar.
 ///
@@ -107,6 +111,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
       final registrationNumber = user.readerRegistrationNumber!;
       final token = user.token;
+
+      // O coração precisa da resposta do servidor: `interests/mine` é a única
+      // rota que diz se este livro está marcado, e um coração vazio por lista
+      // não carregada seria estado falso na direção que ninguém percebe.
+      unawaited(
+        Provider.of<FavoritesProvider>(context, listen: false).ensureLoaded(),
+      );
 
       // O cadastro do leitor era buscado aqui só para checar penalidade. Saiu
       // junto com o estado do botão: uma requisição menos por ficha de livro, e
@@ -207,6 +218,52 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         return;
       }
       toast.error(failure.apiMessage ?? l10n.loanRequestFailed);
+    }
+  }
+
+  /// Curtir é escrita, então o coração só fica preenchido com o que o servidor
+  /// aceitou. O provider já desfaz a pintura na falha; aqui fica o que a tela
+  /// deve **dizer** em cada motivo — e é por isso que a recusa chega tipada em vez
+  /// de virar a mesma frase de erro de conexão para tudo.
+  Future<void> _handleInterest() async {
+    final favorites = Provider.of<FavoritesProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final toast = AppToast.of(context);
+
+    final failure = await favorites.toggle(widget.book);
+    if (failure == null || !mounted) {
+      return;
+    }
+
+    switch (failure) {
+      case ApiFailure.network:
+        toast.error(l10n.interestOfflineError);
+      case ApiFailure.passwordChangeRequired:
+        toast.error(l10n.passwordChangeRequiredMessage);
+        await _openPasswordGate();
+      case ApiFailure.unauthorized:
+        toast.error(l10n.sessionExpiredMessage);
+      default:
+        toast.error(l10n.interestSaveError);
+    }
+  }
+
+  /// Senha inicial pendente: a API deixa **ler** interesse e recusa **escrever**
+  /// até a troca acontecer. A saída é o formulário de troca, que só existe dentro
+  /// da sessão — então ele abre aqui mesmo, e a sessão continua de pé. Deslogar
+  /// seria tirar o leitor justamente do único lugar onde ele resolve isso.
+  ///
+  /// Diálogo escapável de propósito: o gate obrigatório do login existe para o
+  /// primeiro acesso; travar a tela porque alguém tocou num coração seria punir a
+  /// curiosidade. Se a senha for trocada, a curtida que o leitor pediu acontece.
+  Future<void> _openPasswordGate() async {
+    final changed = await showAppDialog<bool>(
+      context: context,
+      builder: (_) => const ChangePasswordDialog(),
+    );
+
+    if (changed == true && mounted) {
+      await _handleInterest();
     }
   }
 
@@ -507,10 +564,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: Row(
         children: [
-          if (access.canLikeBooks) ...[
-            _LikeButton(book: widget.book),
-            const SizedBox(width: 16),
-          ],
+          // O coração aparece para o convidado também, e leva ao login como o
+          // botão de empréstimo ao lado. Escondê-lo deixava a função invisível
+          // para quem ainda não tem conta; preenchê-lo sem sessão seria a mentira
+          // que esta tarefa foi feita para tirar do app.
+          _LikeButton(
+            book: widget.book,
+            canLike: access.canLikeBooks,
+            onPressed: access.canLikeBooks ? _handleInterest : _openLogin,
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: access.canRequestLoan
                 ? _BorrowButton(
@@ -604,16 +667,44 @@ class _InfoItem extends StatelessWidget {
   }
 }
 
+/// O coração da ficha do livro.
+///
+/// Ele mostra o interesse que **o servidor** conhece (`interests/mine`), e não
+/// uma lista local: o mesmo leitor em outro aparelho vê o mesmo coração. O único
+/// momento em que ele adianta a resposta é entre o toque e a confirmação — e
+/// nesse intervalo ele não aceita outro toque, para dois toques rápidos não
+/// virarem duas requisições da mesma coisa.
 class _LikeButton extends StatelessWidget {
+  const _LikeButton({
+    required this.book,
+    required this.canLike,
+    required this.onPressed,
+  });
+
   final Book book;
 
-  const _LikeButton({required this.book});
+  /// Há leitor identificado. Sem isso o botão continua visível, mas leva ao
+  /// login.
+  final bool canLike;
+
+  final Future<void> Function() onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final favoritesProvider = Provider.of<FavoritesProvider>(context);
-    final isLiked = favoritesProvider.isFavorite(book.id);
+    final favorites = context.watch<FavoritesProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final isLiked = canLike && favorites.isFavorite(book.id);
+    final isPending = canLike && favorites.isPending(book.id);
     final scheme = Theme.of(context).colorScheme;
+
+    // Ícone sozinho não anuncia nada em leitor de tela, e este é o único botão da
+    // ficha sem legenda visível. O rótulo diz a ação, não o estado.
+    final String label;
+    if (!canLike) {
+      label = l10n.guestLikesTitle;
+    } else {
+      label = isLiked ? l10n.unlikeAction : l10n.likeAction;
+    }
 
     return Material(
       color: Theme.of(context).cardColor,
@@ -622,15 +713,22 @@ class _LikeButton extends StatelessWidget {
         side: BorderSide(color: scheme.outlineVariant),
       ),
       elevation: 2,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
-        onTap: () => favoritesProvider.toggleFavorite(book),
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Icon(
-            isLiked ? Icons.favorite : Icons.favorite_border,
-            color: isLiked ? LumiLivreTheme.like : scheme.primary,
-            size: 28,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
+          onTap: isPending ? null : onPressed,
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: AnimatedSwitcher(
+              duration: AppMotion.of(context, AppMotion.quick),
+              child: Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                key: ValueKey(isLiked),
+                color: isLiked ? LumiLivreTheme.like : scheme.primary,
+                size: 28,
+              ),
+            ),
           ),
         ),
       ),

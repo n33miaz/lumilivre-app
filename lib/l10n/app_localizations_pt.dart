@@ -627,4 +627,28 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get offlineBannerMessage =>
       'Você está offline. Exibindo dados salvos.';
+
+  @override
+  String get likeAction => 'Curtir';
+
+  @override
+  String get unlikeAction => 'Remover dos curtidos';
+
+  @override
+  String get interestOfflineError => 'Sem conexão: a curtida não foi salva.';
+
+  @override
+  String get interestSaveError =>
+      'Não foi possível salvar a curtida. Tente de novo.';
+
+  @override
+  String interestMigratedNotice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count livros curtidos neste aparelho foram salvos na sua conta.',
+      one: '1 livro curtido neste aparelho foi salvo na sua conta.',
+    );
+    return '$_temp0';
+  }
 }

@@ -1189,6 +1189,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Você está offline. Exibindo dados salvos.'**
   String get offlineBannerMessage;
+
+  /// No description provided for @likeAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Curtir'**
+  String get likeAction;
+
+  /// No description provided for @unlikeAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover dos curtidos'**
+  String get unlikeAction;
+
+  /// No description provided for @interestOfflineError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem conexão: a curtida não foi salva.'**
+  String get interestOfflineError;
+
+  /// No description provided for @interestSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar a curtida. Tente de novo.'**
+  String get interestSaveError;
+
+  /// No description provided for @interestMigratedNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 livro curtido neste aparelho foi salvo na sua conta.} other{{count} livros curtidos neste aparelho foram salvos na sua conta.}}'**
+  String interestMigratedNotice(int count);
 }
 
 class _AppLocalizationsDelegate

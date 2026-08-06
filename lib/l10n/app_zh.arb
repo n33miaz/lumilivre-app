@@ -281,5 +281,17 @@
       }
     }
   },
-  "offlineBannerMessage": "当前离线，显示已保存的数据。"
+  "offlineBannerMessage": "当前离线，显示已保存的数据。",
+  "likeAction": "收藏",
+  "unlikeAction": "取消收藏",
+  "interestOfflineError": "无网络连接：收藏未保存。",
+  "interestSaveError": "无法保存收藏，请重试。",
+  "interestMigratedNotice": "{count, plural, other{本机收藏的 {count} 本图书已保存到你的账号。}}",
+  "@interestMigratedNotice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

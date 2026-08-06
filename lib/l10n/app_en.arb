@@ -281,5 +281,17 @@
       }
     }
   },
-  "offlineBannerMessage": "You're offline. Showing saved data."
+  "offlineBannerMessage": "You're offline. Showing saved data.",
+  "likeAction": "Like",
+  "unlikeAction": "Remove from likes",
+  "interestOfflineError": "No connection: your like wasn't saved.",
+  "interestSaveError": "Couldn't save your like. Try again.",
+  "interestMigratedNotice": "{count, plural, =1{1 book liked on this device was saved to your account.} other{{count} books liked on this device were saved to your account.}}",
+  "@interestMigratedNotice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

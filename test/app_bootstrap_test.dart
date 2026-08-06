@@ -38,7 +38,12 @@ Widget buildBootstrappedApp() {
             settingsProvider!..syncWithAuth(authProvider),
       ),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
-      ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+      ChangeNotifierProxyProvider<AuthProvider, FavoritesProvider>(
+        lazy: false,
+        create: (context) => FavoritesProvider(),
+        update: (context, authProvider, favoritesProvider) =>
+            favoritesProvider!..syncWithAuth(authProvider),
+      ),
       ChangeNotifierProvider(create: (context) => LocaleProvider()),
       ChangeNotifierProxyProvider<AuthProvider, ContentProvider>(
         create: (context) => ContentProvider(),

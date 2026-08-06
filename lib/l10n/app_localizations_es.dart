@@ -628,4 +628,29 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get offlineBannerMessage =>
       'Estás sin conexión. Mostrando los datos guardados.';
+
+  @override
+  String get likeAction => 'Me gusta';
+
+  @override
+  String get unlikeAction => 'Quitar de me gusta';
+
+  @override
+  String get interestOfflineError => 'Sin conexión: no se guardó tu me gusta.';
+
+  @override
+  String get interestSaveError =>
+      'No se pudo guardar tu me gusta. Inténtalo de nuevo.';
+
+  @override
+  String interestMigratedNotice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count libros marcados en este dispositivo se guardaron en tu cuenta.',
+      one: '1 libro marcado en este dispositivo se guardó en tu cuenta.',
+    );
+    return '$_temp0';
+  }
 }

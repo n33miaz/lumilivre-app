@@ -281,5 +281,17 @@
       }
     }
   },
-  "offlineBannerMessage": "Você está offline. Exibindo dados salvos."
+  "offlineBannerMessage": "Você está offline. Exibindo dados salvos.",
+  "likeAction": "Curtir",
+  "unlikeAction": "Remover dos curtidos",
+  "interestOfflineError": "Sem conexão: a curtida não foi salva.",
+  "interestSaveError": "Não foi possível salvar a curtida. Tente de novo.",
+  "interestMigratedNotice": "{count, plural, =1{1 livro curtido neste aparelho foi salvo na sua conta.} other{{count} livros curtidos neste aparelho foram salvos na sua conta.}}",
+  "@interestMigratedNotice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

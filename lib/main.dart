@@ -51,7 +51,20 @@ void main() {
                   settingsProvider!..syncWithAuth(authProvider),
             ),
             ChangeNotifierProvider(create: (context) => ThemeProvider()),
-            ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+            // Proxy: o interesse é do leitor, não do aparelho. O provider recebe
+            // do `AuthProvider` o token e a conta a que a lista pertence, busca
+            // do servidor e esquece tudo (memória e cache) quando a sessão sai.
+            //
+            // `lazy: false` porque o esquecer é o que não pode depender de
+            // ninguém: criado só no primeiro uso, o provider não existiria no
+            // logout de quem nunca abriu a aba de curtidos — e o cache da conta
+            // ficaria no aparelho para o próximo leitor.
+            ChangeNotifierProxyProvider<AuthProvider, FavoritesProvider>(
+              lazy: false,
+              create: (context) => FavoritesProvider(),
+              update: (context, authProvider, favoritesProvider) =>
+                  favoritesProvider!..syncWithAuth(authProvider),
+            ),
             ChangeNotifierProvider(create: (context) => LocaleProvider()),
             // Proxy: o mural é segmentado por público — limpa memória e cache
             // local no logout/troca de usuário (ver ContentProvider.syncWithAuth).

@@ -620,4 +620,29 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get offlineBannerMessage =>
       'आप ऑफ़लाइन हैं। सहेजा गया डेटा दिख रहा है।';
+
+  @override
+  String get likeAction => 'पसंद करें';
+
+  @override
+  String get unlikeAction => 'पसंदीदा से हटाएँ';
+
+  @override
+  String get interestOfflineError =>
+      'कनेक्शन नहीं है: आपकी पसंद सहेजी नहीं गई।';
+
+  @override
+  String get interestSaveError =>
+      'आपकी पसंद सहेजी नहीं जा सकी। पुनः प्रयास करें।';
+
+  @override
+  String interestMigratedNotice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'इस डिवाइस पर पसंद की गई $count किताबें आपके खाते में सहेजी गईं।',
+      one: 'इस डिवाइस पर पसंद की गई $count किताब आपके खाते में सहेजी गई।',
+    );
+    return '$_temp0';
+  }
 }

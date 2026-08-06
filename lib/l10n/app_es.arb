@@ -281,5 +281,17 @@
       }
     }
   },
-  "offlineBannerMessage": "Estás sin conexión. Mostrando los datos guardados."
+  "offlineBannerMessage": "Estás sin conexión. Mostrando los datos guardados.",
+  "likeAction": "Me gusta",
+  "unlikeAction": "Quitar de me gusta",
+  "interestOfflineError": "Sin conexión: no se guardó tu me gusta.",
+  "interestSaveError": "No se pudo guardar tu me gusta. Inténtalo de nuevo.",
+  "interestMigratedNotice": "{count, plural, =1{1 libro marcado en este dispositivo se guardó en tu cuenta.} other{{count} libros marcados en este dispositivo se guardaron en tu cuenta.}}",
+  "@interestMigratedNotice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
