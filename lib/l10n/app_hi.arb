@@ -108,6 +108,14 @@
   "muralAdvisorsLabel": "मार्गदर्शक",
   "muralYearLabel": "वर्ष",
   "muralSemesterLabel": "सत्र",
+  "muralUnseenCount": "{count, plural, one{{count} नया प्रकाशन} other{{count} नए प्रकाशन}}",
+  "@muralUnseenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "forceUpdateTitle": "ऐप अद्यतन करें",
   "forceUpdateMessage": "एक नया अनिवार्य संस्करण उपलब्ध है। LumiLivre का उपयोग जारी रखने के लिए अद्यतन करें।",
   "forceUpdateButton": "अभी अद्यतन करें",
@@ -282,6 +290,17 @@
     }
   },
   "offlineBannerMessage": "आप ऑफ़लाइन हैं। सहेजा गया डेटा दिख रहा है।",
+  "apiHealthWakingBanner": "सर्वर जाग रहा है… {elapsed}",
+  "@apiHealthWakingBanner": {
+    "placeholders": {
+      "elapsed": {
+        "type": "String"
+      }
+    }
+  },
+  "apiHealthWakingToast": "सर्वर निष्क्रिय था और अब चालू हो रहा है। इसमें 3 मिनट तक लग सकते हैं: ऐप अपने आप कोशिश करता रहता है और जवाब मिलते ही सामग्री लोड कर देता है।",
+  "apiHealthRestoredToast": "सर्वर वापस आ गया। सामग्री लोड हो रही है।",
+  "apiHealthUnreachableBanner": "सर्वर से कोई जवाब नहीं। दोबारा कोशिश करने के लिए टैप करें।",
   "likeAction": "पसंद करें",
   "unlikeAction": "पसंदीदा से हटाएँ",
   "interestOfflineError": "कनेक्शन नहीं है: आपकी पसंद सहेजी नहीं गई।",

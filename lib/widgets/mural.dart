@@ -12,18 +12,160 @@ import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 
-class ContentsScreen extends StatefulWidget {
-  const ContentsScreen({super.key});
+/// Botão do mural no cabeçalho, com selo de publicação não vista.
+///
+/// O mural era a terceira aba da barra inferior, e como aba custava caro: era a
+/// única que aparecia e sumia conforme a configuração da biblioteca, e cada
+/// índice do navegador virava conta condicional. Como botão de cabeçalho — a
+/// mesma construção do de tema, no canto que já estava vazio do outro lado — ele
+/// ainda ganha o que aba nenhuma tem: dizer que há coisa nova sem ser aberto.
+class MuralButton extends StatefulWidget {
+  const MuralButton({super.key});
+
+  /// Largura e altura do botão, iguais às do botão de tema (ícone de 20 com 8
+  /// de folga de cada lado). O cabeçalho reserva esta medida quando a
+  /// biblioteca desliga o mural, para o título continuar no centro.
+  static const double diameter = 36;
 
   @override
-  State<ContentsScreen> createState() => _ContentsScreenState();
+  State<MuralButton> createState() => _MuralButtonState();
 }
 
-class _ContentsScreenState extends State<ContentsScreen>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+class _MuralButtonState extends State<MuralButton> {
+  String? _requestedToken;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Quem pedia o feed era a tela da aba, ao ser montada. Sem aba, o selo de
+    // "novo" só acenderia depois de alguém abrir o mural — que é justamente a
+    // informação que o selo existe para dar antes. Então o botão pede o feed uma
+    // vez por sessão, e o `ContentProvider` ignora a chamada repetida.
+    final token = Provider.of<AuthProvider>(context).user?.token;
+    if (!GuestAccess.of(context).canReadContents) return;
+    if (token == null || token.isEmpty || token == _requestedToken) return;
+
+    _requestedToken = token;
+    final contents = Provider.of<ContentProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) contents.load(token);
+    });
+  }
+
+  Future<void> _open() async {
+    final contents = Provider.of<ContentProvider>(context, listen: false);
+
+    await showAppDialog<void>(
+      context: context,
+      builder: (_) => const _MuralModal(),
+    );
+
+    // Marca ao fechar, e não ao abrir: o que chegou pelo pull-to-refresh com o
+    // modal aberto também já passou pelos olhos de quem estava lendo.
+    await contents.markSeen();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final unseen = Provider.of<ContentProvider>(context).unseenCount;
+
+    return MergeSemantics(
+      child: Semantics(
+        label: unseen > 0
+            ? '${l10n.muralTitle}: ${l10n.muralUnseenCount(unseen)}'
+            : l10n.muralTitle,
+        child: Material(
+          color: LumiLivreTheme.onBrand.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(50),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(50),
+            onTap: _open,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              // O número do selo fica fora da leitura de tela porque a frase
+              // acima já o diz por extenso — senão o TalkBack fala "3" solto
+              // depois de "Mural: 3 publicações novas".
+              child: ExcludeSemantics(
+                child: Badge(
+                  isLabelVisible: unseen > 0,
+                  // Selo com a cor de erro do esquema: é o tom que o Material
+                  // reserva para "olhe isto", e o único que não some no roxo do
+                  // cabeçalho. Acima de 9 o número não caberia no círculo.
+                  label: Text(unseen > 9 ? '9+' : '$unseen'),
+                  child: const Icon(
+                    Icons.campaign_outlined,
+                    size: 20,
+                    color: LumiLivreTheme.onBrand,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// O mural dentro de um diálogo.
+///
+/// A lista é a mesma que existia na tela cheia; o que muda é a moldura, e por
+/// isso ela vive num widget separado do botão.
+class _MuralModal extends StatelessWidget {
+  const _MuralModal();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      child: ConstrainedBox(
+        // Modal, e não tela: com poucas publicações o diálogo encolhe até onde a
+        // lista acaba, e nunca passa de três quartos da altura — a moldura por
+        // fora é o que deixa claro que dá para fechar tocando ao lado.
+        constraints: BoxConstraints(
+          maxWidth: 520,
+          maxHeight: MediaQuery.sizeOf(context).height * 0.75,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(child: AppSheetTitle(l10n.muralTitle)),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    // O rótulo de "fechar" já vem traduzido nos cinco idiomas
+                    // com o próprio Material; não precisa de chave nossa.
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const Flexible(child: _MuralList()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MuralList extends StatefulWidget {
+  const _MuralList();
+
+  @override
+  State<_MuralList> createState() => _MuralListState();
+}
+
+class _MuralListState extends State<_MuralList> {
   @override
   void initState() {
     super.initState();
@@ -45,47 +187,25 @@ class _ContentsScreenState extends State<ContentsScreen>
     final token = auth.user?.token;
     if (!auth.isAuthenticated || token == null || token.isEmpty) return;
 
-    await Provider.of<ContentProvider>(
-      context,
-      listen: false,
-    ).refresh(token);
+    await Provider.of<ContentProvider>(context, listen: false).refresh(token);
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final l10n = AppLocalizations.of(context)!;
     final access = GuestAccess.of(context);
     final provider = Provider.of<ContentProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: LumiLivreTheme.onBrand,
-        elevation: 0,
-        centerTitle: false,
-        title: Text(
-          l10n.muralTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: _buildBody(context, l10n, access, provider),
-    );
-  }
-
-  Widget _buildBody(
-    BuildContext context,
-    AppLocalizations l10n,
-    GuestAccess access,
-    ContentProvider provider,
-  ) {
     // O mural é segmentado por público: sem sessão não há o que carregar.
     if (!access.canReadContents) {
-      return Center(child: Text(l10n.muralLoginPrompt));
+      return _message(context, l10n.muralLoginPrompt);
     }
 
     if (provider.isLoading && provider.items.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
 
     // Falha de rede sem cache: erro explícito com retry (erro ≠ mural vazio).
@@ -99,8 +219,11 @@ class _ContentsScreenState extends State<ContentsScreen>
       child: provider.items.isEmpty
           ? _buildEmptyState(context, l10n)
           : ListView.builder(
+              // O diálogo se ajusta à lista curta em vez de esticar até o teto,
+              // e continua rolando quando ela é longa.
+              shrinkWrap: true,
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
               itemCount: provider.items.length,
               itemBuilder: (context, index) {
                 return _ContentCard(
@@ -113,60 +236,63 @@ class _ContentsScreenState extends State<ContentsScreen>
     );
   }
 
+  Widget _message(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 16, 32, 40),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 15, color: Theme.of(context).hintColor),
+      ),
+    );
+  }
+
   Widget _buildErrorState(BuildContext context, AppLocalizations l10n) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.wifi_off_outlined,
-              size: 64,
-              color: Theme.of(context).hintColor.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.muralError,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                color: Theme.of(context).hintColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: _handleRefresh,
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.muralRetry),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 8, 32, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.wifi_off_outlined,
+            size: 64,
+            color: Theme.of(context).hintColor.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.muralError,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, color: Theme.of(context).hintColor),
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: _handleRefresh,
+            icon: const Icon(Icons.refresh),
+            label: Text(l10n.muralRetry),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
+    // Continua sendo lista rolável mesmo vazia: é o que deixa o
+    // pull-to-refresh existir quando não há nada para puxar.
     return ListView(
+      shrinkWrap: true,
       physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(32, 8, 32, 40),
       children: [
-        SizedBox(height: MediaQuery.of(context).size.height * 0.28),
         Icon(
           Icons.campaign_outlined,
           size: 64,
           color: Theme.of(context).hintColor.withValues(alpha: 0.5),
         ),
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Text(
-            l10n.muralEmpty,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              color: Theme.of(context).hintColor,
-            ),
-          ),
+        Text(
+          l10n.muralEmpty,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15, color: Theme.of(context).hintColor),
         ),
       ],
     );
@@ -437,20 +563,14 @@ class _ContentDetailSheet extends StatelessWidget {
   List<Widget> _buildAnnouncementBody(BuildContext context) {
     return [
       if (content.body != null)
-        Text(
-          content.body!,
-          style: const TextStyle(fontSize: 15, height: 1.4),
-        ),
+        Text(content.body!, style: const TextStyle(fontSize: 15, height: 1.4)),
     ];
   }
 
   List<Widget> _buildAttachmentBody(BuildContext context) {
     return [
       if (content.body != null) ...[
-        Text(
-          content.body!,
-          style: const TextStyle(fontSize: 15, height: 1.4),
-        ),
+        Text(content.body!, style: const TextStyle(fontSize: 15, height: 1.4)),
         const SizedBox(height: 20),
       ],
       if (content.fileUrl != null)
@@ -466,10 +586,7 @@ class _ContentDetailSheet extends StatelessWidget {
   List<Widget> _buildWorkBody(BuildContext context) {
     return [
       if (content.body != null) ...[
-        Text(
-          content.body!,
-          style: const TextStyle(fontSize: 15, height: 1.4),
-        ),
+        Text(content.body!, style: const TextStyle(fontSize: 15, height: 1.4)),
         const SizedBox(height: 16),
       ],
       if (content.authors != null)
@@ -522,9 +639,7 @@ class _ContentDetailSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 14)),
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
         ],
       ),
     );

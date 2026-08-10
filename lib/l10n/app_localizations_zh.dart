@@ -276,6 +276,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get muralSemesterLabel => '学期';
 
   @override
+  String muralUnseenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条新发布',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get forceUpdateTitle => '请更新应用';
 
   @override
@@ -593,6 +603,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get offlineBannerMessage => '当前离线，显示已保存的数据。';
+
+  @override
+  String apiHealthWakingBanner(String elapsed) {
+    return '服务器正在唤醒… $elapsed';
+  }
+
+  @override
+  String get apiHealthWakingToast =>
+      '服务器此前处于休眠状态，正在启动。最长可能需要 3 分钟：应用会自动重试，并在服务器响应后立即加载内容。';
+
+  @override
+  String get apiHealthRestoredToast => '服务器已恢复，正在加载内容。';
+
+  @override
+  String get apiHealthUnreachableBanner => '服务器无响应。点击重试。';
 
   @override
   String get likeAction => '收藏';

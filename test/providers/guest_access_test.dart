@@ -81,9 +81,9 @@ void main() {
       expect(access.canEditAvatar, isFalse);
     });
 
-    test('deve manter as abas visiveis para receber o convite de login', () {
+    test('deve manter aba e mural visiveis para receber o convite de login', () {
       expect(access.rankingTabVisible, isTrue);
-      expect(access.contentsTabVisible, isTrue);
+      expect(access.contentsVisible, isTrue);
     });
   });
 
@@ -107,7 +107,7 @@ void main() {
 
       expect(access.rankingTabVisible, isFalse);
       expect(access.canReadRanking, isFalse);
-      expect(access.contentsTabVisible, isFalse);
+      expect(access.contentsVisible, isFalse);
       expect(access.canReadContents, isFalse);
       expect(access.canEditAvatar, isFalse);
     });

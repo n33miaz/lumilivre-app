@@ -108,6 +108,14 @@
   "muralAdvisorsLabel": "Advisor(s)",
   "muralYearLabel": "Year",
   "muralSemesterLabel": "Semester",
+  "muralUnseenCount": "{count, plural, =1{1 new post} other{{count} new posts}}",
+  "@muralUnseenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "forceUpdateTitle": "Update the app",
   "forceUpdateMessage": "A required new version is available. Please update to keep using LumiLivre.",
   "forceUpdateButton": "Update now",
@@ -282,6 +290,17 @@
     }
   },
   "offlineBannerMessage": "You're offline. Showing saved data.",
+  "apiHealthWakingBanner": "Server waking up… {elapsed}",
+  "@apiHealthWakingBanner": {
+    "placeholders": {
+      "elapsed": {
+        "type": "String"
+      }
+    }
+  },
+  "apiHealthWakingToast": "The server was asleep and is starting up. This can take up to 3 minutes: the app keeps trying on its own and loads the content as soon as it answers.",
+  "apiHealthRestoredToast": "Server is back. Loading the content.",
+  "apiHealthUnreachableBanner": "No answer from the server. Tap to try again.",
   "likeAction": "Like",
   "unlikeAction": "Remove from likes",
   "interestOfflineError": "No connection: your like wasn't saved.",

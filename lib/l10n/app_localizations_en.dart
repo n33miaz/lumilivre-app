@@ -294,6 +294,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get muralSemesterLabel => 'Semester';
 
   @override
+  String muralUnseenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new posts',
+      one: '1 new post',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get forceUpdateTitle => 'Update the app';
 
   @override
@@ -620,6 +631,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get offlineBannerMessage => 'You\'re offline. Showing saved data.';
+
+  @override
+  String apiHealthWakingBanner(String elapsed) {
+    return 'Server waking up… $elapsed';
+  }
+
+  @override
+  String get apiHealthWakingToast =>
+      'The server was asleep and is starting up. This can take up to 3 minutes: the app keeps trying on its own and loads the content as soon as it answers.';
+
+  @override
+  String get apiHealthRestoredToast => 'Server is back. Loading the content.';
+
+  @override
+  String get apiHealthUnreachableBanner =>
+      'No answer from the server. Tap to try again.';
 
   @override
   String get likeAction => 'Like';

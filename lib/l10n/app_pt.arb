@@ -108,6 +108,14 @@
   "muralAdvisorsLabel": "Orientador(es)",
   "muralYearLabel": "Ano",
   "muralSemesterLabel": "Semestre",
+  "muralUnseenCount": "{count, plural, =1{1 publicação nova} other{{count} publicações novas}}",
+  "@muralUnseenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "forceUpdateTitle": "Atualize o aplicativo",
   "forceUpdateMessage": "Uma nova versão obrigatória está disponível. Atualize para continuar usando o LumiLivre.",
   "forceUpdateButton": "Atualizar agora",
@@ -282,6 +290,17 @@
     }
   },
   "offlineBannerMessage": "Você está offline. Exibindo dados salvos.",
+  "apiHealthWakingBanner": "Servidor acordando… {elapsed}",
+  "@apiHealthWakingBanner": {
+    "placeholders": {
+      "elapsed": {
+        "type": "String"
+      }
+    }
+  },
+  "apiHealthWakingToast": "O servidor estava em repouso e está iniciando. Pode levar até 3 minutos: o app tenta sozinho e carrega o conteúdo assim que ele responder.",
+  "apiHealthRestoredToast": "Servidor no ar. Carregando o conteúdo.",
+  "apiHealthUnreachableBanner": "Servidor sem resposta. Toque para tentar de novo.",
   "likeAction": "Curtir",
   "unlikeAction": "Remover dos curtidos",
   "interestOfflineError": "Sem conexão: a curtida não foi salva.",

@@ -108,6 +108,14 @@
   "muralAdvisorsLabel": "Tutor(es)",
   "muralYearLabel": "Año",
   "muralSemesterLabel": "Semestre",
+  "muralUnseenCount": "{count, plural, =1{1 publicación nueva} other{{count} publicaciones nuevas}}",
+  "@muralUnseenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "forceUpdateTitle": "Actualiza la aplicación",
   "forceUpdateMessage": "Hay una nueva versión obligatoria disponible. Actualiza para seguir usando LumiLivre.",
   "forceUpdateButton": "Actualizar ahora",
@@ -282,6 +290,17 @@
     }
   },
   "offlineBannerMessage": "Estás sin conexión. Mostrando los datos guardados.",
+  "apiHealthWakingBanner": "Servidor despertando… {elapsed}",
+  "@apiHealthWakingBanner": {
+    "placeholders": {
+      "elapsed": {
+        "type": "String"
+      }
+    }
+  },
+  "apiHealthWakingToast": "El servidor estaba en reposo y está iniciándose. Puede tardar hasta 3 minutos: la app sigue intentándolo sola y carga el contenido en cuanto responda.",
+  "apiHealthRestoredToast": "El servidor volvió. Cargando el contenido.",
+  "apiHealthUnreachableBanner": "El servidor no responde. Toca para intentarlo de nuevo.",
   "likeAction": "Me gusta",
   "unlikeAction": "Quitar de me gusta",
   "interestOfflineError": "Sin conexión: no se guardó tu me gusta.",

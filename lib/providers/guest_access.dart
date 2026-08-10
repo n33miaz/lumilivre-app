@@ -65,8 +65,11 @@ class GuestAccess {
   bool get rankingTabVisible => _settings.features.ranking;
   bool get canReadRanking => isAuthenticated && rankingTabVisible;
 
-  bool get contentsTabVisible => _settings.features.contents;
-  bool get canReadContents => isAuthenticated && contentsTabVisible;
+  /// Mesma divisão do ranking, sem a palavra "aba": o mural virou botão do
+  /// cabeçalho. O convidado continua vendo o botão, com convite ao login no
+  /// lugar da lista.
+  bool get contentsVisible => _settings.features.contents;
+  bool get canReadContents => isAuthenticated && contentsVisible;
 
   /// Trocar senha, sair da conta e biometria só existem com conta.
   bool get canManageAccount => isAuthenticated;

@@ -15,7 +15,6 @@ import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
 import 'package:lumilivre/widgets/offline_banner.dart';
 
 import 'catalog.dart';
-import 'contents.dart';
 import 'search.dart';
 import 'profile.dart';
 
@@ -26,20 +25,48 @@ class MainNavigator extends StatefulWidget {
   State<MainNavigator> createState() => _MainNavigatorState();
 }
 
-class _MainNavigatorState extends State<MainNavigator> {
+class _MainNavigatorState extends State<MainNavigator>
+    with SingleTickerProviderStateMixin {
   /// Item inativo da barra inferior: a tinta da marca a 60%.
   static final Color _inactiveBrandInk = LumiLivreTheme.onBrand.withValues(
     alpha: 0.6,
   );
 
-  int _selectedIndex = 1;
+  /// As três abas, em ordem. Enquanto o mural era aba, o índice do Perfil era
+  /// uma conta condicional (3 com a feature ligada, 2 sem ela) e a barra
+  /// precisava de `clamp` para não estourar quando a biblioteca desligasse a
+  /// feature no meio da sessão. Com o mural no cabeçalho os índices são fixos —
+  /// e nomeados, porque `== 1` no meio de um `build` não diz que ali é o
+  /// Catálogo.
+  static const int _categoriesIndex = 0;
+  static const int _catalogIndex = 1;
+  static const int _profileIndex = 2;
+
+  int _selectedIndex = _catalogIndex;
   late PageController _pageController;
+
+  /// Opacidade da troca de aba não vizinha (ver [_onItemTapped]). Parada em 1,
+  /// não pinta camada nenhuma.
+  late AnimationController _jumpFade;
+
   String? _onboardedToken;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
+    _jumpFade = AnimationController(
+      vsync: this,
+      duration: AppMotion.normal,
+      value: 1,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _jumpFade.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,16 +124,40 @@ class _MainNavigatorState extends State<MainNavigator> {
     }
   }
 
+  /// Troca de aba pelo toque na barra.
+  ///
+  /// `animateToPage` rola o `PageView` por **todas** as páginas do caminho,
+  /// construindo e mostrando cada uma: do Perfil para Categorias o app piscava
+  /// o Catálogo antes de chegar, e o cabeçalho subia e descia no meio do
+  /// trajeto porque cada página intermediária disparava um `onPageChanged`.
+  ///
+  /// Então cada distância ganha o seu movimento: aba vizinha desliza (é o
+  /// deslize que diz de que lado veio a tela nova) e aba distante salta direto e
+  /// desvanece por cima do salto — nada de intermediário aparece nos dois casos.
   void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
+    final isNeighbour = (index - _selectedIndex).abs() == 1;
+
     setState(() {
       _selectedIndex = index;
     });
 
-    _pageController.animateToPage(
-      index,
-      duration: AppMotion.of(context, AppMotion.page),
-      curve: AppMotion.inOut,
-    );
+    if (isNeighbour) {
+      _pageController.animateToPage(
+        index,
+        duration: AppMotion.of(context, AppMotion.page),
+        curve: AppMotion.inOut,
+      );
+      return;
+    }
+
+    _pageController.jumpToPage(index);
+
+    if (AppMotion.reduced(context)) return;
+    _jumpFade
+      ..value = 0
+      ..animateTo(1, duration: AppMotion.normal, curve: AppMotion.enter);
   }
 
   Widget _buildIcon(String name, int index, {bool isLogo = false}) {
@@ -140,20 +191,10 @@ class _MainNavigatorState extends State<MainNavigator> {
     );
   }
 
-  Widget _buildMuralIcon(int index) {
-    final isActive = _selectedIndex == index;
-    return Icon(
-      isActive ? Icons.campaign : Icons.campaign_outlined,
-      size: 24,
-      color: isActive ? LumiLivreTheme.onBrand : _inactiveBrandInk,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
     final l10n = AppLocalizations.of(context)!;
-    final showContents = GuestAccess.of(context).contentsTabVisible;
 
     if (auth.isInitialPassword) {
       return Scaffold(
@@ -177,37 +218,26 @@ class _MainNavigatorState extends State<MainNavigator> {
       );
     }
 
-    String headerTitle = l10n.appTitle;
-    bool showHeader = _selectedIndex == 0 || _selectedIndex == 1;
-
-    // A aba "Mural" (índice 2) só existe quando a feature de conteúdos está
-    // habilitada. O landing padrão continua sendo o Catálogo (índice 1) em
-    // ambos os cenários.
-    final profileIndex = showContents ? 3 : 2;
+    // O Perfil tem tela própria, sem busca nem título de marca no topo.
+    final showHeader = _selectedIndex != _profileIndex;
 
     final screens = <Widget>[
       const SearchScreen(),
       const CatalogScreen(),
-      if (showContents) const ContentsScreen(),
       const ProfileScreen(),
     ];
 
     final navItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: _buildIcon('search-category', 0),
+        icon: _buildIcon('search-category', _categoriesIndex),
         label: l10n.navCategories,
       ),
       BottomNavigationBarItem(
-        icon: _buildIcon('logo', 1, isLogo: true),
+        icon: _buildIcon('logo', _catalogIndex, isLogo: true),
         label: l10n.navCatalog,
       ),
-      if (showContents)
-        BottomNavigationBarItem(
-          icon: _buildMuralIcon(2),
-          label: l10n.muralTitle,
-        ),
       BottomNavigationBarItem(
-        icon: _buildIcon('profile', profileIndex),
+        icon: _buildIcon('profile', _profileIndex),
         label: l10n.navProfile,
       ),
     ];
@@ -228,14 +258,23 @@ class _MainNavigatorState extends State<MainNavigator> {
           child: Scaffold(
             body: Stack(
               children: [
-                PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                  children: screens,
+                // O arrastar entre páginas continua valendo: é a mesma troca de
+                // aba feita com o dedo, e a barra de baixo acompanha por aqui.
+                FadeTransition(
+                  opacity: _jumpFade,
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      // O toque na barra já acertou o índice antes de mandar a
+                      // página trocar; sem esta guarda, o `setState` redundante
+                      // reconstruía o cabeçalho no meio da transição.
+                      if (index == _selectedIndex) return;
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    children: screens,
+                  ),
                 ),
 
                 AnimatedPositioned(
@@ -244,14 +283,14 @@ class _MainNavigatorState extends State<MainNavigator> {
                   top: showHeader ? 0 : -160,
                   left: 0,
                   right: 0,
-                  child: CustomHeader(title: headerTitle),
+                  child: CustomHeader(title: l10n.appTitle),
                 ),
               ],
             ),
 
             bottomNavigationBar: BottomNavigationBar(
               items: navItems,
-              currentIndex: _selectedIndex.clamp(0, screens.length - 1),
+              currentIndex: _selectedIndex,
               selectedItemColor: LumiLivreTheme.onBrand,
               unselectedItemColor: _inactiveBrandInk,
               onTap: _onItemTapped,

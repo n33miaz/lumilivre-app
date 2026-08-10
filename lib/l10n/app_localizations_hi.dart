@@ -293,6 +293,17 @@ class AppLocalizationsHi extends AppLocalizations {
   String get muralSemesterLabel => 'सत्र';
 
   @override
+  String muralUnseenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नए प्रकाशन',
+      one: '$count नया प्रकाशन',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get forceUpdateTitle => 'ऐप अद्यतन करें';
 
   @override
@@ -620,6 +631,23 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get offlineBannerMessage =>
       'आप ऑफ़लाइन हैं। सहेजा गया डेटा दिख रहा है।';
+
+  @override
+  String apiHealthWakingBanner(String elapsed) {
+    return 'सर्वर जाग रहा है… $elapsed';
+  }
+
+  @override
+  String get apiHealthWakingToast =>
+      'सर्वर निष्क्रिय था और अब चालू हो रहा है। इसमें 3 मिनट तक लग सकते हैं: ऐप अपने आप कोशिश करता रहता है और जवाब मिलते ही सामग्री लोड कर देता है।';
+
+  @override
+  String get apiHealthRestoredToast =>
+      'सर्वर वापस आ गया। सामग्री लोड हो रही है।';
+
+  @override
+  String get apiHealthUnreachableBanner =>
+      'सर्वर से कोई जवाब नहीं। दोबारा कोशिश करने के लिए टैप करें।';
 
   @override
   String get likeAction => 'पसंद करें';

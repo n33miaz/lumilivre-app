@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 
 import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/screens/search_results.dart';
+import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/mural.dart';
 
 class CustomHeader extends StatelessWidget {
   final String title;
@@ -16,6 +18,7 @@ class CustomHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final showMural = GuestAccess.of(context).contentsVisible;
 
     return SizedBox(
       height: 160,
@@ -32,11 +35,15 @@ class CustomHeader extends StatelessWidget {
               ),
             ),
           ),
+          // A busca é pintada ANTES dos botões de propósito, e continua no mesmo
+          // lugar: num `Stack` quem pinta por último fica por cima e recebe o
+          // toque primeiro. Com ela por último, em aparelho de barra de status
+          // alta a busca encostava nos botões do topo e engolia o toque deles.
+          Positioned(top: 90, left: 20, right: 20, child: _SearchField()),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // botão tema
@@ -67,25 +74,41 @@ class CustomHeader extends StatelessWidget {
                     ),
                   ),
                   // título
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2.5, left: 10),
-                    child: Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: LumiLivreTheme.onBrand,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                  //
+                  // Com os dois botões do mesmo tamanho nas pontas, o `Expanded`
+                  // no meio põe o centro do texto no centro da tela — o
+                  // `spaceBetween` de antes centralizava entre um botão de 36 e
+                  // um vão de 48, e o recuo de 10 empurrava mais um pouco. Uma
+                  // linha só: o título traduzido não pode empurrar os botões
+                  // nem crescer o cabeçalho, que tem altura fixa.
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2.5),
+                      child: Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: LumiLivreTheme.onBrand,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  // botão mural
+                  //
+                  // Sem a feature o botão não existe, mas o vão continua: é o
+                  // contrapeso que mantém o título centralizado.
+                  if (showMural)
+                    const MuralButton()
+                  else
+                    const SizedBox(width: MuralButton.diameter),
                 ],
               ),
             ),
           ),
-          // campo de busca
-          Positioned(top: 90, left: 20, right: 20, child: _SearchField()),
         ],
       ),
     );

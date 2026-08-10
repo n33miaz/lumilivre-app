@@ -108,6 +108,14 @@
   "muralAdvisorsLabel": "指导老师",
   "muralYearLabel": "年份",
   "muralSemesterLabel": "学期",
+  "muralUnseenCount": "{count, plural, other{{count} 条新发布}}",
+  "@muralUnseenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "forceUpdateTitle": "请更新应用",
   "forceUpdateMessage": "有新的必需版本可用。请更新后继续使用 LumiLivre。",
   "forceUpdateButton": "立即更新",
@@ -282,6 +290,17 @@
     }
   },
   "offlineBannerMessage": "当前离线，显示已保存的数据。",
+  "apiHealthWakingBanner": "服务器正在唤醒… {elapsed}",
+  "@apiHealthWakingBanner": {
+    "placeholders": {
+      "elapsed": {
+        "type": "String"
+      }
+    }
+  },
+  "apiHealthWakingToast": "服务器此前处于休眠状态，正在启动。最长可能需要 3 分钟：应用会自动重试，并在服务器响应后立即加载内容。",
+  "apiHealthRestoredToast": "服务器已恢复，正在加载内容。",
+  "apiHealthUnreachableBanner": "服务器无响应。点击重试。",
   "likeAction": "收藏",
   "unlikeAction": "取消收藏",
   "interestOfflineError": "无网络连接：收藏未保存。",

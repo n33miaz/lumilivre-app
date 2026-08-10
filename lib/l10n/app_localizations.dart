@@ -626,6 +626,12 @@ abstract class AppLocalizations {
   /// **'Semestre'**
   String get muralSemesterLabel;
 
+  /// No description provided for @muralUnseenCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 publicação nova} other{{count} publicações novas}}'**
+  String muralUnseenCount(int count);
+
   /// No description provided for @forceUpdateTitle.
   ///
   /// In pt, this message translates to:
@@ -1189,6 +1195,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Você está offline. Exibindo dados salvos.'**
   String get offlineBannerMessage;
+
+  /// No description provided for @apiHealthWakingBanner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Servidor acordando… {elapsed}'**
+  String apiHealthWakingBanner(String elapsed);
+
+  /// No description provided for @apiHealthWakingToast.
+  ///
+  /// In pt, this message translates to:
+  /// **'O servidor estava em repouso e está iniciando. Pode levar até 3 minutos: o app tenta sozinho e carrega o conteúdo assim que ele responder.'**
+  String get apiHealthWakingToast;
+
+  /// No description provided for @apiHealthRestoredToast.
+  ///
+  /// In pt, this message translates to:
+  /// **'Servidor no ar. Carregando o conteúdo.'**
+  String get apiHealthRestoredToast;
+
+  /// No description provided for @apiHealthUnreachableBanner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Servidor sem resposta. Toque para tentar de novo.'**
+  String get apiHealthUnreachableBanner;
 
   /// No description provided for @likeAction.
   ///
