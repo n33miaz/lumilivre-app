@@ -4,6 +4,7 @@ import 'package:lumilivre/screens/category_books.dart';
 import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/genre_card.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 
 /// Uma categoria da grade: o gênero que a API entende, a arte e o rótulo.
 ///
@@ -142,11 +143,13 @@ class SearchScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-              child: Text(
-                l10n.browseAllTitle,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              child: SectionRule(
+                child: Text(
+                  l10n.browseAllTitle,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

@@ -53,8 +53,11 @@ class _GenreCardState extends State<GenreCard> {
         curve: AppMotion.enter,
         child: Card(
           clipBehavior: Clip.antiAlias,
-          elevation: _isPressed ? 2 : 5,
-          shadowColor: widget.color.withValues(alpha: 0.4),
+          // Sem sombra, como as outras cartas. Este cartão é um bloco de cor
+          // cheia sobre papel: ele já se separa do fundo sozinho, e a sombra
+          // colorida de raio 5 era a mais pesada da grade. O afundar ao toque
+          // continua sendo dito pela escala.
+          elevation: 0,
           child: Container(
             decoration: BoxDecoration(
               color: widget.color,

@@ -314,17 +314,18 @@ class _RankingScreenState extends State<RankingScreen> {
       ),
       bottomNavigationBar: (myRankItem != null && !amIInTop3)
           ? Container(
+              // A faixa fixa do "meu lugar" se destacava por uma sombra para
+              // cima, que no tema escuro não aparecia. Agora é a régua de 2 px —
+              // a mesma peça que marca cabeçalho de bloco, aqui marcando o
+              // rodapé que não rola com a lista.
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.shadow.withValues(alpha: 0.12),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
+                border: Border(
+                  top: BorderSide(
+                    color: LumiLivreTheme.rule(context),
+                    width: LumiLivreTheme.ruleWidth,
                   ),
-                ],
+                ),
               ),
               child: _RankingCard(
                 item: myRankItem,
@@ -350,7 +351,7 @@ class _RankingCard extends StatelessWidget {
     required this.item,
     required this.position,
     required this.isMe,
-    this.elevation = 2,
+    this.elevation = 0,
     this.backgroundColor,
   });
 
@@ -366,11 +367,13 @@ class _RankingCard extends StatelessWidget {
           (isMe
               ? scheme.primary.withValues(alpha: 0.1)
               : Theme.of(context).cardColor),
+      // Sem o filete, a linha de quem não é o leitor ficava sem contorno nenhum
+      // agora que a carta perdeu a sombra: a lista virava texto solto.
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
         side: isMe
             ? BorderSide(color: scheme.primary, width: 1.5)
-            : BorderSide.none,
+            : BorderSide(color: scheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

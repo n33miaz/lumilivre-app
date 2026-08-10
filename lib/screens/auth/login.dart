@@ -12,6 +12,7 @@ import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/services/api_error.dart';
 import 'package:lumilivre/services/api_health.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -198,12 +199,19 @@ class _LoginScreenState extends State<LoginScreen>
                             BlendMode.srcIn,
                           ),
                         ),
-                        Text(
-                          l10n.appTitle,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
+                        // Cabeçalho de ficha: o nome sobre a régua, e o
+                        // formulário logo abaixo dela. É o mesmo desenho das
+                        // telas de autenticação do web e a única marcação de
+                        // que esta tela precisa — nada mudou de lugar, entrou
+                        // uma linha entre o que já estava um sobre o outro.
+                        SectionRule.below(
+                          child: Text(
+                            l10n.appTitle,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 25),

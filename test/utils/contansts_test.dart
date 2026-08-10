@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
+
+/// Razão de contraste WCAG entre duas cores opacas.
+///
+/// `computeLuminance` já é a luminância relativa da norma; o que falta é a
+/// razão, que é o número comparável com o mínimo AA.
+double _contrastRatio(Color a, Color b) {
+  final first = a.computeLuminance();
+  final second = b.computeLuminance();
+  final lighter = first > second ? first : second;
+  final darker = first > second ? second : first;
+  return (lighter + 0.05) / (darker + 0.05);
+}
 
 void main() {
   group('apiBaseUrl', () {
@@ -25,20 +38,39 @@ void main() {
     test('label deve ser variação clara do primary', () {
       expect(LumiLivreTheme.label, const Color(0xFFC964C5));
     });
-    test('lightBackground deve ser cinza claro', () {
-      expect(LumiLivreTheme.lightBackground, const Color(0xFFF3F4F6));
+    test('lightBackground deve ser o papel (#F8F5EE)', () {
+      expect(LumiLivreTheme.lightBackground, const Color(0xFFF8F5EE));
     });
-    test('darkBackground deve ser escuro', () {
-      expect(LumiLivreTheme.darkBackground, const Color(0xFF111827));
+    test('darkBackground deve ser a tinta (#0B0810)', () {
+      expect(LumiLivreTheme.darkBackground, const Color(0xFF0B0810));
     });
-    test('lightCard deve ser branco', () {
-      expect(LumiLivreTheme.lightCard, Colors.white);
+    test('lightCard deve ser a face da ficha (#FFFDF9)', () {
+      expect(LumiLivreTheme.lightCard, const Color(0xFFFFFDF9));
     });
-    test('darkCard deve ser cinza escuro', () {
-      expect(LumiLivreTheme.darkCard, const Color(0xFF1F2937));
+    test('darkCard deve ser a ficha no escuro (#13101B)', () {
+      expect(LumiLivreTheme.darkCard, const Color(0xFF13101B));
     });
-    test('darkText deve ser branco', () {
-      expect(LumiLivreTheme.darkText, Colors.white);
+    test('darkText deve ser a tinta clara (#F5F1E8)', () {
+      expect(LumiLivreTheme.darkText, const Color(0xFFF5F1E8));
+    });
+
+    /// O neutro do app deixou de ser cinza azulado. É isso que faz o roxo da
+    /// marca ler como cor em vez de mais um degrau do próprio fundo, e é a
+    /// única coisa que precisa continuar valendo se alguém reafinar a paleta:
+    /// no papel o vermelho vem antes do azul; na tinta escura, o inverso (ela é
+    /// arroxeada de propósito, é a família do #762075).
+    test('o neutro claro é quente, e não cinza azulado', () {
+      for (final color in [
+        LumiLivreTheme.lightBackground,
+        LumiLivreTheme.lightCard,
+        LumiLivreTheme.lightText,
+      ]) {
+        expect(
+          color.r,
+          greaterThan(color.b),
+          reason: '$color puxa para o azul',
+        );
+      }
     });
   });
 
@@ -215,6 +247,132 @@ void main() {
         greaterThan(light!.danger.computeLuminance()),
       );
     });
+  });
+
+  /// A paleta é quente, o que não a dispensa de nada: o valor de um neutro é
+  /// justamente quanto texto ele aguenta por cima. Cada par abaixo aparece em
+  /// tela em corpo pequeno, então o piso é o AA de texto normal (4,5:1) — e não
+  /// o de texto grande.
+  group('LumiLivreTheme - contraste AA', () {
+    for (final entry in {
+      'claro': LumiLivreTheme.lightTheme,
+      'escuro': LumiLivreTheme.darkTheme,
+    }.entries) {
+      final name = entry.key;
+      final theme = entry.value;
+      final scheme = theme.colorScheme;
+      final screen = theme.scaffoldBackgroundColor;
+
+      test('tema $name: texto e tinta passam AA sobre papel e carta', () {
+        final pairs = <String, List<Color>>{
+          'texto sobre a carta': [scheme.onSurface, scheme.surface],
+          'texto sobre a tela': [scheme.onSurface, screen],
+          'texto secundário sobre a carta': [
+            scheme.onSurfaceVariant,
+            scheme.surface,
+          ],
+          'texto secundário sobre a tela': [scheme.onSurfaceVariant, screen],
+          // Trilho de abas, pastilha de posição, botão indisponível: é o degrau
+          // mais escuro que ainda recebe texto.
+          'texto secundário sobre a faixa recuada': [
+            scheme.onSurfaceVariant,
+            scheme.surfaceContainerHighest,
+          ],
+          'tinta da marca sobre a carta': [scheme.primary, scheme.surface],
+          'faixa de aviso do sistema': [
+            scheme.onInverseSurface,
+            scheme.inverseSurface,
+          ],
+          'tinta sobre o roxo da marca': [
+            LumiLivreTheme.onBrand,
+            theme.primaryColor,
+          ],
+        };
+
+        pairs.forEach((label, colors) {
+          expect(
+            _contrastRatio(colors[0], colors[1]),
+            greaterThanOrEqualTo(4.5),
+            reason: '$label falha AA no tema $name',
+          );
+        });
+      });
+    }
+
+    /// O selo do empréstimo é a carta com 10% da cor de status por cima, e é
+    /// onde a tinta de status aparece em corpo 12. Medido ali, e não sobre a
+    /// carta limpa, porque é ali que ele é lido.
+    testWidgets('a tinta de status passa AA sobre o próprio selo', (
+      tester,
+    ) async {
+      for (final theme in [
+        LumiLivreTheme.lightTheme,
+        LumiLivreTheme.darkTheme,
+      ]) {
+        late LumiStatusColors status;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Theme(
+              data: theme,
+              child: Builder(
+                builder: (context) {
+                  status = LumiStatusColors.of(context);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+        );
+
+        final card = theme.colorScheme.surface;
+        for (final ink in [status.success, status.warning, status.danger]) {
+          final badge = Color.alphaBlend(ink.withValues(alpha: 0.1), card);
+          expect(
+            _contrastRatio(ink, badge),
+            greaterThanOrEqualTo(4.5),
+            reason: '$ink falha AA sobre o selo de status',
+          );
+        }
+      }
+    });
+  });
+
+  /// Onde havia sombra agora há filete, e filete é forma: a `AppBar` desenha
+  /// uma borda só na base, a carta desenha um contorno inteiro e o modal
+  /// desenha o dele com raio. Borda não-uniforme como forma de `Material` é o
+  /// tipo de coisa que passa na análise e falha ao pintar — aqui ela pinta, nos
+  /// dois brilhos.
+  testWidgets('as superfícies do tema pintam nos dois brilhos', (tester) async {
+    for (final theme in [LumiLivreTheme.lightTheme, LumiLivreTheme.darkTheme]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: theme,
+          home: Scaffold(
+            appBar: AppBar(title: const Text('ficha')),
+            body: const Column(
+              children: [
+                Card(child: SizedBox(height: 40, width: 40)),
+                Divider(),
+                SectionRule(child: Text('bloco')),
+                SectionRule.below(child: Text('cabeçalho')),
+                // Linha de registro: etiqueta e valor alinhados pela base. A
+                // etiqueta embrulha o texto em `Semantics` para o leitor de
+                // tela não soletrar a caixa alta, e quem alinha pela base
+                // precisa que esse embrulho ainda entregue uma linha de base.
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [CotaLabel('cota'), Text('valor')],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    }
   });
 
   group('genreCardColors', () {

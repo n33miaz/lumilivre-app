@@ -21,6 +21,7 @@ import 'package:lumilivre/utils/parsers.dart';
 import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 import 'package:lumilivre/widgets/change_password_dialog.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 
 /// Estados que o botão de empréstimo sabe mostrar.
 ///
@@ -413,10 +414,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             width: 120,
             height: 180,
             child: Card(
-              elevation: 8,
+              // A capa deixa de flutuar: filete de 1 px, como a foto colada na
+              // ficha. A sombra de 8 era a mais pesada do app e não existia em
+              // nenhuma outra superfície.
+              elevation: 0,
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
               child: CachedNetworkImage(
                 imageUrl: (details.imagem != null && details.imagem!.isNotEmpty)
@@ -602,11 +609,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           _InfoRow(label: l10n.bookPublisherLabel, value: details.editora),
           const Divider(height: 32),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                l10n.bookGenresLabel,
-                style: TextStyle(color: Theme.of(context).hintColor),
-              ),
+              // Mesma etiqueta de campo da linha acima: é a coluna esquerda de
+              // uma ficha de catálogo, e ela era um rótulo comum aqui e um
+              // rótulo comum ali, com pesos diferentes.
+              CotaLabel(l10n.bookGenresLabel),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -620,11 +629,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             ],
           ),
           const Divider(height: 32),
-          Text(
-            l10n.bookSynopsisLabel,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          SectionRule(
+            child: Text(
+              l10n.bookSynopsisLabel,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -658,6 +669,11 @@ class _InfoItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
+        // Aqui a etiqueta de cota fica de fora: os três itens dividem uma linha
+        // com largura própria, e o espaçamento entre letras — que é o que faz a
+        // cota ser cota — estoura a linha em espanhol ("Edad recomendada") e em
+        // hindi. Legenda de valor não é rótulo de campo; quem carrega o motivo
+        // nesta tela são as linhas do registro, logo abaixo.
         Text(
           bottom,
           style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
@@ -712,7 +728,7 @@ class _LikeButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(LumiLivreTheme.radiusControl),
         side: BorderSide(color: scheme.outlineVariant),
       ),
-      elevation: 2,
+      elevation: 0,
       child: Tooltip(
         message: label,
         child: InkWell(
@@ -874,10 +890,15 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Alinhados pela base, como as linhas do registro de catálogo do web: a
+    // etiqueta é menor que o valor, e alinhar pelo topo deixaria as duas
+    // flutuando em alturas diferentes.
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       children: [
-        Text(label, style: TextStyle(color: Theme.of(context).hintColor)),
+        CotaLabel(label),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );

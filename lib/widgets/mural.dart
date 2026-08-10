@@ -11,6 +11,7 @@ import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 
 /// Botão do mural no cabeçalho, com selo de publicação não vista.
 ///
@@ -133,21 +134,26 @@ class _MuralModal extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Cabeçalho da ficha: a régua fica embaixo porque acima dela não há
+            // o que separar — é o topo da própria superfície. Antes o título e
+            // a lista se encostavam sem nenhuma linha entre os dois.
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
-              child: Row(
-                children: [
-                  Expanded(child: AppSheetTitle(l10n.muralTitle)),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    // O rótulo de "fechar" já vem traduzido nos cinco idiomas
-                    // com o próprio Material; não precisa de chave nossa.
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+              child: SectionRule.below(
+                child: Row(
+                  children: [
+                    Expanded(child: AppSheetTitle(l10n.muralTitle)),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      // O rótulo de "fechar" já vem traduzido nos cinco idiomas
+                      // com o próprio Material; não precisa de chave nossa.
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
               ),
             ),
             const Flexible(child: _MuralList()),
@@ -372,21 +378,16 @@ class _TypeBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final color = _typeColor(context, content);
 
+    // Etiqueta retangular, e não pastilha: a caixa alta pequena já era a forma
+    // certa, faltava o espaçamento entre letras que faz dela uma cota — e o
+    // canto quase arredondado, que é o que sobrava do desenho de pastilha.
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        _typeLabel(l10n, content).toUpperCase(),
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: color,
-          letterSpacing: 0.4,
-        ),
-      ),
+      child: CotaLabel(_typeLabel(l10n, content), color: color),
     );
   }
 }

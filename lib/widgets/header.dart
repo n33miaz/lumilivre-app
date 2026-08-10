@@ -173,17 +173,17 @@ class _SearchFieldState extends State<_SearchField> {
       height: 54,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadiusValue),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
         // Anel de foco é tinta sobre a superfície do campo, não superfície de
         // marca: com o roxo cravado ele não aparecia no tema escuro.
+        //
+        // Fora do foco a borda era transparente e a separação vinha de uma
+        // sombra difusa — que sobre o rosa do cabeçalho virava um borrão. Agora
+        // o mesmo anel carrega o filete do papel, e o que muda ao focar é só a
+        // cor: nenhuma medida do campo se mexe.
         border: Border.all(
-          color: _isFocused ? theme.colorScheme.primary : Colors.transparent,
+          color: _isFocused
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant,
           width: 2.0,
         ),
       ),

@@ -43,15 +43,13 @@ class BookCard extends StatelessWidget {
       },
       child: Container(
         width: width,
-        decoration: BoxDecoration(
+        // Filete no lugar da sombra, como em toda carta do app. Vem em
+        // `foregroundDecoration` porque a borda de `decoration` é pintada
+        // **antes** do filho, e aqui o filho é a capa sangrando até a margem —
+        // ela cobriria a linha.
+        foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),

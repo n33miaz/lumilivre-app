@@ -13,6 +13,7 @@ import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 
 import '../widgets/change_password_dialog.dart';
 import 'auth/login.dart';
@@ -371,15 +372,13 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // `primaryColor` é superfície de marca (roxo escuro); como tinta sobre a
-    // tela ele sumia no tema escuro. Título de seção usa a tinta da marca.
-    return Text(
-      title,
-      style: TextStyle(
-        color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+    // Etiqueta de gaveta, e não subtítulo: a régua de 2 px é que separa as
+    // seções, então o rótulo pode voltar a ser rótulo — pequeno, em caixa alta e
+    // no texto secundário (4,98:1 sobre a tela clara, 7,6:1 sobre a escura).
+    // Em roxo e corpo 16 ele competia em peso com o conteúdo da própria seção.
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: SectionRule(child: CotaLabel(title)),
     );
   }
 }

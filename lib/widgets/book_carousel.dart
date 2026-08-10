@@ -9,6 +9,7 @@ import 'package:lumilivre/services/api.dart';
 import 'package:lumilivre/utils/app_motion.dart';
 import 'package:lumilivre/utils/incremental_pager.dart';
 import 'package:lumilivre/widgets/book_card.dart';
+import 'package:lumilivre/widgets/section_rule.dart';
 import 'package:provider/provider.dart';
 
 class BookCarousel extends StatefulWidget {
@@ -150,23 +151,29 @@ class _BookCarouselState extends State<BookCarousel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Régua sobre o título: cada gênero vira uma gaveta do fichário, e é o
+        // que separa uma esteira da outra agora que a carta do livro perdeu a
+        // sombra. Nada muda de lugar — a régua entra acima da linha que já
+        // existia, dentro da mesma margem de 16.
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          child: SectionRule(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () => _navigateToCategory(context),
-              ),
-            ],
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () => _navigateToCategory(context),
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 8),

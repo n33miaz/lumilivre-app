@@ -114,13 +114,13 @@ class LoanCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      ),
+      // Mesma ficha das outras cartas: filete de 1 px no lugar da sombra. Em
+      // primeiro plano porque a capa sangra até a margem esquerda e cobriria a
+      // linha se ela fosse pintada junto com o fundo.
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(LumiLivreTheme.radiusCard),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
