@@ -16,6 +16,7 @@ import 'package:lumilivre/l10n/app_localizations.dart';
 import 'package:lumilivre/services/api_health.dart';
 import 'package:lumilivre/utils/constants.dart';
 import 'package:lumilivre/widgets/api_warmup_observer.dart';
+import 'package:lumilivre/widgets/offline_banner.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/force_update.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
@@ -125,6 +126,22 @@ class LumiLivreApp extends StatelessWidget {
                 theme: LumiLivreTheme.lightTheme,
                 darkTheme: LumiLivreTheme.darkTheme,
                 themeMode: themeProvider.currentTheme,
+
+                // A faixa de estado da API morava dentro do `MainNavigator`, ou
+                // seja: só quem já tinha entrado ficava sabendo que o servidor
+                // estava acordando. Quem abre o app pela primeira vez com a
+                // instância hibernando via o toast genérico de erro de conexão e
+                // concluía que o app não funciona — no exato momento em que
+                // bastava esperar.
+                //
+                // Aqui ela cobre tudo: o splash, o gate de versão, o login e o
+                // app inteiro depois dele. Fica em `builder` e não em volta do
+                // `home` porque o login também é rota **empilhada** (o convidado
+                // que toca em "Entrar"), e o `builder` é o único ponto acima do
+                // Navigator — a faixa continua na tela seja qual for a rota, sem
+                // existir duas vezes na árvore.
+                builder: (context, child) =>
+                    OfflineBanner(child: child ?? const SizedBox.shrink()),
 
                 // O gate de versão precede a autenticação: enquanto a
                 // checagem ou o auto-login não terminam, mostramos o loader; se

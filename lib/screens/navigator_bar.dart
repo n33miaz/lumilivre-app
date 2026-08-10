@@ -12,7 +12,6 @@ import 'package:lumilivre/widgets/app_modal.dart';
 import 'package:lumilivre/widgets/guided_tour.dart';
 import 'package:lumilivre/widgets/header.dart';
 import 'package:lumilivre/widgets/mandatory_password_dialog.dart';
-import 'package:lumilivre/widgets/offline_banner.dart';
 
 import 'catalog.dart';
 import 'search.dart';
@@ -254,51 +253,53 @@ class _MainNavigatorState extends State<MainNavigator>
           highlightColor: Colors.transparent,
         ),
 
-        child: OfflineBanner(
-          child: Scaffold(
-            body: Stack(
-              children: [
-                // O arrastar entre páginas continua valendo: é a mesma troca de
-                // aba feita com o dedo, e a barra de baixo acompanha por aqui.
-                FadeTransition(
-                  opacity: _jumpFade,
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      // O toque na barra já acertou o índice antes de mandar a
-                      // página trocar; sem esta guarda, o `setState` redundante
-                      // reconstruía o cabeçalho no meio da transição.
-                      if (index == _selectedIndex) return;
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    children: screens,
-                  ),
+        // A faixa de estado da API subiu para o `builder` do `MaterialApp`
+        // (ver `main.dart`): daqui ela só cobria quem já tinha entrado, e o
+        // primeiro contato de quem abre o app com o servidor hibernando é
+        // justamente a tela de login.
+        child: Scaffold(
+          body: Stack(
+            children: [
+              // O arrastar entre páginas continua valendo: é a mesma troca de
+              // aba feita com o dedo, e a barra de baixo acompanha por aqui.
+              FadeTransition(
+                opacity: _jumpFade,
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    // O toque na barra já acertou o índice antes de mandar a
+                    // página trocar; sem esta guarda, o `setState` redundante
+                    // reconstruía o cabeçalho no meio da transição.
+                    if (index == _selectedIndex) return;
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  children: screens,
                 ),
+              ),
 
-                AnimatedPositioned(
-                  duration: AppMotion.of(context, AppMotion.page),
-                  curve: AppMotion.inOut,
-                  top: showHeader ? 0 : -160,
-                  left: 0,
-                  right: 0,
-                  child: CustomHeader(title: l10n.appTitle),
-                ),
-              ],
-            ),
+              AnimatedPositioned(
+                duration: AppMotion.of(context, AppMotion.page),
+                curve: AppMotion.inOut,
+                top: showHeader ? 0 : -160,
+                left: 0,
+                right: 0,
+                child: CustomHeader(title: l10n.appTitle),
+              ),
+            ],
+          ),
 
-            bottomNavigationBar: BottomNavigationBar(
-              items: navItems,
-              currentIndex: _selectedIndex,
-              selectedItemColor: LumiLivreTheme.onBrand,
-              unselectedItemColor: _inactiveBrandInk,
-              onTap: _onItemTapped,
-              backgroundColor: LumiLivreTheme.primary,
-              type: BottomNavigationBarType.fixed,
-              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-              showUnselectedLabels: false,
-            ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: navItems,
+            currentIndex: _selectedIndex,
+            selectedItemColor: LumiLivreTheme.onBrand,
+            unselectedItemColor: _inactiveBrandInk,
+            onTap: _onItemTapped,
+            backgroundColor: LumiLivreTheme.primary,
+            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            showUnselectedLabels: false,
           ),
         ),
       ),
