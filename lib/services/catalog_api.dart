@@ -75,7 +75,7 @@ class CatalogApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.heavy);
 
       if (response.statusCode == 200) {
         final body = utf8.decode(response.bodyBytes);
@@ -158,7 +158,7 @@ class CatalogApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       // 204 é o que a API responde para página fora do fim da lista.
       if (response.statusCode == 204) {

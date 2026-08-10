@@ -19,6 +19,7 @@ import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
+import 'package:lumilivre/services/api_health.dart';
 import 'package:lumilivre/services/auth_storage.dart';
 
 Widget buildBootstrappedApp() {
@@ -57,6 +58,10 @@ Widget buildBootstrappedApp() {
           return appUpdateProvider;
         },
       ),
+      // O monitor de saúde da API entra desligado: sem `ApiHealth.enable()` ele
+      // não pinga nada e a faixa de aviso fica fora da tela, que é o cenário de
+      // servidor no ar que estes testes descrevem.
+      ChangeNotifierProvider<ApiHealth>.value(value: ApiHealth.instance),
     ],
     child: const LumiLivreApp(),
   );
@@ -66,6 +71,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
+    // Singleton: sem isto um teste que ligasse o monitor deixaria o gancho de
+    // falha instalado para o seguinte.
+    ApiHealth.instance.resetForTest();
     SharedPreferences.setMockInitialValues({});
     FlutterSecureStorage.setMockInitialValues({});
     // Sem o mock, PackageInfo.fromPlatform() nunca completa e o gate de

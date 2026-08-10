@@ -21,7 +21,7 @@ class AppVersionApi {
 
     final response = await _client
         .get(url, headers: await RequestContext.headers())
-        .timeout(const Duration(seconds: 5));
+        .timeout(ApiTimeouts.versionGate);
 
     if (response.statusCode == 200) {
       final data =

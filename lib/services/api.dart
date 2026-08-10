@@ -10,6 +10,8 @@ import '../models/paged_result.dart';
 import '../models/ranking.dart';
 import '../models/user.dart';
 
+import 'api_error.dart';
+import 'api_health.dart';
 import 'app_version_api.dart';
 import 'auth_api.dart';
 import 'book_api.dart';
@@ -22,6 +24,7 @@ import 'settings_api.dart';
 import 'upload_api.dart';
 
 export 'api_error.dart';
+export 'api_health.dart';
 export 'app_version_api.dart';
 export 'auth_api.dart';
 export 'book_api.dart';
@@ -53,6 +56,40 @@ class ApiService {
   final SettingsApi _settings = SettingsApi();
   final UploadApi _upload = UploadApi();
 
+  /// Espera o servidor acordar e refaz a chamada, uma vez.
+  ///
+  /// A instância da API hiberna: a primeira chamada depois do sono estoura o
+  /// prazo e a tela mostrava erro definitivo para uma indisponibilidade que se
+  /// resolve sozinha em minutos. Quem chamou continua pendurado no mesmo
+  /// `Future` — vendo o mesmo carregamento que já veria, com a faixa de aviso
+  /// explicando o motivo e contando o tempo — em vez de precisar sair e entrar
+  /// no app para tentar de novo.
+  ///
+  /// **Só envolve leitura.** Refazer sozinho um `POST` de solicitação de
+  /// empréstimo criaria duas solicitações, e refazer um login três minutos
+  /// depois deixaria a pessoa olhando um botão girando por três minutos. Nesses
+  /// o erro sobe na hora e a tela decide o que dizer; o aquecimento disparado no
+  /// login é o que reduz a chance de eles caírem aqui.
+  ///
+  /// Quando não há monitor ligado (testes), [ApiHealth.waitUntilReachable]
+  /// responde `false` na hora e este método vira o repasse do erro que sempre
+  /// foi.
+  Future<T> _whenServerWakes<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } catch (error) {
+      // `classify` e não `fromError`: o erro já foi reportado ao monitor lá
+      // embaixo, no `catch` do próprio serviço.
+      if (ApiException.classify(error).failure != ApiFailure.network) {
+        rethrow;
+      }
+      if (!await ApiHealth.instance.waitUntilReachable()) {
+        rethrow;
+      }
+      return await call();
+    }
+  }
+
   // --- Auth ---
 
   Future<LoginResponse> login(String user, String password) =>
@@ -80,45 +117,52 @@ class ApiService {
       _catalog.getCatalogLocal();
 
   Future<Map<String, List<Book>>> fetchAndSaveCatalog({String? token}) =>
-      _catalog.fetchAndSaveCatalog(token: token);
+      _whenServerWakes(() => _catalog.fetchAndSaveCatalog(token: token));
 
   Future<PagedResult<Book>> searchBooks(
     String query, {
     int page = 0,
     String? token,
-  }) => _catalog.searchBooks(query, page: page, token: token);
+  }) => _whenServerWakes(
+    () => _catalog.searchBooks(query, page: page, token: token),
+  );
 
   Future<PagedResult<Book>> getBooksByGenre(
     String genre, {
     int page = 0,
     String? token,
-  }) => _catalog.getBooksByGenre(genre, page: page, token: token);
+  }) => _whenServerWakes(
+    () => _catalog.getBooksByGenre(genre, page: page, token: token),
+  );
 
   // --- Contents (Mural) ---
 
   Future<List<AppContent>> getContentFeedLocal() => _content.getFeedLocal();
 
   Future<List<AppContent>> fetchAndSaveContentFeed({required String token}) =>
-      _content.fetchAndSaveFeed(token: token);
+      _whenServerWakes(() => _content.fetchAndSaveFeed(token: token));
 
   Future<void> clearContentFeedCache() => _content.clearFeedCache();
 
   // --- Books ---
 
   Future<BookDetails> getBookDetails(String bookId, {String? token}) =>
-      _book.getBookDetails(bookId, token: token);
+      _whenServerWakes(() => _book.getBookDetails(bookId, token: token));
 
   // --- Loans ---
 
   Future<List<Loan>> getMyLoans(
     String readerRegistrationNumber,
     String token,
-  ) => _loan.getMyLoans(readerRegistrationNumber, token);
+  ) =>
+      _whenServerWakes(() => _loan.getMyLoans(readerRegistrationNumber, token));
 
   Future<List<Loan>> getMyRequests(
     String readerRegistrationNumber,
     String token,
-  ) => _loan.getMyRequests(readerRegistrationNumber, token);
+  ) => _whenServerWakes(
+    () => _loan.getMyRequests(readerRegistrationNumber, token),
+  );
 
   Future<bool> requestLoan(
     String readerRegistrationNumber,
@@ -135,17 +179,19 @@ class ApiService {
   Future<List<Loan>> getMyLoansHistory(
     String readerRegistrationNumber,
     String token,
-  ) => _loan.getMyLoansHistory(readerRegistrationNumber, token);
+  ) => _whenServerWakes(
+    () => _loan.getMyLoansHistory(readerRegistrationNumber, token),
+  );
 
   // --- Readers ---
 
   Future<String?> getReaderName(String registrationNumber, String token) =>
-      _reader.getReaderName(registrationNumber, token);
+      _whenServerWakes(() => _reader.getReaderName(registrationNumber, token));
 
   Future<Map<String, dynamic>?> getReaderData(
     String registrationNumber,
     String token,
-  ) => _reader.getReaderData(registrationNumber, token);
+  ) => _whenServerWakes(() => _reader.getReaderData(registrationNumber, token));
 
   // --- Ranking ---
 
@@ -155,23 +201,26 @@ class ApiService {
     int? moduloId,
     int? turnoId,
     required String token,
-  }) => _ranking.getRanking(
-    top: top,
-    cursoId: cursoId,
-    moduloId: moduloId,
-    turnoId: turnoId,
-    token: token,
+  }) => _whenServerWakes(
+    () => _ranking.getRanking(
+      top: top,
+      cursoId: cursoId,
+      moduloId: moduloId,
+      turnoId: turnoId,
+      token: token,
+    ),
   );
 
   Future<List<FilterItem>> getSimpleList(String endpoint, String token) =>
-      _ranking.getSimpleList(endpoint, token);
+      _whenServerWakes(() => _ranking.getSimpleList(endpoint, token));
 
-  Future<List<FilterItem>> getCursos(String token) => _ranking.getCursos(token);
+  Future<List<FilterItem>> getCursos(String token) =>
+      _whenServerWakes(() => _ranking.getCursos(token));
 
   // --- Settings ---
 
   Future<LibrarySettings> getSettings(String token) =>
-      _settings.getSettings(token);
+      _whenServerWakes(() => _settings.getSettings(token));
 
   // --- Upload ---
 

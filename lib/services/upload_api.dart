@@ -38,9 +38,7 @@ class UploadApi {
     }
 
     try {
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
+      final streamedResponse = await request.send().timeout(ApiTimeouts.upload);
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 204) {

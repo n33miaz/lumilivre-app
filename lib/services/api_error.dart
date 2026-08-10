@@ -42,6 +42,17 @@ enum ApiFailure {
 class ApiException implements Exception {
   const ApiException(this.failure, {this.statusCode, this.apiMessage});
 
+  /// Quem quer saber que uma chamada falhou no transporte.
+  ///
+  /// Todo `catch` de todo serviço do app termina em [fromError] — é o único
+  /// ponto por onde as dez classes de API já passam sem que nenhuma precise
+  /// saber que existe um monitor de saúde escutando. O gancho é um campo, e não
+  /// uma chamada direta ao monitor, por dois motivos: a taxonomia de erro não
+  /// pode depender de quem faz HTTP (o monitor faz, e o erro dele voltaria para
+  /// cá), e sem ninguém instalado — o caso dos testes de unidade — [fromError]
+  /// continua sendo a função pura que sempre foi, sem timer nem rede por trás.
+  static void Function(ApiFailure failure)? onFailure;
+
   final ApiFailure failure;
   final int? statusCode;
 
@@ -138,6 +149,17 @@ class ApiException implements Exception {
   /// distingue "servidor fora do ar" de "resposta corrompida" — ambos caem em
   /// [ApiFailure.network], que é o que a tela precisa saber (oferecer retry).
   factory ApiException.fromError(Object error) {
+    final failure = classify(error);
+    onFailure?.call(failure.failure);
+    return failure;
+  }
+
+  /// A mesma classificação de [fromError], sem avisar [onFailure].
+  ///
+  /// Existe para quem já é o observador (o monitor de saúde) ou para quem está
+  /// tratando um erro que **já foi** reportado — repetir o aviso não erra, mas
+  /// esconde de quem lê o código que ali não nasce informação nova.
+  static ApiException classify(Object error) {
     if (error is ApiException) {
       return error;
     }

@@ -10,6 +10,7 @@ import 'package:lumilivre/providers/auth.dart';
 import 'package:lumilivre/providers/guest_access.dart';
 import 'package:lumilivre/providers/theme.dart';
 import 'package:lumilivre/services/api_error.dart';
+import 'package:lumilivre/services/api_health.dart';
 import 'package:lumilivre/widgets/app_toast.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -34,6 +35,15 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
+
+    // Pede o aquecimento da instância enquanto a pessoa digita: são dezenas de
+    // segundos entre chegar aqui e tocar em "Entrar", e é justamente esse
+    // intervalo que o servidor gasta para sair da hibernação. Sem isto o login
+    // é a primeira chamada a acordar a API — e a que mais dói esperar, porque
+    // dela depende tudo. Não bloqueia nada: o pedido é ignorado se o servidor
+    // já respondeu há pouco (ver ApiHealth.warmUp).
+    ApiHealth.instance.warmUp();
+
     // Eram 800 ms para o formulário aparecer — quase um segundo antes de a tela
     // ficar utilizável. O `AnimationController` já encurta sozinho para 5% da
     // duração quando o sistema pede menos animação, então aqui não há consulta

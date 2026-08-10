@@ -25,7 +25,7 @@ class RankingApi {
     try {
       final response = await http
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final data =
@@ -56,7 +56,7 @@ class RankingApi {
     try {
       final response = await http
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final page =
@@ -80,7 +80,7 @@ class RankingApi {
     try {
       final response = await http
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final data =

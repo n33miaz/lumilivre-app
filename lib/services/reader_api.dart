@@ -14,7 +14,7 @@ class ReaderApi {
     try {
       final response = await http
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final jsonResponse =
@@ -37,7 +37,7 @@ class ReaderApi {
     try {
       final response = await http
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final jsonResponse =

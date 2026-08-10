@@ -67,7 +67,7 @@ class InterestApi {
       final request = clearing
           ? _client.delete(url, headers: headers)
           : _client.post(url, headers: headers);
-      final response = await request.timeout(const Duration(seconds: 10));
+      final response = await request.timeout(ApiTimeouts.standard);
 
       if (response.statusCode != 200) {
         // `fromResponse` e não `fromStatus`: o 403 de senha inicial pendente só
@@ -109,7 +109,7 @@ class InterestApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 204) {
         return PagedResult<BookInterest>.empty(page: page);

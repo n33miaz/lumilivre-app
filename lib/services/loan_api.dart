@@ -24,7 +24,7 @@ class LoanApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         return loanFromJson(utf8.decode(response.bodyBytes));
@@ -47,7 +47,7 @@ class LoanApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         final data =
@@ -75,7 +75,7 @@ class LoanApi {
     try {
       final response = await _client
           .post(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       if (kDebugMode) debugPrint('Erro ao solicitar: $e');
@@ -104,7 +104,7 @@ class LoanApi {
     try {
       final response = await _client
           .post(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return;
@@ -134,7 +134,7 @@ class LoanApi {
     try {
       final response = await _client
           .get(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         return loanFromJson(utf8.decode(response.bodyBytes));

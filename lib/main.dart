@@ -13,7 +13,9 @@ import 'package:lumilivre/providers/settings.dart';
 import 'package:lumilivre/providers/content_provider.dart';
 import 'package:lumilivre/providers/app_update_provider.dart';
 import 'package:lumilivre/l10n/app_localizations.dart';
+import 'package:lumilivre/services/api_health.dart';
 import 'package:lumilivre/utils/constants.dart';
+import 'package:lumilivre/widgets/api_warmup_observer.dart';
 import 'package:lumilivre/screens/auth/login.dart';
 import 'package:lumilivre/screens/force_update.dart';
 import 'package:lumilivre/screens/navigator_bar.dart';
@@ -80,8 +82,13 @@ void main() {
                 return appUpdateProvider;
               },
             ),
+            // `.value` porque o monitor não pertence à árvore: os serviços
+            // reportam falha nele antes de existir tela, e ele precisa
+            // sobreviver a qualquer remontagem. Aqui ele só é exposto a quem
+            // desenha o aviso.
+            ChangeNotifierProvider<ApiHealth>.value(value: ApiHealth.instance),
           ],
-          child: const LumiLivreApp(),
+          child: const ApiWarmUpObserver(child: LumiLivreApp()),
         ),
       );
     },

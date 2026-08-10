@@ -33,7 +33,7 @@ class AuthApi {
             headers: await RequestContext.jsonHeaders(),
             body: jsonEncode({'username': user, 'password': password}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       if (response.statusCode == 200) {
         return loginResponseFromJson(utf8.decode(response.bodyBytes));
@@ -74,7 +74,7 @@ class AuthApi {
               'newPassword': newPassword,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
 
       // 204 é a resposta da API antiga: aceita para o app não quebrar contra um
       // servidor que ainda não subiu a versão nova.
@@ -104,7 +104,7 @@ class AuthApi {
     try {
       final response = await _client
           .post(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
       return response.statusCode == 204 || response.statusCode == 200;
     } catch (e) {
       final failure = ApiException.fromError(e);
@@ -120,7 +120,7 @@ class AuthApi {
     try {
       final response = await _client
           .post(url, headers: await RequestContext.headers(token: token))
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiTimeouts.standard);
       return response.statusCode == 204 || response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) debugPrint('Erro completeTour: $e');
